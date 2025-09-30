@@ -1,6 +1,5 @@
-import { Header } from "@/components/header"
-import { FreelancerFilters } from "@/components/freelancer/freelancer-filters"
-import { FreelancerCard } from "@/components/freelancer/freelancer-card"
+import { FreelancerCard } from "@/components/freelancer/freelancer-card";
+import { FreelancerFilters } from "@/components/freelancer/freelancer-filters";
 
 // Mock data
 const mockFreelancers = [
@@ -52,23 +51,26 @@ const mockFreelancers = [
     isOnline: true,
     isFavorited: false,
   },
-]
+];
 
 export default function FreelancersPage() {
   return (
     <div className="min-h-screen">
-      <Header />
       <main className="container py-8 px-4">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">프리랜서 찾기</h1>
-          <p className="text-muted-foreground">프로젝트에 딱 맞는 전문 프리랜서를 찾아보세요</p>
+          <p className="text-muted-foreground">
+            프로젝트에 딱 맞는 전문 프리랜서를 찾아보세요
+          </p>
         </div>
 
         <div className="space-y-6">
           <FreelancerFilters />
 
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">총 {mockFreelancers.length}명의 프리랜서</p>
+            <p className="text-sm text-muted-foreground">
+              총 {mockFreelancers.length}명의 프리랜서
+            </p>
             <select className="text-sm border rounded-md px-3 py-1">
               <option>추천순</option>
               <option>평점 높은순</option>
@@ -93,5 +95,5 @@ export default function FreelancersPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

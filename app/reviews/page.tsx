@@ -1,6 +1,5 @@
-import { Header } from "@/components/header"
-import { ReviewStats } from "@/components/review/review-stats"
-import { ReviewList } from "@/components/review/review-list"
+import { ReviewList } from "@/components/review/review-list";
+import { ReviewStats } from "@/components/review/review-stats";
 
 // Mock data
 const mockReviewStats = {
@@ -13,7 +12,7 @@ const mockReviewStats = {
     2: 2,
     1: 1,
   },
-}
+};
 
 const mockReviews = [
   {
@@ -96,16 +95,17 @@ const mockReviews = [
     isHelpful: false,
     canEdit: false,
   },
-]
+];
 
 export default function ReviewsPage() {
   return (
     <div className="min-h-screen">
-      <Header />
       <main className="container py-8 px-4">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">리뷰</h1>
-          <p className="text-muted-foreground">프리랜서와 클라이언트의 솔직한 후기를 확인해보세요</p>
+          <p className="text-muted-foreground">
+            프리랜서와 클라이언트의 솔직한 후기를 확인해보세요
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -121,5 +121,5 @@ export default function ReviewsPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

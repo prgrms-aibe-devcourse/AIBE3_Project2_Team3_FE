@@ -1,5 +1,4 @@
-import { Header } from "@/components/header"
-import { ChatLayout } from "@/components/chat/chat-layout"
+import { ChatLayout } from "@/components/chat/chat-layout";
 
 // Mock data
 const mockChats = [
@@ -35,14 +34,16 @@ const mockChats = [
       },
       {
         id: "3",
-        content: "React로 전자상거래 사이트를 만들고 싶습니다. 예산은 500만원 정도 생각하고 있어요.",
+        content:
+          "React로 전자상거래 사이트를 만들고 싶습니다. 예산은 500만원 정도 생각하고 있어요.",
         timestamp: "2024-01-15T09:10:00Z",
         sender: "other" as const,
         type: "text" as const,
       },
       {
         id: "4",
-        content: "좋은 프로젝트네요! 기능 요구사항과 일정에 대해 더 자세히 논의해보면 좋을 것 같습니다.",
+        content:
+          "좋은 프로젝트네요! 기능 요구사항과 일정에 대해 더 자세히 논의해보면 좋을 것 같습니다.",
         timestamp: "2024-01-15T09:15:00Z",
         sender: "me" as const,
         type: "text" as const,
@@ -134,15 +135,14 @@ const mockChats = [
       },
     ],
   },
-]
+];
 
 export default function MessagesPage() {
   return (
     <div className="min-h-screen">
-      <Header />
       <main>
         <ChatLayout chats={mockChats} />
       </main>
     </div>
-  )
+  );
 }
