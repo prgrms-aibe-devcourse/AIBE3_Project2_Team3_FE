@@ -1,6 +1,5 @@
-import { Header } from "@/components/header"
-import { ProjectFilters } from "@/components/project/project-filters"
-import { ProjectCard } from "@/components/project/project-card"
+import { ProjectCard } from "@/components/project/project-card";
+import { ProjectFilters } from "@/components/project/project-filters";
 
 // Mock data
 const mockProjects = [
@@ -61,23 +60,26 @@ const mockProjects = [
     views: 189,
     isFavorited: false,
   },
-]
+];
 
 export default function ProjectsPage() {
   return (
     <div className="min-h-screen">
-      <Header />
       <main className="container py-8 px-4">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">프로젝트 찾기</h1>
-          <p className="text-muted-foreground">당신의 스킬에 맞는 완벽한 프로젝트를 찾아보세요</p>
+          <p className="text-muted-foreground">
+            당신의 스킬에 맞는 완벽한 프로젝트를 찾아보세요
+          </p>
         </div>
 
         <div className="space-y-6">
           <ProjectFilters />
 
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">총 {mockProjects.length}개의 프로젝트</p>
+            <p className="text-sm text-muted-foreground">
+              총 {mockProjects.length}개의 프로젝트
+            </p>
             <select className="text-sm border rounded-md px-3 py-1">
               <option>최신순</option>
               <option>예산 높은순</option>
@@ -101,5 +103,5 @@ export default function ProjectsPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

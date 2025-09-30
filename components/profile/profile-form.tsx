@@ -1,36 +1,46 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { FileUpload } from "@/components/ui/file-upload"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, X, MapPin, DollarSign } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FileUpload } from "@/components/ui/file-upload";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { DollarSign, MapPin, Plus, X } from "lucide-react";
+import { useState } from "react";
 
-export function ProfileForm() {
-  const [skills, setSkills] = useState<string[]>(["React", "TypeScript", "Node.js"])
-  const [newSkill, setNewSkill] = useState("")
-  const [portfolio, setPortfolio] = useState<File[]>([])
+export function ProfileForm({ onSave }: { onSave?: () => void }) {
+  const [skills, setSkills] = useState<string[]>([
+    "React",
+    "TypeScript",
+    "Node.js",
+  ]);
+  const [newSkill, setNewSkill] = useState("");
+  const [portfolio, setPortfolio] = useState<File[]>([]);
 
   const addSkill = () => {
     if (newSkill.trim() && !skills.includes(newSkill.trim())) {
-      setSkills([...skills, newSkill.trim()])
-      setNewSkill("")
+      setSkills([...skills, newSkill.trim()]);
+      setNewSkill("");
     }
-  }
+  };
 
   const removeSkill = (skill: string) => {
-    setSkills(skills.filter((s) => s !== skill))
-  }
+    setSkills(skills.filter((s) => s !== skill));
+  };
 
   const handlePortfolioUpload = (files: File[]) => {
-    setPortfolio((prev) => [...prev, ...files])
-  }
+    setPortfolio((prev) => [...prev, ...files]);
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -49,7 +59,9 @@ export function ProfileForm() {
               <Button variant="outline" size="sm">
                 프로필 사진 변경
               </Button>
-              <p className="text-xs text-muted-foreground">JPG, PNG 파일만 업로드 가능 (최대 5MB)</p>
+              <p className="text-xs text-muted-foreground">
+                JPG, PNG 파일만 업로드 가능 (최대 5MB)
+              </p>
             </div>
           </div>
 
@@ -66,7 +78,11 @@ export function ProfileForm() {
               <Label htmlFor="location">지역</Label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input id="location" className="pl-10" defaultValue="서울, 대한민국" />
+                <Input
+                  id="location"
+                  className="pl-10"
+                  defaultValue="서울, 대한민국"
+                />
               </div>
             </div>
             <div className="space-y-2">
@@ -105,7 +121,11 @@ export function ProfileForm() {
         <CardContent className="space-y-4">
           <div className="flex flex-wrap gap-2">
             {skills.map((skill) => (
-              <Badge key={skill} variant="secondary" className="flex items-center gap-1">
+              <Badge
+                key={skill}
+                variant="secondary"
+                className="flex items-center gap-1"
+              >
                 {skill}
                 <Button
                   variant="ghost"
@@ -143,16 +163,28 @@ export function ProfileForm() {
               <Label htmlFor="hourly-rate">시간당 요금</Label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input id="hourly-rate" className="pl-10" defaultValue="50,000" />
-                <span className="absolute right-3 top-3 text-sm text-muted-foreground">원/시간</span>
+                <Input
+                  id="hourly-rate"
+                  className="pl-10"
+                  defaultValue="50,000"
+                />
+                <span className="absolute right-3 top-3 text-sm text-muted-foreground">
+                  원/시간
+                </span>
               </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="project-rate">프로젝트 최소 요금</Label>
               <div className="relative">
                 <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input id="project-rate" className="pl-10" defaultValue="500,000" />
-                <span className="absolute right-3 top-3 text-sm text-muted-foreground">원</span>
+                <Input
+                  id="project-rate"
+                  className="pl-10"
+                  defaultValue="500,000"
+                />
+                <span className="absolute right-3 top-3 text-sm text-muted-foreground">
+                  원
+                </span>
               </div>
             </div>
           </div>
@@ -176,8 +208,15 @@ export function ProfileForm() {
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button size="lg">프로필 저장</Button>
+        <Button
+          size="lg"
+          onClick={() => {
+            onSave && onSave();
+          }}
+        >
+          프로필 저장
+        </Button>
       </div>
     </div>
-  )
+  );
 }
