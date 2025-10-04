@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-
 import { QueryClientCustomProvider } from "../global/contexts/queryProvider";
 import ClientLayout from "./ClientLayout";
 
