@@ -313,26 +313,16 @@ export interface components {
             username: string;
             password: string;
         };
-        RsDataUserLoginResBody: {
+        RsDataUserDto: {
             resultCode: string;
             message: string;
-            data: components["schemas"]["UserLoginResBody"];
-        };
-        UserLoginResBody: {
-            item: components["schemas"]["UserDto"];
-            accessToken: string;
-            refreshToken: string;
+            data: components["schemas"]["UserDto"];
         };
         UserJoinReqBody: {
             username: string;
             password: string;
             nickname: string;
             email: string;
-        };
-        RsDataUserDto: {
-            resultCode: string;
-            message: string;
-            data: components["schemas"]["UserDto"];
         };
         UserFindPasswordReqBody: {
             username: string;
@@ -399,8 +389,8 @@ export interface components {
             role: string;
             email: string;
             authorities: components["schemas"]["GrantedAuthority"][];
-            admin: boolean;
             authoritiesStringList: string[];
+            admin: boolean;
         };
         UserPasswordUpdateReqBody: {
             oldPassword: string;
@@ -602,7 +592,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["RsDataUserLoginResBody"];
+                    "*/*": components["schemas"]["RsDataUserDto"];
                 };
             };
             /** @description Bad Request */
