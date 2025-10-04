@@ -35,7 +35,7 @@ export const useLogin = () => {
     mutationKey: authQueryKeys.login().queryKey,
     mutationFn: (param: UserLoginReqBody) => login(param),
     onSuccess: (res) => {
-      qc.setQueryData(authQueryKeys.me().queryKey, res.data);
+      qc.setQueryData(authQueryKeys.me().queryKey, res);
     },
   });
 };

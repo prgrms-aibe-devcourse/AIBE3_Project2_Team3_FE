@@ -1,16 +1,19 @@
 "use client";
 
+import { useFetchMe, useLogout } from "@/global/auth/api/useAuthQuery";
 import { useState } from "react";
 
 import Link from "next/link";
 
-import { Bell, Menu, MessageCircle, Search, User, X } from "lucide-react";
+import { Bell, Menu, MessageCircle, User, X } from "lucide-react";
 
 import { Badge } from "./badge";
 import { Button } from "./button";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { data } = useFetchMe();
+  const { mutate, isPending } = useLogout();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -47,31 +50,39 @@ export function Header() {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center space-x-4">
-          <Button variant="ghost" size="sm">
-            <Search className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="sm" className="relative" asChild>
-            <Link href="/messages">
-              <MessageCircle className="h-4 w-4" />
-              <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-xs">
-                2
-              </Badge>
-            </Link>
-          </Button>
-          <Button variant="ghost" size="sm">
-            <Bell className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/auth/login">로그인</Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link href="/auth/signup">회원가입</Link>
-          </Button>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/profile">
-              <User className="h-4 w-4" />
-            </Link>
-          </Button>
+          {!!data ? (
+            <>
+              <Button variant="ghost" size="sm" className="relative" asChild>
+                <Link href="/messages">
+                  <MessageCircle className="h-4 w-4" />
+                  <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-xs">
+                    2
+                  </Badge>
+                </Link>
+              </Button>
+              <Button variant="ghost" size="sm">
+                <Bell className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/profile">
+                  <User className="h-4 w-4" />
+                  {data?.data?.nickname}님
+                </Link>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => mutate()}>
+                {isPending ? "로그아웃 중..." : "로그아웃"}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/auth/login">로그인</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link href="/auth/signup">회원가입</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -115,48 +126,49 @@ export function Header() {
               대시보드
             </Link>
             <Link
-              href="/reviews"
-              className="block text-sm font-medium hover:text-primary transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              리뷰
-            </Link>
-            <Link
               href="/messages"
               className="block text-sm font-medium hover:text-primary transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               메시지
             </Link>
-            <Link
-              href="/how-it-works"
-              className="block text-sm font-medium hover:text-primary transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              이용방법
-            </Link>
             <div className="flex items-center space-x-2 pt-4 border-t">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 bg-transparent"
-                asChild
-              >
-                <Link href="/auth/login">로그인</Link>
-              </Button>
-              <Button size="sm" className="flex-1" asChild>
-                <Link href="/auth/signup">회원가입</Link>
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 bg-transparent"
-                asChild
-              >
-                <Link href="/profile">
-                  <User className="h-4 w-4" />
-                </Link>
-              </Button>
+              {!!data ? (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 bg-transparent"
+                    asChild
+                  >
+                    <Link href="/profile">
+                      <User className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 bg-transparent"
+                    onClick={() => mutate()}
+                  >
+                    {isPending ? "로그아웃 중..." : "로그아웃"}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 bg-transparent"
+                    asChild
+                  >
+                    <Link href="/auth/login">로그인</Link>
+                  </Button>
+                  <Button size="sm" className="flex-1" asChild>
+                    <Link href="/auth/signup">회원가입</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
