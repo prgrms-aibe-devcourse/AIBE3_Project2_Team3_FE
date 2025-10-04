@@ -1,9 +1,13 @@
 import { createQueryKeys } from "@lukemorales/query-key-factory";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { unwrap } from "../../backend/apiV1/unwrap";
-import client from "../../backend/client";
-import { UserJoinReqBody, UserLoginReqBody } from "../types";
+import client from "../backend/client";
+import { unwrap } from "../backend/unwrap";
+import {
+  UserJoinReqBody,
+  UserLoginReqBody,
+  UserModifyReqBody,
+} from "../types/auth.types";
 
 const me = async () => unwrap(await client.GET("/api/v1/users/me"));
 const login = async (param: UserLoginReqBody) =>
@@ -11,12 +15,15 @@ const login = async (param: UserLoginReqBody) =>
 const logout = async () => unwrap(await client.DELETE("/api/v1/users/logout"));
 const join = async (param: UserJoinReqBody) =>
   unwrap(await client.POST("/api/v1/users/join", { body: param }));
+const modifyUser = async (param: UserModifyReqBody) =>
+  unwrap(await client.PUT("/api/v1/users", { body: param }));
 
 export const authQueryKeys = createQueryKeys("auth", {
   me: () => ["me"],
   login: () => ["login"],
   logout: () => ["logout"],
   join: () => ["join"],
+  modifyUser: () => ["modifyUser"],
 });
 
 export const useFetchMe = () => {
@@ -55,6 +62,17 @@ export const useJoin = () => {
   return useMutation({
     mutationKey: authQueryKeys.join().queryKey,
     mutationFn: (param: UserJoinReqBody) => join(param),
-    onSuccess: (res) => {},
+    onSuccess: () => {},
+  });
+};
+
+export const useModifyUser = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: authQueryKeys.modifyUser().queryKey,
+    mutationFn: modifyUser,
+    onSuccess: (res) => {
+      qc.setQueryData(authQueryKeys.me().queryKey, res);
+    },
   });
 };

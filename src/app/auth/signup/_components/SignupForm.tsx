@@ -1,6 +1,6 @@
 "use client";
 
-import { useJoin } from "@/global/auth/api/useAuthQuery";
+import { useJoin } from "@/global/api/useAuthQuery";
 import { Button } from "@/global/components/ui/button";
 import {
   Card,
@@ -12,7 +12,7 @@ import {
 import { Checkbox } from "@/global/components/ui/checkbox";
 import { Input } from "@/global/components/ui/input";
 import { Separator } from "@/global/components/ui/separator";
-import { toast } from "@/global/hooks/use-toast";
+import { toast } from "@/global/hooks/useToast";
 import { Label } from "@radix-ui/react-label";
 import type React from "react";
 import { useState } from "react";
