@@ -1,6 +1,6 @@
 "use client";
 
-import { useLogin } from "@/global/auth/api/useAuthQuery";
+import { useLogin } from "@/global/api/useAuthQuery";
 import { Button } from "@/global/components/ui/button";
 import {
   Card,
@@ -12,7 +12,7 @@ import {
 import { Input } from "@/global/components/ui/input";
 import { Label } from "@/global/components/ui/label";
 import { Separator } from "@/global/components/ui/separator";
-import { toast } from "@/global/hooks/use-toast";
+import { toast } from "@/global/hooks/useToast";
 import { useState } from "react";
 
 import Link from "next/link";
