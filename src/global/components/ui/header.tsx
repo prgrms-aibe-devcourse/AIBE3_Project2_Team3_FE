@@ -1,6 +1,6 @@
 "use client";
 
-import { useFetchMe, useLogout } from "@/global/auth/api/useAuthQuery";
+import { useFetchMe, useLogout } from "@/global/api/useAuthQuery";
 import { useState } from "react";
 
 import Link from "next/link";
@@ -69,7 +69,12 @@ export function Header() {
                   {data?.data?.nickname}님
                 </Link>
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => mutate()}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="cursor-pointer"
+                onClick={() => mutate()}
+              >
                 {isPending ? "로그아웃 중..." : "로그아웃"}
               </Button>
             </>
@@ -143,12 +148,13 @@ export function Header() {
                   >
                     <Link href="/profile">
                       <User className="h-4 w-4" />
+                      마이페이지
                     </Link>
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 bg-transparent"
+                    className="flex-1 bg-transparent cursor-pointer"
                     onClick={() => mutate()}
                   >
                     {isPending ? "로그아웃 중..." : "로그아웃"}

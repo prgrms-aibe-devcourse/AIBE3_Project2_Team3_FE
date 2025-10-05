@@ -260,6 +260,22 @@ export interface components {
             nickname: string;
             email: string;
         };
+        RsDataUserDto: {
+            resultCode: string;
+            message: string;
+            data: components["schemas"]["UserDto"];
+        };
+        UserDto: {
+            /** Format: int64 */
+            id: number;
+            /** Format: date-time */
+            createdDate: string;
+            /** Format: date-time */
+            modifiedDate: string;
+            nickname: string;
+            email: string;
+            role: string;
+        };
         QuestionModifyReqBody: {
             title: string;
             content: string;
@@ -294,17 +310,6 @@ export interface components {
             message: string;
             data: components["schemas"]["QuestionDto"];
         };
-        UserDto: {
-            /** Format: int64 */
-            id: number;
-            /** Format: date-time */
-            createdDate: string;
-            /** Format: date-time */
-            modifiedDate: string;
-            nickname: string;
-            email: string;
-            role: string;
-        };
         OfferModifyReqBody: {
             /** @enum {string} */
             status: "REQUESTED" | "ACCEPTED" | "REJECTED";
@@ -312,11 +317,6 @@ export interface components {
         UserLoginReqBody: {
             username: string;
             password: string;
-        };
-        RsDataUserDto: {
-            resultCode: string;
-            message: string;
-            data: components["schemas"]["UserDto"];
         };
         UserJoinReqBody: {
             username: string;
@@ -389,8 +389,8 @@ export interface components {
             role: string;
             email: string;
             authorities: components["schemas"]["GrantedAuthority"][];
-            authoritiesStringList: string[];
             admin: boolean;
+            authoritiesStringList: string[];
         };
         UserPasswordUpdateReqBody: {
             oldPassword: string;
@@ -429,7 +429,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["RsDataVoid"];
+                    "*/*": components["schemas"]["RsDataUserDto"];
                 };
             };
             /** @description Bad Request */
