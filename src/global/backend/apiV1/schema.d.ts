@@ -20,7 +20,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/questions/modify/{id}": {
+    "/api/v1/questions/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -28,9 +28,30 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        /** 질문 수정 */
         put: operations["modifyQuestion"];
         post?: never;
-        delete?: never;
+        /** 질문 삭제 */
+        delete: operations["deleteQuestion"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 프로젝트 글 단건 조회 */
+        get: operations["getItem"];
+        /** 프로젝트 글 수정 */
+        put: operations["modify_1"];
+        post?: never;
+        /** 프로젝트 글 삭제 */
+        delete: operations["delete_1"];
         options?: never;
         head?: never;
         patch?: never;
@@ -45,10 +66,47 @@ export interface paths {
         };
         get?: never;
         /** 수정 */
-        put: operations["modify_1"];
+        put: operations["modify_2"];
         post?: never;
         /** 삭제 */
-        delete: operations["delete_1"];
+        delete: operations["delete_2"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/freelancers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 프리랜서 글 단건 조회 */
+        get: operations["getItem_1"];
+        /** 프리랜서 글 수정 */
+        put: operations["modify_3"];
+        post?: never;
+        /** 프리랜서 글 삭제 */
+        delete: operations["delete_3"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/answers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** 답변 수정 */
+        put: operations["modifyAnswer"];
+        post?: never;
+        /** 답변 삭제 */
+        delete: operations["deleteAnswer"];
         options?: never;
         head?: never;
         patch?: never;
@@ -102,16 +160,36 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/questions/create": {
+    "/api/v1/questions": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** 질문,답변 조회 */
+        get: operations["getAllQuestionsWithAnswers"];
         put?: never;
+        /** 질문 등록 */
         post: operations["createQuestion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 프로젝트 글 다건 조회 */
+        get: operations["getItems"];
+        put?: never;
+        /** 프로젝트 글 작성 */
+        post: operations["write"];
         delete?: never;
         options?: never;
         head?: never;
@@ -128,7 +206,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** 등록 */
-        post: operations["write"];
+        post: operations["write_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -142,9 +220,28 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["getAll"];
+        /** 프리랜서 글 다건 조회 */
+        get: operations["getItems_1"];
         put?: never;
-        post: operations["create"];
+        /** 프리랜서 글 작성 */
+        post: operations["write_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/answers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 답변 등록 */
+        post: operations["createAnswer"];
         delete?: never;
         options?: never;
         head?: never;
@@ -183,14 +280,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/questions": {
+    "/api/v1/questions/my": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getAllQuestions"];
+        /** 본인이 등록한 문의 및 답변 조회 */
+        get: operations["getMyQuestionsWithAnswers"];
         put?: never;
         post?: never;
         delete?: never;
@@ -199,17 +297,35 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/freelancers/{id}": {
+    "/api/v1/offers/my": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getById"];
+        /** 본인이 등록한 구인 조회 */
+        get: operations["getMyOffers"];
         put?: never;
         post?: never;
-        delete: operations["delete_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/offers/freelancer/{freelancerId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 프리랜서의 구인 조회 */
+        get: operations["getOffersForFreelancer"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -226,22 +342,6 @@ export interface paths {
         put?: never;
         post?: never;
         delete: operations["logout"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/questions/delete/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete: operations["deleteQuestion"];
         options?: never;
         head?: never;
         patch?: never;
@@ -288,10 +388,7 @@ export interface components {
             createdDate: string;
             /** Format: date-time */
             modifiedDate: string;
-            /** Format: int64 */
-            userId: number;
-            /** Format: int64 */
-            questionId: number;
+            user: components["schemas"]["UserDto"];
         };
         QuestionDto: {
             /** Format: int64 */
@@ -310,9 +407,131 @@ export interface components {
             message: string;
             data: components["schemas"]["QuestionDto"];
         };
+        PostModifyDto: {
+            title: string;
+            content: string;
+            isViewed?: boolean;
+        };
+        ProjectModifyDto: {
+            /** Format: date-time */
+            deadlineDate: string;
+            /** Format: date-time */
+            startedDate: string;
+            /** Format: date-time */
+            endedDate: string;
+            hirerType: string;
+            employmentType: string;
+            /** Format: int64 */
+            salary: number;
+            /** Format: int32 */
+            personnel: number;
+            /** Format: int32 */
+            skillLevel: number;
+        };
+        ProjectModifyReqBody: {
+            post: components["schemas"]["PostModifyDto"];
+            project: components["schemas"]["ProjectModifyDto"];
+            regionIds: number[];
+            categoryIds: number[];
+            skillIds: number[];
+        };
+        CategoryDto: {
+            /** Format: int64 */
+            id: number;
+            name: string;
+        };
+        ProjectDto: {
+            /** Format: int64 */
+            id: number;
+            /** Format: date-time */
+            createdDate: string;
+            /** Format: date-time */
+            modifiedDate: string;
+            title: string;
+            content: string;
+            isViewed: boolean;
+            author: components["schemas"]["UserDto"];
+            regions: components["schemas"]["RegionDto"][];
+            categories: components["schemas"]["CategoryDto"][];
+            skills: components["schemas"]["SkillDto"][];
+            /** Format: date-time */
+            deadlineDate: string;
+            /** Format: date-time */
+            startedDate: string;
+            /** Format: date-time */
+            endedDate: string;
+            hirerType: string;
+            employmentType: string;
+            /** Format: int64 */
+            salary: number;
+            /** Format: int32 */
+            personnel: number;
+            /** Format: int32 */
+            skillLevel: number;
+        };
+        RegionDto: {
+            /** Format: int64 */
+            id: number;
+            name: string;
+        };
+        RsDataProjectDto: {
+            resultCode: string;
+            message: string;
+            data: components["schemas"]["ProjectDto"];
+        };
+        SkillDto: {
+            /** Format: int64 */
+            id: number;
+            name: string;
+        };
         OfferModifyReqBody: {
             /** @enum {string} */
             status: "REQUESTED" | "ACCEPTED" | "REJECTED";
+        };
+        FreelancerModifyDto: {
+            /** Format: int64 */
+            salary: number;
+            /** Format: int64 */
+            period: number;
+        };
+        FreelancerModifyReqBody: {
+            post: components["schemas"]["PostModifyDto"];
+            freelancer: components["schemas"]["FreelancerModifyDto"];
+            regionIds: number[];
+            categoryIds: number[];
+            skillIds: number[];
+        };
+        FreelancerDto: {
+            /** Format: int64 */
+            id: number;
+            /** Format: date-time */
+            createdDate: string;
+            /** Format: date-time */
+            modifiedDate: string;
+            title: string;
+            content: string;
+            isViewed: boolean;
+            author: components["schemas"]["UserDto"];
+            regions: components["schemas"]["RegionDto"][];
+            categories: components["schemas"]["CategoryDto"][];
+            skills: components["schemas"]["SkillDto"][];
+            /** Format: int64 */
+            salary: number;
+            /** Format: int64 */
+            period: number;
+        };
+        RsDataFreelancerDto: {
+            resultCode: string;
+            message: string;
+            data: components["schemas"]["FreelancerDto"];
+        };
+        AnswerModifyReqBody: {
+            content: string;
+        };
+        RsDataAnswerDto: {
+            resultCode: string;
+            message: string;
+            data: components["schemas"]["AnswerDto"];
         };
         UserLoginReqBody: {
             username: string;
@@ -331,6 +550,34 @@ export interface components {
         QuestionCreateReqBody: {
             title: string;
             content: string;
+        };
+        PostWriteDto: {
+            title: string;
+            content: string;
+            isViewed?: boolean;
+        };
+        ProjectWriteDto: {
+            /** Format: date-time */
+            deadlineDate: string;
+            /** Format: date-time */
+            startedDate: string;
+            /** Format: date-time */
+            endedDate: string;
+            hirerType: string;
+            employmentType: string;
+            /** Format: int64 */
+            salary: number;
+            /** Format: int32 */
+            personnel: number;
+            /** Format: int32 */
+            skillLevel: number;
+        };
+        ProjectWriteReqBody: {
+            post: components["schemas"]["PostWriteDto"];
+            project: components["schemas"]["ProjectWriteDto"];
+            regionIds: number[];
+            categoryIds: number[];
+            skillIds: number[];
         };
         OfferWriteReqBody: {
             /** Format: int64 */
@@ -354,52 +601,124 @@ export interface components {
             message: string;
             data: components["schemas"]["OfferDto"];
         };
-        Freelancer: {
+        FreelancerWriteDto: {
             /** Format: int64 */
-            id: number;
-            post: components["schemas"]["Post"];
-            salary: string;
-            period: string;
-        };
-        GrantedAuthority: {
-            authority: string;
-        };
-        Post: {
+            salary: number;
             /** Format: int64 */
-            id: number;
-            /** Format: date-time */
-            createdDate: string;
-            /** Format: date-time */
-            modifiedDate: string;
-            user: components["schemas"]["User"];
-            title: string;
+            period: number;
+        };
+        FreelancerWriteReqBody: {
+            post: components["schemas"]["PostWriteDto"];
+            freelancer: components["schemas"]["FreelancerWriteDto"];
+            regionIds: number[];
+            categoryIds: number[];
+            skillIds: number[];
+        };
+        AnswerCreateReqBody: {
             content: string;
-            viewed: boolean;
-        };
-        User: {
             /** Format: int64 */
-            id: number;
-            /** Format: date-time */
-            createdDate: string;
-            /** Format: date-time */
-            modifiedDate: string;
-            username: string;
-            password: string;
-            nickname: string;
-            role: string;
-            email: string;
-            authorities: components["schemas"]["GrantedAuthority"][];
-            admin: boolean;
-            authoritiesStringList: string[];
+            questionId?: number;
         };
         UserPasswordUpdateReqBody: {
             oldPassword: string;
             newPassword: string;
         };
-        RsDataListQuestionDto: {
+        Pageable: {
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            sort: string[];
+        };
+        PageMeta: {
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            /** Format: int64 */
+            totalElements: number;
+            /** Format: int32 */
+            totalPages: number;
+            first: boolean;
+            last: boolean;
+            hasNext: boolean;
+            hasPrevious: boolean;
+            sort: components["schemas"]["SortOrder"][];
+        };
+        PagePayloadQuestionDto: {
+            content: components["schemas"]["QuestionDto"][];
+            page: components["schemas"]["PageMeta"];
+        };
+        SortOrder: {
+            property: string;
+            direction: string;
+        };
+        PagePayloadProjectDto: {
+            content: components["schemas"]["ProjectDto"][];
+            page: components["schemas"]["PageMeta"];
+        };
+        OfferWithPostDto: {
+            /** Format: int64 */
+            offerId: number;
+            offerStatus: string;
+            /** Format: date-time */
+            offerCreatedDate: string;
+            /** Format: int64 */
+            postId: number;
+            /** Format: int64 */
+            postUserId: number;
+            postUserNickname: string;
+            postTitle: string;
+        };
+        PagedResBodyOfferWithPostDto: {
+            content: components["schemas"]["OfferWithPostDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            /** Format: int32 */
+            totalPages: number;
+            /** Format: int64 */
+            totalElements: number;
+            first: boolean;
+            last: boolean;
+        };
+        RsDataPagedResBodyOfferWithPostDto: {
             resultCode: string;
             message: string;
-            data: components["schemas"]["QuestionDto"][];
+            data: components["schemas"]["PagedResBodyOfferWithPostDto"];
+        };
+        OfferWithUserDto: {
+            /** Format: int64 */
+            id: number;
+            status: string;
+            /** Format: date-time */
+            createdDate: string;
+            /** Format: int64 */
+            userId: number;
+            userNickname: string;
+        };
+        PagedResBodyOfferWithUserDto: {
+            content: components["schemas"]["OfferWithUserDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            /** Format: int32 */
+            totalPages: number;
+            /** Format: int64 */
+            totalElements: number;
+            first: boolean;
+            last: boolean;
+        };
+        RsDataPagedResBodyOfferWithUserDto: {
+            resultCode: string;
+            message: string;
+            data: components["schemas"]["PagedResBodyOfferWithUserDto"];
+        };
+        PagePayloadFreelancerDto: {
+            content: components["schemas"]["FreelancerDto"][];
+            page: components["schemas"]["PageMeta"];
         };
     };
     responses: never;
@@ -507,7 +826,135 @@ export interface operations {
             };
         };
     };
+    deleteQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getItem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProjectDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     modify_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProjectModifyReqBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataProjectDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    delete_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    modify_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -542,7 +989,7 @@ export interface operations {
             };
         };
     };
-    delete_1: {
+    delete_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -560,6 +1007,169 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RsDataOfferDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getItem_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FreelancerDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    modify_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FreelancerModifyReqBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataFreelancerDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    delete_3: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    modifyAnswer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnswerModifyReqBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataAnswerDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    deleteAnswer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
                 };
             };
             /** @description Bad Request */
@@ -672,6 +1282,38 @@ export interface operations {
             };
         };
     };
+    getAllQuestionsWithAnswers: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+                searchKeyword?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PagePayloadQuestionDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     createQuestion: {
         parameters: {
             query?: never;
@@ -705,7 +1347,77 @@ export interface operations {
             };
         };
     };
+    getItems: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                searchKeyword?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PagePayloadProjectDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     write: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProjectWriteReqBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataProjectDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    write_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -738,9 +1450,17 @@ export interface operations {
             };
         };
     };
-    getAll: {
+    getItems_1: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                searchKeyword?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -753,7 +1473,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Freelancer"][];
+                    "*/*": components["schemas"]["PagePayloadFreelancerDto"];
                 };
             };
             /** @description Bad Request */
@@ -767,7 +1487,7 @@ export interface operations {
             };
         };
     };
-    create: {
+    write_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -776,7 +1496,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["Freelancer"];
+                "application/json": components["schemas"]["FreelancerWriteReqBody"];
             };
         };
         responses: {
@@ -786,7 +1506,40 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Freelancer"];
+                    "*/*": components["schemas"]["RsDataFreelancerDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    createAnswer: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnswerCreateReqBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataAnswerDto"];
                 };
             };
             /** @description Bad Request */
@@ -862,9 +1615,11 @@ export interface operations {
             };
         };
     };
-    getAllQuestions: {
+    getMyQuestionsWithAnswers: {
         parameters: {
-            query?: never;
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -877,7 +1632,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["RsDataListQuestionDto"];
+                    "*/*": components["schemas"]["PagePayloadQuestionDto"];
                 };
             };
             /** @description Bad Request */
@@ -891,13 +1646,14 @@ export interface operations {
             };
         };
     };
-    getById: {
+    getMyOffers: {
         parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
+            query: {
+                pageable: components["schemas"]["Pageable"];
+                status?: "REQUESTED" | "ACCEPTED" | "REJECTED";
             };
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -908,7 +1664,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Freelancer"];
+                    "*/*": components["schemas"]["RsDataPagedResBodyOfferWithPostDto"];
                 };
             };
             /** @description Bad Request */
@@ -922,12 +1678,15 @@ export interface operations {
             };
         };
     };
-    delete_2: {
+    getOffersForFreelancer: {
         parameters: {
-            query?: never;
+            query: {
+                pageable: components["schemas"]["Pageable"];
+                status?: "REQUESTED" | "ACCEPTED" | "REJECTED";
+            };
             header?: never;
             path: {
-                id: number;
+                freelancerId: number;
             };
             cookie?: never;
         };
@@ -938,7 +1697,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "*/*": components["schemas"]["RsDataPagedResBodyOfferWithUserDto"];
+                };
             };
             /** @description Bad Request */
             400: {
@@ -956,37 +1717,6 @@ export interface operations {
             query?: never;
             header?: never;
             path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataVoid"];
-                };
-            };
-            /** @description Bad Request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataVoid"];
-                };
-            };
-        };
-    };
-    deleteQuestion: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
             cookie?: never;
         };
         requestBody?: never;

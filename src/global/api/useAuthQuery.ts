@@ -10,13 +10,17 @@ import {
 } from "../types/auth.types";
 
 const me = async () => unwrap(await client.GET("/api/v1/users/me"));
-const login = async (param: UserLoginReqBody) =>
-  unwrap(await client.POST("/api/v1/users/login", { body: param }));
+
+const login = async (body: UserLoginReqBody) =>
+  unwrap(await client.POST("/api/v1/users/login", { body }));
+
 const logout = async () => unwrap(await client.DELETE("/api/v1/users/logout"));
-const join = async (param: UserJoinReqBody) =>
-  unwrap(await client.POST("/api/v1/users/join", { body: param }));
-const modifyUser = async (param: UserModifyReqBody) =>
-  unwrap(await client.PUT("/api/v1/users", { body: param }));
+
+const join = async (body: UserJoinReqBody) =>
+  unwrap(await client.POST("/api/v1/users/join", { body }));
+
+const modifyUser = async (body: UserModifyReqBody) =>
+  unwrap(await client.PUT("/api/v1/users", { body }));
 
 export const authQueryKeys = createQueryKeys("auth", {
   me: () => ["me"],
@@ -40,7 +44,7 @@ export const useLogin = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationKey: authQueryKeys.login().queryKey,
-    mutationFn: (param: UserLoginReqBody) => login(param),
+    mutationFn: login,
     onSuccess: (res) => {
       qc.setQueryData(authQueryKeys.me().queryKey, res);
     },
@@ -61,7 +65,7 @@ export const useLogout = () => {
 export const useJoin = () => {
   return useMutation({
     mutationKey: authQueryKeys.join().queryKey,
-    mutationFn: (param: UserJoinReqBody) => join(param),
+    mutationFn: join,
     onSuccess: () => {},
   });
 };
