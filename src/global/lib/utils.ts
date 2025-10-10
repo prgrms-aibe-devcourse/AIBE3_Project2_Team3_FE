@@ -10,6 +10,8 @@ import {
 import { ko } from "date-fns/locale";
 import { twMerge } from "tailwind-merge";
 
+import { UnitOption } from "../types/common.types";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -54,4 +56,20 @@ export function formatTimeAgo(input: InputDate): string {
 
   const abs = format(date, "yyyy.MM.dd HH:mm", { locale: ko });
   return abs; // 7일 이상은 절대 날짜
+}
+
+export function toUnit(unitOption: UnitOption[], amount: number, unit: string) {
+  const f = unitOption.find((o) => o.value === unit)!.factor;
+  if (!f) return null;
+  return amount * f;
+}
+
+export function fromUnit(
+  unitOption: UnitOption[],
+  total: number,
+  unit: string,
+) {
+  const f = unitOption.find((o) => o.value === unit)!.factor;
+  if (!f) return null;
+  return Math.trunc(total / f);
 }

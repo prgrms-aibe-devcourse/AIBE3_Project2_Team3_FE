@@ -23,9 +23,7 @@ import { useState } from "react";
 import { Filter, Search, X } from "lucide-react";
 
 export function ProjectFilters() {
-  const { page, size, sort, search, setSearch, reset } = useProjectListStore(
-    (state) => state,
-  );
+  const { search, setSearch, reset } = useProjectListStore((state) => state);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [budgetRange, setBudgetRange] = useState([0, 10000000]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);

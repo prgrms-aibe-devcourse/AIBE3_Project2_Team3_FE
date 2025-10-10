@@ -28,13 +28,11 @@ export function FreelancerFilters() {
   const RATE_STEP = 10_000;
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [rateRange, setRateRange] = useState([0, MAX_RATE]);
-  const { page, size, sort, search, setSearch, reset } = useFreelancerListStore(
-    (state) => state,
-  );
+  const { search, setSearch, reset } = useFreelancerListStore((state) => state);
 
   return (
     <div className="space-y-4">
-      {/* Search Bar */}
+      {/* 검색 */}
       <div className="flex gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -55,7 +53,7 @@ export function FreelancerFilters() {
         </Button>
       </div>
 
-      {/* Filters Panel */}
+      {/* 필터 패널 */}
       {isFilterOpen && (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-4">
@@ -75,12 +73,12 @@ export function FreelancerFilters() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Category */}
+              {/* 카테고리 */}
               <div className="space-y-2">
-                <Label>전문 분야</Label>
+                <Label>카테고리</Label>
                 <Select>
                   <SelectTrigger>
-                    <SelectValue placeholder="분야 선택" />
+                    <SelectValue placeholder="카테고리 선택" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="development">개발</SelectItem>
@@ -92,7 +90,7 @@ export function FreelancerFilters() {
                 </Select>
               </div>
 
-              {/* Location */}
+              {/* 지역 */}
               <div className="space-y-2">
                 <Label>지역</Label>
                 <Select>
@@ -109,7 +107,7 @@ export function FreelancerFilters() {
                 </Select>
               </div>
 
-              {/* Experience Level */}
+              {/* 경력 (스킬 레벨) */}
               <div className="space-y-2">
                 <Label>경력 수준</Label>
                 <Select>
@@ -126,7 +124,7 @@ export function FreelancerFilters() {
               </div>
             </div>
 
-            {/* Hourly Rate Range */}
+            {/* 비용 */}
             <div className="space-y-4">
               <Label>비용</Label>
               <div className="px-2">
@@ -144,7 +142,7 @@ export function FreelancerFilters() {
               </div>
             </div>
 
-            {/* Skills */}
+            {/* 기술 */}
             <div className="space-y-3">
               <Label>보유 스킬</Label>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">

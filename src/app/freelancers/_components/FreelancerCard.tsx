@@ -8,6 +8,7 @@ import {
 import { Badge } from "@/global/components/ui/badge";
 import { Button } from "@/global/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/global/components/ui/card";
+import { formatCustomDuration } from "@/global/lib/utils";
 import { FreelancerDto } from "@/global/types/freelancer.types";
 import { MouseEvent, useState } from "react";
 
@@ -37,6 +38,7 @@ export function FreelancerCard({ freelancer }: FreelancerCardProps) {
       onClick={clickCard}
     >
       <CardHeader className="pb-4">
+        {/* 카테고리 */}
         <div className="flex items-center gap-2 mb-2">
           <Tag className="h-4 w-4 mr-1" />
           {freelancer.categories.slice(0, 4).map((category) => (
@@ -50,6 +52,7 @@ export function FreelancerCard({ freelancer }: FreelancerCardProps) {
             </Badge>
           )}
         </div>
+        {/* 제목 내용 */}
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h3 className="font-semibold text-lg hover:text-primary transition-colors line-clamp-2">
@@ -73,7 +76,7 @@ export function FreelancerCard({ freelancer }: FreelancerCardProps) {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Skills */}
+        {/* 기술 */}
         <div className="flex flex-wrap gap-2">
           {freelancer.skills.slice(0, 3).map((skill) => (
             <Badge key={skill.id} variant="secondary" className="text-xs">
@@ -87,7 +90,7 @@ export function FreelancerCard({ freelancer }: FreelancerCardProps) {
           )}
         </div>
 
-        {/* 프리랜서 Details */}
+        {/* 지역 */}
         <div className="flex text-sm">
           <div className="flex items-center text-muted-foreground">
             <MapPin className="h-4 w-4 mr-2" />
@@ -104,18 +107,18 @@ export function FreelancerCard({ freelancer }: FreelancerCardProps) {
           </div>
         </div>
 
-        {/* 프리랜서 기간 */}
+        {/* 제작 기간 */}
         <div className="flex items-center text-muted-foreground">
           <Clock className="h-4 w-4 mr-2" />
-          {freelancer.period} 일
+          작업 기간: {formatCustomDuration(0, freelancer.period)}
         </div>
 
         {/* 가격 */}
         <div className="text-lg font-semibold text-primary">
-          {freelancer.salary} 원
+          {freelancer.salary.toLocaleString()} 원
         </div>
 
-        {/* Client Info */}
+        {/* 작성자 정보 */}
         <div className="flex items-center justify-between pt-4 border-t">
           <div className="flex items-center space-x-3">
             <Avatar className="h-8 w-8">

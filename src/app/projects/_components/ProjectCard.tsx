@@ -39,6 +39,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
       onClick={clickCard}
     >
       <CardHeader className="pb-4">
+        {/* 카테고리 */}
         <div className="flex items-center gap-2 mb-2">
           <Tag className="h-4 w-4 mr-1" />
           {project.categories.slice(0, 4).map((category) => (
@@ -52,6 +53,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
             </Badge>
           )}
         </div>
+        {/* 제목 내용 */}
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h3 className="font-semibold text-lg hover:text-primary transition-colors line-clamp-2">
@@ -75,7 +77,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Skills */}
+        {/*기술 */}
         <div className="flex flex-wrap gap-2">
           {project.skills.slice(0, 3).map((skill) => (
             <Badge key={skill.id} variant="secondary" className="text-xs">
@@ -89,7 +91,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
           )}
         </div>
 
-        {/* Project Details */}
+        {/* 지역 */}
         <div className="flex text-sm">
           <div className="flex items-center text-muted-foreground">
             <MapPin className="h-4 w-4 mr-2" />
@@ -106,18 +108,19 @@ export function ProjectCard({ project }: ProjectCardProps) {
           </div>
         </div>
 
-        {/* 프리랜서 기간 */}
+        {/* 고용 기간 */}
         <div className="flex items-center text-muted-foreground">
           <Clock className="h-4 w-4 mr-2" />
+          프로젝트 기간:{" "}
           {formatCustomDuration(project.startedDate, project.endedDate)}
         </div>
 
         {/* 가격 */}
         <div className="text-lg font-semibold text-primary">
-          {project.salary} 원
+          {project.salary.toLocaleString()} 원
         </div>
 
-        {/* Client Info */}
+        {/* 작성자 정보 */}
         <div className="flex items-center justify-between pt-4 border-t">
           <div className="flex items-center space-x-3">
             <Avatar className="h-8 w-8">

@@ -9,13 +9,11 @@ interface FreelancerListState {
 }
 
 interface FreelancerListAction {
-  action: {
-    setPage: (page: number) => void;
-    setSize: (size: number) => void;
-    setSort: (sort: string[]) => void;
-    setSearch: (search: string) => void;
-    reset: () => void;
-  };
+  setPage: (page: number) => void;
+  setSize: (size: number) => void;
+  setSort: (sort: string[]) => void;
+  setSearch: (search: string) => void;
+  reset: () => void;
 }
 
 const initState: FreelancerListState = {
@@ -30,13 +28,11 @@ export const useFreelancerListStore = create(
     combine(
       initState,
       (set): FreelancerListAction => ({
-        action: {
-          setPage: (page) => set({ page }),
-          setSize: (size) => set({ size }),
-          setSort: (sort) => set({ sort, page: 0 }),
-          setSearch: (search) => set({ search }),
-          reset: () => set(initState),
-        },
+        setPage: (page) => set({ page }),
+        setSize: (size) => set({ size }),
+        setSort: (sort) => set({ sort, page: 0 }),
+        setSearch: (search) => set({ search }),
+        reset: () => set(initState),
       }),
     ),
   ),

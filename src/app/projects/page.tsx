@@ -1,12 +1,15 @@
 "use client";
 
 import { useListProject } from "@/global/api/useProjectQuery";
+import { PaginationBar } from "@/global/components/ui/paginationBar";
+import { useProjectListStore } from "@/global/stores/useProjectListStore";
 
 import { ProjectCard } from "./_components/ProjectCard";
 import { ProjectFilters } from "./_components/ProjectFilters";
 
 export default function ProjectsPage() {
   const { data, isLoading } = useListProject();
+  const { page, setPage } = useProjectListStore((state) => state);
   return (
     <div className="min-h-screen">
       <main className="container py-8 px-4">
@@ -37,11 +40,14 @@ export default function ProjectsPage() {
               ))}
           </div>
 
-          {/* Load More */}
           <div className="text-center pt-8">
-            <button className="px-6 py-2 border rounded-md hover:bg-accent transition-colors">
-              더 많은 프로젝트 보기
-            </button>
+            {data && (
+              <PaginationBar
+                pageIndex={page}
+                pageCount={data.page.totalPages}
+                onPageIndexChange={setPage}
+              />
+            )}
           </div>
         </div>
       </main>

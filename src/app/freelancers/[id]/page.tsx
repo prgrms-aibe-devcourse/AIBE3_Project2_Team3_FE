@@ -43,8 +43,7 @@ export default function FreelancerDetailPage({
   params: Promise<{ id: number }>;
 }) {
   const { id } = use(params);
-  const { data: freelancer, isLoading } = useDetailFreelancer(id);
-  const DAY_TO_MILLISECONDS = 24 * 60 * 60 * 1000;
+  const { data: freelancer } = useDetailFreelancer(id);
   const [isFavorited, setIsFavorited] = useState(false);
   if (!freelancer) return <>loading중</>;
   return (
@@ -102,10 +101,7 @@ export default function FreelancerDetailPage({
                     <div className="flex items-center">
                       <Clock className="h-4 w-4 mr-2" />
                       작업기간:&nbsp;
-                      {formatCustomDuration(
-                        0,
-                        freelancer.period * DAY_TO_MILLISECONDS,
-                      )}
+                      {formatCustomDuration(0, freelancer.period)}
                     </div>
                     <div className="flex items-center">
                       <Users className="h-4 w-4 mr-2" />
