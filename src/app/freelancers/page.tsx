@@ -1,13 +1,15 @@
 "use client";
 
 import { useListFreelancer } from "@/global/api/useFreelancerQuery";
+import { PaginationBar } from "@/global/components/ui/paginationBar";
+import { useFreelancerListStore } from "@/global/stores/useFreelancerListStore";
 
 import { FreelancerCard } from "./_components/FreelancerCard";
 import { FreelancerFilters } from "./_components/FreelancerFilters";
 
 export default function FreelancersPage() {
   const { data, isLoading } = useListFreelancer();
-  console.log(data);
+  const { page, setPage } = useFreelancerListStore((state) => state);
   return (
     <div className="min-h-screen">
       <main className="container py-8 px-4">
@@ -41,12 +43,15 @@ export default function FreelancersPage() {
               ))}
           </div>
 
-          {/* Load More (무한스크롤) */}
-          {/* <div className="text-center pt-8">
-            <button className="px-6 py-2 border rounded-md hover:bg-accent transition-colors">
-              더 많은 프리랜서 보기
-            </button>
-          </div> */}
+          <div className="text-center pt-8">
+            {data && (
+              <PaginationBar
+                pageIndex={page}
+                pageCount={data.page.totalPages}
+                onPageIndexChange={setPage}
+              />
+            )}
+          </div>
         </div>
       </main>
     </div>
