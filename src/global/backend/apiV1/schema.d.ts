@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reviews/{reviewId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getOne"];
+        put: operations["modify_1"];
+        post?: never;
+        delete: operations["delete_1"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/questions/{id}": {
         parameters: {
             query?: never;
@@ -48,10 +64,10 @@ export interface paths {
         /** 프로젝트 글 단건 조회 */
         get: operations["getItem"];
         /** 프로젝트 글 수정 */
-        put: operations["modify_1"];
+        put: operations["modify_2"];
         post?: never;
         /** 프로젝트 글 삭제 */
-        delete: operations["delete_1"];
+        delete: operations["delete_2"];
         options?: never;
         head?: never;
         patch?: never;
@@ -66,10 +82,10 @@ export interface paths {
         };
         get?: never;
         /** 수정 */
-        put: operations["modify_2"];
+        put: operations["modify_3"];
         post?: never;
         /** 삭제 */
-        delete: operations["delete_2"];
+        delete: operations["delete_3"];
         options?: never;
         head?: never;
         patch?: never;
@@ -85,10 +101,10 @@ export interface paths {
         /** 프리랜서 글 단건 조회 */
         get: operations["getItem_1"];
         /** 프리랜서 글 수정 */
-        put: operations["modify_3"];
+        put: operations["modify_4"];
         post?: never;
         /** 프리랜서 글 삭제 */
-        delete: operations["delete_3"];
+        delete: operations["delete_4"];
         options?: never;
         head?: never;
         patch?: never;
@@ -154,6 +170,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["findPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reviews/{contractId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -231,6 +263,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/chat/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["leave"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat/join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["join_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/answers": {
         parameters: {
             query?: never;
@@ -262,6 +326,23 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["updatePassword"];
+        trace?: never;
+    };
+    "/api/v1/projects/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** 프로젝트 상태 변경 */
+        patch: operations["changeStatus"];
         trace?: never;
     };
     "/api/v1/users/me": {
@@ -297,6 +378,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 프로젝트 글 검색 및 다건조회 */
+        get: operations["getProjects"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/offers/my": {
         parameters: {
             query?: never;
@@ -323,6 +421,22 @@ export interface paths {
         };
         /** 프리랜서의 구인 조회 */
         get: operations["getOffersForFreelancer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat/rooms/{roomId}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["history"];
         put?: never;
         post?: never;
         delete?: never;
@@ -375,6 +489,26 @@ export interface components {
             nickname: string;
             email: string;
             role: string;
+        };
+        ReviewReqBody: {
+            /** Format: int32 */
+            rating: number;
+            comment: string;
+        };
+        ReviewDto: {
+            /** Format: int64 */
+            id: number;
+            writerNickname: string;
+            /** Format: int32 */
+            rating: number;
+            comment: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        RsDataReviewDto: {
+            resultCode: string;
+            message: string;
+            data: components["schemas"]["ReviewDto"];
         };
         QuestionModifyReqBody: {
             title: string;
@@ -614,6 +748,10 @@ export interface components {
             categoryIds: number[];
             skillIds: number[];
         };
+        JoinRoomReqBody: {
+            /** Format: int64 */
+            roomId: number;
+        };
         AnswerCreateReqBody: {
             content: string;
             /** Format: int64 */
@@ -720,6 +858,51 @@ export interface components {
             content: components["schemas"]["FreelancerDto"][];
             page: components["schemas"]["PageMeta"];
         };
+        ChatMessageResBody: {
+            /** Format: int64 */
+            MessageId: number;
+            /** Format: int64 */
+            roomId: number;
+            /** Format: int64 */
+            senderUserId: number;
+            content: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        PageChatMessageResBody: {
+            /** Format: int64 */
+            totalElements: number;
+            /** Format: int32 */
+            totalPages: number;
+            /** Format: int32 */
+            size: number;
+            content: components["schemas"]["ChatMessageResBody"][];
+            /** Format: int32 */
+            number: number;
+            first: boolean;
+            last: boolean;
+            /** Format: int32 */
+            numberOfElements: number;
+            sort: components["schemas"]["SortObject"];
+            pageable: components["schemas"]["PageableObject"];
+            empty: boolean;
+        };
+        PageableObject: {
+            /** Format: int64 */
+            offset: number;
+            sort: components["schemas"]["SortObject"];
+            paged: boolean;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            pageNumber: number;
+            unpaged: boolean;
+        };
+        SortObject: {
+            empty: boolean;
+            sorted: boolean;
+            unsorted: boolean;
+        };
     };
     responses: never;
     parameters: never;
@@ -767,6 +950,103 @@ export interface operations {
             query?: never;
             header?: never;
             path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reviewId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataReviewDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    modify_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reviewId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewReqBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataReviewDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    delete_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reviewId: number;
+            };
             cookie?: never;
         };
         requestBody?: never;
@@ -888,7 +1168,7 @@ export interface operations {
             };
         };
     };
-    modify_1: {
+    modify_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -923,7 +1203,7 @@ export interface operations {
             };
         };
     };
-    delete_1: {
+    delete_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -954,7 +1234,7 @@ export interface operations {
             };
         };
     };
-    modify_2: {
+    modify_3: {
         parameters: {
             query?: never;
             header?: never;
@@ -989,7 +1269,7 @@ export interface operations {
             };
         };
     };
-    delete_2: {
+    delete_3: {
         parameters: {
             query?: never;
             header?: never;
@@ -1051,7 +1331,7 @@ export interface operations {
             };
         };
     };
-    modify_3: {
+    modify_4: {
         parameters: {
             query?: never;
             header?: never;
@@ -1086,7 +1366,7 @@ export interface operations {
             };
         };
     };
-    delete_3: {
+    delete_4: {
         parameters: {
             query?: never;
             header?: never;
@@ -1269,6 +1549,41 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contractId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewReqBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataReviewDto"];
                 };
             };
             /** @description Bad Request */
@@ -1520,6 +1835,68 @@ export interface operations {
             };
         };
     };
+    leave: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JoinRoomReqBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    join_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JoinRoomReqBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     createAnswer: {
         parameters: {
             query?: never;
@@ -1565,6 +1942,39 @@ export interface operations {
                 "application/json": components["schemas"]["UserPasswordUpdateReqBody"];
             };
         };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    changeStatus: {
+        parameters: {
+            query?: {
+                status?: string;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description OK */
             200: {
@@ -1646,6 +2056,41 @@ export interface operations {
             };
         };
     };
+    getProjects: {
+        parameters: {
+            query?: {
+                status?: string;
+                regionIds?: number[];
+                categoryIds?: number[];
+                skillIds?: number[];
+                keyword?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProjectDto"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     getMyOffers: {
         parameters: {
             query: {
@@ -1699,6 +2144,40 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RsDataPagedResBodyOfferWithUserDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    history: {
+        parameters: {
+            query?: {
+                page?: number;
+                size?: number;
+            };
+            header?: never;
+            path: {
+                roomId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageChatMessageResBody"];
                 };
             };
             /** @description Bad Request */

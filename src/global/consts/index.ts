@@ -13,3 +13,19 @@ export const SALARY_UNITS = [
   { value: "krw_1k", label: "천원", factor: 1_000 },
   { value: "krw_10k", label: "만원", factor: 10_000 },
 ];
+
+export type ExperienceRange = {
+  id: string;
+  label: string;
+  min: number; // 포함
+  max?: number; // 미포함 (없으면 상한 없음)
+  level: number;
+};
+
+export const EXPERIENCE_OPTIONS: ExperienceRange[] = [
+  { id: "rookie", label: "0–1년 (루키/주니어)", min: 0, max: 1, level: 1 },
+  { id: "junior", label: "1–3년 (주니어)", min: 1, max: 3, level: 2 },
+  { id: "middle", label: "3–6년 (미들)", min: 3, max: 6, level: 3 },
+  { id: "senior", label: "6–10년 (시니어)", min: 6, max: 10, level: 4 },
+  { id: "lead", label: "10년 이상 (리드+)", min: 10, level: 5 },
+];

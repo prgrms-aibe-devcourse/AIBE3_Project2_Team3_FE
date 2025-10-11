@@ -1,7 +1,9 @@
 "use client";
 
+import { CustomDatepicker } from "@/global/components/ui/CustomDatepicker";
 import { MultiChildSelect } from "@/global/components/ui/MultiChildSelect";
 import { MultiSearchSelect } from "@/global/components/ui/MultiSearchSelect";
+import { NumberInput } from "@/global/components/ui/NumberInput";
 import { UnitInput } from "@/global/components/ui/UnitInput";
 import { Button } from "@/global/components/ui/button";
 import {
@@ -13,8 +15,19 @@ import {
 import { Checkbox } from "@/global/components/ui/checkbox";
 import { Input } from "@/global/components/ui/input";
 import { Label } from "@/global/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/global/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/global/components/ui/select";
 import { Textarea } from "@/global/components/ui/textarea";
-import { SALARY_UNITS, TIME_UNITS } from "@/global/consts";
+import { EXPERIENCE_OPTIONS, SALARY_UNITS } from "@/global/consts";
+import { toUnit } from "@/global/lib/utils";
+import { EmploymentType, HirerType } from "@/global/types/project.types";
+import { addDays, startOfDay } from "date-fns";
 import { useState } from "react";
 
 import { sample } from "./test";
@@ -35,12 +48,21 @@ export function ProjectForm({ onSubmit, onCancel }: any) {
     { id: 5, name: "Node.js" },
     { id: 6, name: "Spring" },
   ]);
-  const [duration, setDuration] = useState({ amount: 7, unit: "day" });
+  const [hirerType, setHirerType] = useState<HirerType>("individual");
+  const [employmentType, setEmploymentType] =
+    useState<EmploymentType>("onsite");
   const [salary, setSalary] = useState({ amount: 1, unit: "krw_10k" });
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-  };
+  const [personnel, setPersonel] = useState({ amount: 0, unit: "person" });
+  const [skillLevel, setSkillLevel] = useState(EXPERIENCE_OPTIONS[0].id);
+  const [deadlineDate, setDeadlineDate] = useState<Date>(
+    startOfDay(addDays(new Date(), 7)),
+  );
+  const [startedDate, setStartedDate] = useState<Date>(
+    startOfDay(addDays(new Date(), 14)),
+  );
+  const [endedDate, setEndedDate] = useState<Date>(
+    startOfDay(addDays(new Date(), 21)),
+  );
 
   const handleFileSelect = (files: File[]) => {
     setAttachments((prev) => [...prev, ...files]);
@@ -59,6 +81,51 @@ export function ProjectForm({ onSubmit, onCancel }: any) {
     setMaster((prev) => [...prev, created]);
     return created;
   }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const submitter = (e.nativeEvent as SubmitEvent).submitter as
+      | HTMLButtonElement
+      | HTMLInputElement
+      | null;
+
+    let fd: FormData;
+    try {
+      fd = new FormData(e.currentTarget);
+    } catch {
+      fd = new FormData(e.currentTarget);
+      if (submitter) {
+        const name = submitter.getAttribute("name");
+        if (name) fd.append(name, submitter.getAttribute("value") ?? "");
+      }
+    }
+
+    const isViewed = fd.get("isViewed") === "true";
+
+    try {
+      await onSubmit({
+        post: { title, content, isViewed },
+        project: {
+          deadlineDate,
+          startedDate,
+          endedDate,
+          hirerType,
+          employmentType,
+          salary: toUnit(SALARY_UNITS, salary.amount, salary.unit),
+          personnel: personnel.amount,
+          skillLevel: EXPERIENCE_OPTIONS.find((o) => o.id === skillLevel)!
+            .level,
+        },
+        regionIds: selectedRegion,
+        categoryIds: selectedCategory,
+        skillIds: selectedSkill,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -131,47 +198,119 @@ export function ProjectForm({ onSubmit, onCancel }: any) {
             />
           </div>
 
-          {/* 작업 기간 */}
-          <div className="space-y-2">
-            <Label htmlFor="title">작업기간</Label>
-            <UnitInput
-              value={duration}
-              onChange={setDuration}
-              unitOptions={TIME_UNITS}
-              defaultUnit="day"
-              placeholder="기간을 입력하세요."
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">고용인 유형</Label>
+              <RadioGroup
+                value={hirerType}
+                onValueChange={(v: HirerType) => setHirerType(v)}
+                className="flex flex-wrap gap-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem id="employer-individual" value="individual" />
+                  <Label htmlFor="employer-individual">개인</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem id="employer-corporate" value="corporate" />
+                  <Label htmlFor="employer-corporate">법인</Label>
+                </div>
+              </RadioGroup>
+            </div>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">고용유형</Label>
+              <RadioGroup
+                value={employmentType}
+                onValueChange={(v: EmploymentType) => setEmploymentType(v)}
+                className="flex flex-wrap gap-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem id="employment-onsite" value="onsite" />
+                  <Label htmlFor="employment-onsite">상주</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    id="employment-outsourcing"
+                    value="outsourcing"
+                  />
+                  <Label htmlFor="employment-outsourcing">외주</Label>
+                </div>
+              </RadioGroup>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">공고 마감일</Label>
+              <CustomDatepicker
+                value={deadlineDate}
+                onChange={setDeadlineDate}
+                minDate={new Date()}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="title">프로젝트 시작일</Label>
+              <CustomDatepicker
+                value={startedDate}
+                onChange={setStartedDate}
+                minDate={new Date()}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="title">프로젝트 마감일</Label>
+              <CustomDatepicker
+                value={endedDate}
+                onChange={setEndedDate}
+                minDate={new Date()}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">모집 인원</Label>
+              <div className="flex items-center space-x-2">
+                <NumberInput
+                  value={personnel}
+                  onChange={setPersonel}
+                  placeholder="인원을 입력하세요."
+                />
+                <span>명</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="title">모집 경력</Label>
+              <Select value={skillLevel} onValueChange={setSkillLevel}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="경력 선택" />
+                </SelectTrigger>
+                <SelectContent>
+                  {EXPERIENCE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.level} value={opt.id}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="title">비용</Label>
-            <UnitInput
-              value={salary}
-              onChange={setSalary}
-              unitOptions={SALARY_UNITS}
-              defaultUnit="krw"
-              placeholder="비용을 입력하세요."
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="title">공고 마감일</Label>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="title">프로젝트 시작일</Label>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="title">프로젝트 마감일</Label>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="title">모집인원</Label>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="title">경력</Label>
+            <div className="w-full flex items-center space-x-2">
+              {employmentType === "onsite" && (
+                <div className="whitespace-nowrap">월</div>
+              )}
+              <div className="flex-1 min-w-0">
+                <UnitInput
+                  value={salary}
+                  onChange={setSalary}
+                  unitOptions={SALARY_UNITS}
+                  defaultUnit="krw"
+                  placeholder="비용을 입력하세요."
+                />
+              </div>
+            </div>
           </div>
 
           {/* 동의항목 */}
