@@ -263,7 +263,39 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/chat/leave": {
+    "/api/v1/chat/rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list"];
+        put?: never;
+        post: operations["create_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat/rooms/{roomId}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMessages"];
+        put?: never;
+        post: operations["sendMessage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat/rooms/{roomId}/leave": {
         parameters: {
             query?: never;
             header?: never;
@@ -279,7 +311,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/chat/join": {
+    "/api/v1/chat/rooms/{roomId}/invites": {
         parameters: {
             query?: never;
             header?: never;
@@ -288,7 +320,23 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["join_1"];
+        post: operations["invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat/rooms/{roomId}/invites/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["accept"];
         delete?: never;
         options?: never;
         head?: never;
@@ -429,14 +477,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/chat/rooms/{roomId}/messages": {
+    "/api/v1/chat/rooms/{roomId}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["history"];
+        get: operations["get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat/rooms/{roomId}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMessages_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -489,6 +553,7 @@ export interface components {
             nickname: string;
             email: string;
             role: string;
+            profileImageUrl: string;
         };
         ReviewReqBody: {
             /** Format: int32 */
@@ -748,9 +813,62 @@ export interface components {
             categoryIds: number[];
             skillIds: number[];
         };
-        JoinRoomReqBody: {
+        ChatCreateReqBody: {
+            roomName: string;
+            inviteeIds: number[];
+        };
+        ChatMessageDto: {
             /** Format: int64 */
-            roomId: number;
+            id: number;
+            /** Format: int64 */
+            senderId: number;
+            senderNickname: string;
+            senderProfileImageUrl: string;
+            content: string;
+            /** Format: date-time */
+            createdDate: string;
+        };
+        ChatRoomDto: {
+            /** Format: int64 */
+            id: number;
+            name: string;
+            lastMessage: components["schemas"]["ChatMessageDto"];
+            /** Format: int64 */
+            memberCount: number;
+            membershipStatus: string;
+            avatarPreview: components["schemas"]["UserDto"][];
+            /** Format: int64 */
+            unreadCount: number;
+        };
+        RsDataChatRoomDto: {
+            resultCode: string;
+            message: string;
+            data: components["schemas"]["ChatRoomDto"];
+        };
+        ChatSendReqBody: {
+            content: string;
+        };
+        RsDataChatMessageDto: {
+            resultCode: string;
+            message: string;
+            data: components["schemas"]["ChatMessageDto"];
+        };
+        ChatInviteReqBody: {
+            inviteeIds: number[];
+        };
+        ChatInviteResBody: {
+            invited: number[];
+            skipped: components["schemas"]["Skip"][];
+        };
+        RsDataChatInviteResBody: {
+            resultCode: string;
+            message: string;
+            data: components["schemas"]["ChatInviteResBody"];
+        };
+        Skip: {
+            /** Format: int64 */
+            id: number;
+            reason: string;
         };
         AnswerCreateReqBody: {
             content: string;
@@ -858,50 +976,42 @@ export interface components {
             content: components["schemas"]["FreelancerDto"][];
             page: components["schemas"]["PageMeta"];
         };
-        ChatMessageResBody: {
+        PagePayloadChatRoomDto: {
+            content: components["schemas"]["ChatRoomDto"][];
+            page: components["schemas"]["PageMeta"];
+        };
+        ChatRoomDetailDto: {
             /** Format: int64 */
-            MessageId: number;
+            id: number;
+            name: string;
             /** Format: int64 */
-            roomId: number;
-            /** Format: int64 */
-            senderUserId: number;
-            content: string;
+            lastMessageId: number;
             /** Format: date-time */
-            createdAt: string;
-        };
-        PageChatMessageResBody: {
+            LastMessageSendedDate: string;
             /** Format: int64 */
-            totalElements: number;
-            /** Format: int32 */
-            totalPages: number;
-            /** Format: int32 */
-            size: number;
-            content: components["schemas"]["ChatMessageResBody"][];
-            /** Format: int32 */
-            number: number;
-            first: boolean;
-            last: boolean;
-            /** Format: int32 */
-            numberOfElements: number;
-            sort: components["schemas"]["SortObject"];
-            pageable: components["schemas"]["PageableObject"];
-            empty: boolean;
+            memberCount: number;
+            membershipStatus: string;
+            avatarPreview: components["schemas"]["UserDto"][];
         };
-        PageableObject: {
+        PagePayloadChatMessageDto: {
+            content: components["schemas"]["ChatMessageDto"][];
+            page: components["schemas"]["PageMeta"];
+        };
+        ChatMemberDto: {
             /** Format: int64 */
-            offset: number;
-            sort: components["schemas"]["SortObject"];
-            paged: boolean;
-            /** Format: int32 */
-            pageSize: number;
-            /** Format: int32 */
-            pageNumber: number;
-            unpaged: boolean;
+            userId: number;
+            nickname: string;
+            profileImageUrl: string;
+            role: string;
+            membershipStatus: string;
+            /** Format: date-time */
+            startedDate: string;
+            /** Format: date-time */
+            endedDate: string;
         };
-        SortObject: {
-            empty: boolean;
-            sorted: boolean;
-            unsorted: boolean;
+        PagePayloadChatMemberDto: {
+            content: components["schemas"]["ChatMemberDto"][];
+            page: components["schemas"]["PageMeta"];
         };
     };
     responses: never;
@@ -1835,25 +1945,30 @@ export interface operations {
             };
         };
     };
-    leave: {
+    list: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
             header?: never;
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["JoinRoomReqBody"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description OK */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "*/*": components["schemas"]["PagePayloadChatRoomDto"];
+                };
             };
             /** @description Bad Request */
             400: {
@@ -1866,7 +1981,7 @@ export interface operations {
             };
         };
     };
-    join_1: {
+    create_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -1875,7 +1990,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["JoinRoomReqBody"];
+                "application/json": components["schemas"]["ChatCreateReqBody"];
             };
         };
         responses: {
@@ -1884,7 +1999,179 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "*/*": components["schemas"]["RsDataChatRoomDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getMessages: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path: {
+                roomId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PagePayloadChatMessageDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    sendMessage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roomId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChatSendReqBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataChatMessageDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    leave: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roomId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    invite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roomId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChatInviteReqBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataChatInviteResBody"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    accept: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roomId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
             };
             /** @description Bad Request */
             400: {
@@ -2157,11 +2444,47 @@ export interface operations {
             };
         };
     };
-    history: {
+    get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                roomId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ChatRoomDetailDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getMessages_1: {
         parameters: {
             query?: {
+                status?: string;
+                /** @description Zero-based page index (0..N) */
                 page?: number;
+                /** @description The size of the page to be returned */
                 size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
             };
             header?: never;
             path: {
@@ -2177,7 +2500,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["PageChatMessageResBody"];
+                    "*/*": components["schemas"]["PagePayloadChatMemberDto"];
                 };
             };
             /** @description Bad Request */

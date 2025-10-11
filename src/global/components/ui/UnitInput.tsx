@@ -29,7 +29,6 @@ type Props = {
   step?: number;
   allowZero?: boolean;
 
-  label?: string;
   placeholder?: string;
   inputClassName?: string;
   selectClassName?: string;

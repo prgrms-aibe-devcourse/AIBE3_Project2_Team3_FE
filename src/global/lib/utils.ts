@@ -73,3 +73,47 @@ export function fromUnit(
   if (!f) return null;
   return Math.trunc(total / f);
 }
+
+export function formatChatTimestamp(input?: string | number | Date) {
+  if (!input) return "";
+  const d = new Date(input);
+
+  const now = new Date();
+  const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+  );
+  const startOfYesterday = new Date(startOfToday);
+  startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+
+  const startOfD = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+  // 오늘
+  if (startOfD.getTime() === startOfToday.getTime()) {
+    // 오전/오후 hh:mm (예: "오전 12:05")
+    return new Intl.DateTimeFormat("ko-KR", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }).format(d);
+  }
+
+  // 어제
+  if (startOfD.getTime() === startOfYesterday.getTime()) {
+    return "어제";
+  }
+
+  // 그 외: YYYY-MM-DD
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+export function formatChatTime(ts: string) {
+  return new Date(ts).toLocaleTimeString("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}

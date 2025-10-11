@@ -78,7 +78,7 @@ export function Header() {
           {!!data ? (
             <>
               <Button variant="ghost" size="sm" className="relative" asChild>
-                <Link href="/messages">
+                <Link href="/chat">
                   <MessageCircle className="h-4 w-4" />
                   <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-xs">
                     2
@@ -244,7 +244,7 @@ export function Header() {
                   대시보드
                 </Link>
                 <Link
-                  href="/messages"
+                  href="/chat"
                   className="block text-sm font-medium hover:text-primary transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
