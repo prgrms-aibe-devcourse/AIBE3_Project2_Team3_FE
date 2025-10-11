@@ -12,3 +12,6 @@ export type PagePayloadProjectDto =
 export type ProjectListParam = Pageable & {
   searchKeyword: string;
 };
+
+export type EmployerType = "individual" | "corporate"; // 고용인 유형
+export type EmploymentType = "onsite" | "outsourcing"; // 고용 유형

@@ -37,7 +37,7 @@ export function FreelancerForm({ onSubmit, onCancel }: any) {
     { id: 5, name: "Node.js" },
     { id: 6, name: "Spring" },
   ]);
-  const [duration, setDuration] = useState({ amount: 7, unit: "day" });
+  const [period, setPeriod] = useState({ amount: 7, unit: "day" });
   const [salary, setSalary] = useState({ amount: 1, unit: "krw_10k" });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -67,7 +67,7 @@ export function FreelancerForm({ onSubmit, onCancel }: any) {
         post: { title, content, isViewed },
         freelancer: {
           salary: toUnit(SALARY_UNITS, salary.amount, salary.unit),
-          period: toUnit(TIME_UNITS, duration.amount, duration.unit),
+          period: toUnit(TIME_UNITS, period.amount, period.unit),
         },
         regionIds: selectedRegion,
         categoryIds: selectedCategory,
@@ -171,8 +171,8 @@ export function FreelancerForm({ onSubmit, onCancel }: any) {
           <div className="space-y-2">
             <Label htmlFor="title">작업기간</Label>
             <UnitInput
-              value={duration}
-              onChange={setDuration}
+              value={period}
+              onChange={setPeriod}
               unitOptions={TIME_UNITS}
               defaultUnit="day"
               placeholder="기간을 입력하세요."

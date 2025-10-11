@@ -102,7 +102,7 @@ export function ProfileForm() {
       </Card>
 
       {/* Save Button */}
-      <div className="flex justify-end">
+      <div className="flex justify-end space-x-4">
         {isEditMode ? (
           <>
             <Button
@@ -115,6 +115,7 @@ export function ProfileForm() {
             </Button>
             <Button
               type="button"
+              variant="outline"
               disabled={isLoading}
               size="lg"
               onClick={onCancel}
