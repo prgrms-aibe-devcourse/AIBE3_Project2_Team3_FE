@@ -13,5 +13,5 @@ export type ProjectListParam = Pageable & {
   searchKeyword: string;
 };
 
-export type EmployerType = "individual" | "corporate"; // 고용인 유형
+export type HirerType = "individual" | "corporate"; // 고용인 유형
 export type EmploymentType = "onsite" | "outsourcing"; // 고용 유형

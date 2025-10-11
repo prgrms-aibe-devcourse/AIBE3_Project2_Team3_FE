@@ -14,7 +14,7 @@ import { MouseEvent, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import { Clock, Eye, Heart, MapPin, Star, Tag } from "lucide-react";
+import { Clock, Eye, Heart, MapPin, Puzzle, Star, Tag } from "lucide-react";
 
 interface FreelancerCardProps {
   freelancer: FreelancerDto;
@@ -93,21 +93,7 @@ export function FreelancerCard({ freelancer }: FreelancerCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        {/* 기술 */}
-        <div className="flex flex-wrap gap-2">
-          {freelancer.skills.slice(0, 3).map((skill) => (
-            <Badge key={skill.id} variant="secondary" className="text-xs">
-              {skill.name}
-            </Badge>
-          ))}
-          {freelancer.skills.length > 3 && (
-            <Badge variant="outline" className="text-xs">
-              +{freelancer.skills.length - 3}
-            </Badge>
-          )}
-        </div>
-
+      <CardContent className="mt-auto space-y-3">
         {/* 지역 */}
         <div className="flex text-sm">
           <div className="flex items-center text-muted-foreground">
@@ -123,6 +109,21 @@ export function FreelancerCard({ freelancer }: FreelancerCardProps) {
               </Badge>
             )}
           </div>
+        </div>
+
+        {/* 기술 */}
+        <div className="flex flex-wrap gap-2">
+          <Puzzle className="h-4 w-4 mr-2" />
+          {freelancer.skills.slice(0, 3).map((skill) => (
+            <Badge key={skill.id} variant="secondary" className="text-xs">
+              {skill.name}
+            </Badge>
+          ))}
+          {freelancer.skills.length > 3 && (
+            <Badge variant="outline" className="text-xs">
+              +{freelancer.skills.length - 3}
+            </Badge>
+          )}
         </div>
 
         {/* 제작 기간 */}
