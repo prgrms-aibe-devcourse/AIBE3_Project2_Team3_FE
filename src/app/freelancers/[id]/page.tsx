@@ -24,6 +24,8 @@ import { formatCustomDuration, formatTimeAgo } from "@/global/lib/utils";
 import { format } from "date-fns";
 import { use, useState } from "react";
 
+import { useRouter } from "next/navigation";
+
 import {
   Calendar,
   Clock,
@@ -45,6 +47,7 @@ export default function FreelancerDetailPage({
   const { id } = use(params);
   const { data: freelancer } = useDetailFreelancer(id);
   const [isFavorited, setIsFavorited] = useState(false);
+  const router = useRouter();
   if (!freelancer) return <>loading중</>;
   return (
     <div className="py-4 px-4">
@@ -315,12 +318,16 @@ export default function FreelancerDetailPage({
                 </span>
                 <p className="text-gray-600">(VAT 포함가)</p>
               </div>
-              <Button className="w-full" size="lg">
+              <Button className="w-full cursor-pointer" size="lg">
                 <MessageCircle className="mr-2 h-4 w-4" />
-                메시지 보내기
+                전문가에게 문의하기
               </Button>
-              <Button variant="outline" className="w-full bg-transparent">
-                프로젝트 제안하기
+              <Button
+                variant="outline"
+                className="w-full bg-transparent cursor-pointer"
+                onClick={() => router.replace(`/offers/${freelancer.id}`)}
+              >
+                구매하기
               </Button>
             </CardContent>
           </Card>

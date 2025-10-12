@@ -29,3 +29,8 @@ export const EXPERIENCE_OPTIONS: ExperienceRange[] = [
   { id: "senior", label: "6–10년 (시니어)", min: 6, max: 10, level: 4 },
   { id: "lead", label: "10년 이상 (리드+)", min: 10, level: 5 },
 ];
+
+export type Rounding = "ceil" | "floor" | "round";
+export const DEFAULT_FEE_RATE = 0.03; // 3.5%
+export const DEFAULT_FEE_MIN = 900; // 최소 900원
+export const DEFAULT_FEE_ROUNDING: Rounding = "ceil"; // 소수 발생 시 올림 권장
