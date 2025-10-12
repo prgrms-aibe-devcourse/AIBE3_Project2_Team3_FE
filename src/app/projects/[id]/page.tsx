@@ -1,6 +1,7 @@
 "use client";
 
 import { useDetailProject } from "@/global/api/useProjectQuery";
+import LoadingScreen from "@/global/components/loading/loading";
 import {
   Avatar,
   AvatarFallback,
@@ -18,6 +19,8 @@ import { Separator } from "@/global/components/ui/separator";
 import { formatCustomDuration, formatTimeAgo } from "@/global/lib/utils";
 import { format } from "date-fns";
 import { use, useState } from "react";
+
+import { useRouter } from "next/navigation";
 
 import {
   Calendar,
@@ -38,7 +41,14 @@ export default function ProjectDetailPage({
   const { id } = use(params);
   const { data: project, isLoading } = useDetailProject(id);
   const [isFavorited, setIsFavorited] = useState(false);
-  if (!project) return <>loading중</>;
+  const router = useRouter();
+  if (!project)
+    return (
+      <LoadingScreen
+        message="데이터를 불러오는 중입니다"
+        tips={["잠시만 기다려 주세요"]}
+      />
+    );
   return (
     <div className="py-4 px-4">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -159,11 +169,11 @@ export default function ProjectDetailPage({
               </p>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button className="w-full" size="lg">
+              <Button
+                className="w-full cursor-pointer"
+                onClick={() => router.replace(`/applications/${project.id}`)}
+              >
                 지원하기
-              </Button>
-              <Button variant="outline" className="w-full bg-transparent">
-                문의하기
               </Button>
             </CardContent>
           </Card>
