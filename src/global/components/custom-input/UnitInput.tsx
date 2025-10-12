@@ -1,14 +1,13 @@
-import { cn } from "@/global/lib/utils";
-import { useEffect } from "react";
-
-import { Input } from "./input";
+import { Input } from "@/global/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./select";
+} from "@/global/components/ui/select";
+import { cn } from "@/global/lib/utils";
+import { useEffect } from "react";
 
 type Unit = string;
 

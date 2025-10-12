@@ -1,8 +1,8 @@
 "use client";
 
-import { MultiChildSelect } from "@/global/components/ui/MultiChildSelect";
-import { MultiSearchSelect } from "@/global/components/ui/MultiSearchSelect";
-import { UnitInput } from "@/global/components/ui/UnitInput";
+import { UnitInput } from "@/global/components/custom-input/UnitInput";
+import { MultiChildSelect } from "@/global/components/multi-select/MultiChildSelect";
+import { MultiSearchSelect } from "@/global/components/multi-select/MultiSearchSelect";
 import { Button } from "@/global/components/ui/button";
 import {
   Card,
@@ -17,11 +17,16 @@ import { Label } from "@/global/components/ui/label";
 import { Textarea } from "@/global/components/ui/textarea";
 import { SALARY_UNITS, TIME_UNITS } from "@/global/consts";
 import { toUnit } from "@/global/lib/utils";
+import { FreelancerWriteReqBody } from "@/global/types/freelancer.types";
 import { useState } from "react";
 
 import { sample } from "./test";
 
-export function FreelancerForm({ onSubmit, onCancel }: any) {
+type FreelancerFormProps = {
+  onSubmit: (param: FreelancerWriteReqBody) => void;
+  onCancel: () => void;
+};
+export function FreelancerForm({ onSubmit, onCancel }: FreelancerFormProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [attachments, setAttachments] = useState<File[]>([]);
@@ -66,8 +71,8 @@ export function FreelancerForm({ onSubmit, onCancel }: any) {
       await onSubmit({
         post: { title, content, isViewed },
         freelancer: {
-          salary: toUnit(SALARY_UNITS, salary.amount, salary.unit),
-          period: toUnit(TIME_UNITS, period.amount, period.unit),
+          salary: toUnit(SALARY_UNITS, salary.amount, salary.unit) ?? 0,
+          period: toUnit(TIME_UNITS, period.amount, period.unit) ?? 0,
         },
         regionIds: selectedRegion,
         categoryIds: selectedCategory,

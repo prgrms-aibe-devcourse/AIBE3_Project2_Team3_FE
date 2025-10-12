@@ -123,6 +123,9 @@ export function formatChatTime(ts: string) {
     minute: "2-digit",
   });
 }
+export function toLocalDateTimeString(d: Date) {
+  return format(d, "yyyy-MM-dd'T'HH:mm:ss");
+}
 
 export function calcFee(
   amount: number,
@@ -146,4 +149,14 @@ export function calcFee(
         : Math.round(raw);
 
   return Math.max(rounded, min);
+}
+
+export function calcTotals(
+  items: { price: number; qty: number }[],
+  opts?: { rate?: number; min?: number; rounding?: Rounding },
+) {
+  const subtotal = items.reduce((s, it) => s + it.price * it.qty, 0);
+  const fee = calcFee(subtotal, opts);
+  const total = subtotal + fee;
+  return { subtotal, fee, total };
 }

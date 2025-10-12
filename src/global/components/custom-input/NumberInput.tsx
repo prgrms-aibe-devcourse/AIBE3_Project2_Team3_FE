@@ -1,6 +1,5 @@
+import { Input } from "@/global/components/ui/input";
 import { cn } from "@/global/lib/utils";
-
-import { Input } from "./input";
 
 type Unit = string;
 

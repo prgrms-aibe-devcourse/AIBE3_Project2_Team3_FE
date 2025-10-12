@@ -8,8 +8,12 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/global/components/ui/avatar";
-import { Button } from "@/global/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/global/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/global/components/ui/card";
 import { Separator } from "@/global/components/ui/separator";
 import {
   Table,
@@ -26,10 +30,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/global/components/ui/tooltip";
-import { calcFee, formatCustomDuration } from "@/global/lib/utils";
+import { calcFee, calcTotals, formatCustomDuration } from "@/global/lib/utils";
 import { use, useEffect, useMemo, useState } from "react";
 
 import { HelpCircle } from "lucide-react";
+
+import { TossPayments } from "./_components/TossPayments";
+import { TossPaymentsButton } from "./_components/TossPaymentsButton";
 
 type Item = {
   id: string;
@@ -180,6 +187,23 @@ export default function OfferWritePage({
             </CardContent>
           </Card>
           {/* TODO: 결제 방법 */}
+          <Card>
+            <CardHeader>
+              <CardTitle>결제 방법</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TossPayments
+                amount={
+                  calcTotals(
+                    items.map((item) => ({
+                      price: item.unitPrice,
+                      qty: item.qty,
+                    })),
+                  ).total ?? 0
+                }
+              />
+            </CardContent>
+          </Card>
         </div>
 
         {/* Sidebar */}
@@ -222,14 +246,20 @@ export default function OfferWritePage({
                 </span>
                 <span className="text-[1.15rem]">
                   {rows[0]?.price
-                    ? (rows[0].price + calcFee(rows[0].price)).toLocaleString()
+                    ? calcTotals(
+                        items.map((item) => ({
+                          price: item.unitPrice,
+                          qty: item.qty,
+                        })),
+                      ).total.toLocaleString()
                     : 0}
                   원
                 </span>
               </div>
-              <Button className="w-full cursor-pointer" size="lg">
-                결제하기
-              </Button>
+              <TossPaymentsButton
+                freelancer={freelancer}
+                qty={items[0]?.qty ?? 0}
+              />
             </CardContent>
           </Card>
         </div>

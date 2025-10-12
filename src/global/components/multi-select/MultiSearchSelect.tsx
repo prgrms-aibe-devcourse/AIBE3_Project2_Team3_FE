@@ -1,12 +1,11 @@
 "use client";
 
+import { Badge } from "@/global/components/ui/badge";
+import { Input } from "@/global/components/ui/input";
 import { cn } from "@/global/lib/utils";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Search, X } from "lucide-react";
-
-import { Badge } from "./badge";
-import { Input } from "./input";
 
 export type Item = { id: number; name: string };
 
