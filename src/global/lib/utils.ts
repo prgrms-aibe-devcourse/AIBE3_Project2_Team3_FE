@@ -10,6 +10,12 @@ import {
 import { ko } from "date-fns/locale";
 import { twMerge } from "tailwind-merge";
 
+import {
+  DEFAULT_FEE_MIN,
+  DEFAULT_FEE_RATE,
+  DEFAULT_FEE_ROUNDING,
+  Rounding,
+} from "../consts";
 import { UnitOption } from "../types/common.types";
 
 export function cn(...inputs: ClassValue[]) {
@@ -116,4 +122,28 @@ export function formatChatTime(ts: string) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+export function calcFee(
+  amount: number,
+  opts?: { rate?: number; min?: number; rounding?: Rounding },
+): number {
+  if (!Number.isFinite(amount) || amount < 0) {
+    throw new Error("amount must be a non-negative finite number");
+  }
+  if (amount === 0) return 0;
+
+  const rate = opts?.rate ?? DEFAULT_FEE_RATE;
+  const min = opts?.min ?? DEFAULT_FEE_MIN;
+  const rounding = opts?.rounding ?? DEFAULT_FEE_ROUNDING;
+
+  const raw = amount * rate;
+  const rounded =
+    rounding === "ceil"
+      ? Math.ceil(raw)
+      : rounding === "floor"
+        ? Math.floor(raw)
+        : Math.round(raw);
+
+  return Math.max(rounded, min);
 }
