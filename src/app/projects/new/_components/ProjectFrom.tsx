@@ -1,10 +1,10 @@
 "use client";
 
+import { NumberInput } from "@/global/components/custom-input/NumberInput";
+import { UnitInput } from "@/global/components/custom-input/UnitInput";
+import { MultiChildSelect } from "@/global/components/multi-select/MultiChildSelect";
+import { MultiSearchSelect } from "@/global/components/multi-select/MultiSearchSelect";
 import { CustomDatepicker } from "@/global/components/ui/CustomDatepicker";
-import { MultiChildSelect } from "@/global/components/ui/MultiChildSelect";
-import { MultiSearchSelect } from "@/global/components/ui/MultiSearchSelect";
-import { NumberInput } from "@/global/components/ui/NumberInput";
-import { UnitInput } from "@/global/components/ui/UnitInput";
 import { Button } from "@/global/components/ui/button";
 import {
   Card,
@@ -25,14 +25,23 @@ import {
 } from "@/global/components/ui/select";
 import { Textarea } from "@/global/components/ui/textarea";
 import { EXPERIENCE_OPTIONS, SALARY_UNITS } from "@/global/consts";
-import { toUnit } from "@/global/lib/utils";
-import { EmploymentType, HirerType } from "@/global/types/project.types";
+import { toLocalDateTimeString, toUnit } from "@/global/lib/utils";
+import {
+  EmploymentType,
+  HirerType,
+  ProjectWriteReqBody,
+} from "@/global/types/project.types";
 import { addDays, startOfDay } from "date-fns";
 import { useState } from "react";
 
 import { sample } from "./test";
 
-export function ProjectForm({ onSubmit, onCancel }: any) {
+type ProjectFormProps = {
+  onSubmit: (param: ProjectWriteReqBody) => void;
+  onCancel: () => void;
+};
+
+export function ProjectForm({ onSubmit, onCancel }: ProjectFormProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [attachments, setAttachments] = useState<File[]>([]);
@@ -108,12 +117,12 @@ export function ProjectForm({ onSubmit, onCancel }: any) {
       await onSubmit({
         post: { title, content, isViewed },
         project: {
-          deadlineDate,
-          startedDate,
-          endedDate,
+          deadlineDate: toLocalDateTimeString(deadlineDate),
+          startedDate: toLocalDateTimeString(startedDate),
+          endedDate: toLocalDateTimeString(endedDate),
           hirerType,
           employmentType,
-          salary: toUnit(SALARY_UNITS, salary.amount, salary.unit),
+          salary: toUnit(SALARY_UNITS, salary.amount, salary.unit) ?? 0,
           personnel: personnel.amount,
           skillLevel: EXPERIENCE_OPTIONS.find((o) => o.id === skillLevel)!
             .level,

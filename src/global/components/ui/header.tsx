@@ -65,12 +65,16 @@ export function Header() {
           >
             프리랜서 찾기
           </Link>
-          <Link
-            href="/dashboard"
-            className="text-sm font-medium hover:text-primary transition-colors"
-          >
-            대시보드
-          </Link>
+          {!!data && (
+            <>
+              <Link
+                href="/dashboard"
+                className="text-sm font-medium hover:text-primary transition-colors"
+              >
+                대시보드
+              </Link>
+            </>
+          )}
         </nav>
 
         {/* Desktop Actions */}

@@ -1,11 +1,10 @@
 "use client";
 
+import { Checkbox } from "@/global/components/ui/checkbox";
 import { cn } from "@/global/lib/utils";
 import { useCallback, useMemo, useState } from "react";
 
 import { ChevronDown, ChevronRight } from "lucide-react";
-
-import { Checkbox } from "./checkbox";
 
 type ChildNode = {
   id: number;
