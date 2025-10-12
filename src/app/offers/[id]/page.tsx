@@ -1,6 +1,7 @@
 "use client";
 
 import { useDetailFreelancer } from "@/global/api/useFreelancerQuery";
+import LoadingScreen from "@/global/components/loading/loading";
 import { QuantityStepper } from "@/global/components/ui/QuantitySetpper";
 import {
   Avatar,
@@ -71,7 +72,13 @@ export default function OfferWritePage({
     });
   }, [items]);
 
-  if (isLoading || !freelancer) return <>loading중</>;
+  if (isLoading || !freelancer)
+    return (
+      <LoadingScreen
+        message="데이터를 불러오는 중입니다"
+        tips={["잠시만 기다려 주세요"]}
+      />
+    );
   return (
     <div className="py-4 px-4">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -172,20 +179,7 @@ export default function OfferWritePage({
               </div>
             </CardContent>
           </Card>
-          {/* 결제 방법 */}
-          {/* <Card>
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h1 className="text-xl font-bold mb-2">결제 방법</h1>
-                </div>
-              </div>
-              <Separator />
-            </CardHeader>
-            <CardContent className="pt-6">
-              <div className="flex flex-col">나중에 추가</div>
-            </CardContent>
-          </Card> */}
+          {/* TODO: 결제 방법 */}
         </div>
 
         {/* Sidebar */}
