@@ -6,8 +6,8 @@ import ContextLayout from "./ContextLayout";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "프리랜서 매칭 플랫폼",
-  description: "재능있는 프리랜서와 클라이언트를 연결하는 전문 매칭 플랫폼",
+  title: "잡픽(JOB+PICK)",
+  description: "구인과 구직이 만나는 가장 간단한 방법",
 };
 
 export default function RootLayout({
