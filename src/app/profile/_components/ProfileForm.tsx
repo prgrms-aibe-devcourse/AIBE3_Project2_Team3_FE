@@ -132,30 +132,6 @@ export function ProfileForm() {
           </div>
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <div className="w-full flex justify-between items-center">
-              <h1>회원 탈퇴</h1>
-              <ConfirmWithPassword
-                title="회원 탈퇴"
-                description="삭제된 계정은 복구할 수 없습니다. 정말 탈퇴하시겠습니까?"
-                triggerText="탈퇴"
-                confirmText="탈퇴하기"
-                loadingText="탈퇴 중..."
-                onConfirm={async (password) => {
-                  if (!password.trim()) return;
-                  try {
-                    await handleRemoveUser(password); // 성공 시에만 아래 실행
-                  } catch (e) {
-                    throw e;
-                  }
-                }}
-              />
-            </div>
-          </CardTitle>
-        </CardHeader>
-      </Card>
 
       {/* Save Button */}
       <div className="flex justify-end space-x-4">
@@ -197,6 +173,31 @@ export function ProfileForm() {
           </>
         )}
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <div className="w-full flex justify-between items-center">
+              <h1>회원 탈퇴</h1>
+              <ConfirmWithPassword
+                title="회원 탈퇴"
+                description="삭제된 계정은 복구할 수 없습니다. 정말 탈퇴하시겠습니까?"
+                triggerText="탈퇴"
+                confirmText="탈퇴하기"
+                loadingText="탈퇴 중..."
+                onConfirm={async (password) => {
+                  if (!password.trim()) return;
+                  try {
+                    await handleRemoveUser(password); // 성공 시에만 아래 실행
+                  } catch (e) {
+                    throw e;
+                  }
+                }}
+              />
+            </div>
+          </CardTitle>
+        </CardHeader>
+      </Card>
     </form>
   );
 }
