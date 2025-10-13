@@ -1,3 +1,5 @@
+import { MatchingDashboard } from "./_components/MatchingDashboard";
+
 export default function DashboardPage() {
   return (
     <div className="container mx-auto py-8 px-4">
@@ -7,6 +9,7 @@ export default function DashboardPage() {
           프로젝트 현황과 매칭 정보를 한눈에 확인하세요
         </p>
       </div>
+      <MatchingDashboard />
     </div>
   );
 }
