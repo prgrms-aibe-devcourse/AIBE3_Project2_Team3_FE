@@ -455,11 +455,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 전체 스킬 조회 */
-        get: operations["getSkills"];
+        get?: never;
         put?: never;
         /** 스킬 생성 */
-        post: operations["createSkill"];
+        post: operations["create_2"];
         delete?: never;
         options?: never;
         head?: never;
@@ -473,11 +472,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 전체 지역 조회 */
-        get: operations["getRegions"];
+        get?: never;
         put?: never;
         /** 지역 생성 */
-        post: operations["createRegion"];
+        post: operations["create_3"];
         delete?: never;
         options?: never;
         head?: never;
@@ -491,11 +489,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 전체 카테고리 조회 */
-        get: operations["getCategories"];
+        get?: never;
         put?: never;
         /** 카테고리 생성 */
-        post: operations["createCategory"];
+        post: operations["create_4"];
         delete?: never;
         options?: never;
         head?: never;
@@ -560,6 +557,40 @@ export interface paths {
             cookie?: never;
         };
         get: operations["me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/skills": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 전체 스킬 조회 */
+        get: operations["getSkills"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/regions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 전체 카테고리 조회 */
+        get: operations["getTreeAll"];
         put?: never;
         post?: never;
         delete?: never;
@@ -702,6 +733,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 전체 카테고리 조회 */
+        get: operations["getTreeAll_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/applications/{applicationId}/files/{id}": {
         parameters: {
             query?: never;
@@ -780,7 +828,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** 스킬 삭제 */
-        delete: operations["deleteSkill"];
+        delete: operations["delete_7"];
         options?: never;
         head?: never;
         patch?: never;
@@ -797,7 +845,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** 지역 삭제 */
-        delete: operations["deleteRegion"];
+        delete: operations["delete_8"];
         options?: never;
         head?: never;
         patch?: never;
@@ -814,7 +862,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** 카테고리 삭제 */
-        delete: operations["deleteCategory"];
+        delete: operations["delete_9"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1258,25 +1306,54 @@ export interface components {
             name: string;
         };
         RegionCreateReqBody: {
+            /**
+             * @description 지역명
+             * @example 서울
+             */
+            name: string;
+            /**
+             * Format: int64
+             * @description 부모 카테고리 ID (없으면 상위로 생성)
+             * @example 10
+             */
+            parentId?: number;
+        };
+        RegionTreeDto: {
+            /** Format: int64 */
+            id: number;
             name: string;
             /** Format: int64 */
             parentId: number;
+            /** Format: int64 */
+            childCount: number;
+            children: components["schemas"]["RegionTreeDto"][];
         };
         CategoryCreateReqBody: {
+            /**
+             * @description 카테고리명
+             * @example 웹 개발
+             */
+            name: string;
+            /**
+             * Format: int64
+             * @description 부모 카테고리 ID (없으면 상위로 생성)
+             * @example 10
+             */
+            parentId?: number;
+        };
+        CategoryTreeDto: {
+            /** Format: int64 */
+            id: number;
             name: string;
             /** Format: int64 */
             parentId: number;
+            /** Format: int64 */
+            childCount: number;
+            children: components["schemas"]["CategoryTreeDto"][];
         };
         UserPasswordUpdateReqBody: {
             oldPassword: string;
             newPassword: string;
-        };
-        Pageable: {
-            /** Format: int32 */
-            page: number;
-            /** Format: int32 */
-            size: number;
-            sort: string[];
         };
         PageMeta: {
             /** Format: int32 */
@@ -1293,13 +1370,24 @@ export interface components {
             hasPrevious: boolean;
             sort: components["schemas"]["SortOrder"][];
         };
-        PagePayloadQuestionDto: {
-            content: components["schemas"]["QuestionDto"][];
+        PagePayloadSkillDto: {
+            content: components["schemas"]["SkillDto"][];
             page: components["schemas"]["PageMeta"];
         };
         SortOrder: {
             property: string;
             direction: string;
+        };
+        Pageable: {
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            size: number;
+            sort: string[];
+        };
+        PagePayloadQuestionDto: {
+            content: components["schemas"]["QuestionDto"][];
+            page: components["schemas"]["PageMeta"];
         };
         PagePayloadProjectDto: {
             content: components["schemas"]["ProjectDto"][];
@@ -1480,10 +1568,6 @@ export interface components {
             modifiedDate: string;
             files: components["schemas"]["ApplicationFileDto"][];
         };
-        PagePayloadSkillDto: {
-            content: components["schemas"]["SkillDto"][];
-            page: components["schemas"]["PageMeta"];
-        };
         PageReportDto: {
             /** Format: int64 */
             totalElements: number;
@@ -1517,14 +1601,6 @@ export interface components {
             empty: boolean;
             sorted: boolean;
             unsorted: boolean;
-        };
-        PagePayloadRegionDto: {
-            content: components["schemas"]["RegionDto"][];
-            page: components["schemas"]["PageMeta"];
-        };
-        PagePayloadCategoryDto: {
-            content: components["schemas"]["CategoryDto"][];
-            page: components["schemas"]["PageMeta"];
         };
     };
     responses: never;
@@ -3030,43 +3106,7 @@ export interface operations {
             };
         };
     };
-    getSkills: {
-        parameters: {
-            query?: {
-                /** @description Zero-based page index (0..N) */
-                page?: number;
-                /** @description The size of the page to be returned */
-                size?: number;
-                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-                sort?: string[];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PagePayloadSkillDto"];
-                };
-            };
-            /** @description Bad Request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataVoid"];
-                };
-            };
-        };
-    };
-    createSkill: {
+    create_2: {
         parameters: {
             query?: never;
             header?: never;
@@ -3099,43 +3139,7 @@ export interface operations {
             };
         };
     };
-    getRegions: {
-        parameters: {
-            query?: {
-                /** @description Zero-based page index (0..N) */
-                page?: number;
-                /** @description The size of the page to be returned */
-                size?: number;
-                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-                sort?: string[];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PagePayloadRegionDto"];
-                };
-            };
-            /** @description Bad Request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataVoid"];
-                };
-            };
-        };
-    };
-    createRegion: {
+    create_3: {
         parameters: {
             query?: never;
             header?: never;
@@ -3154,7 +3158,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["RegionDto"];
+                    "*/*": components["schemas"]["RegionTreeDto"];
                 };
             };
             /** @description Bad Request */
@@ -3168,43 +3172,7 @@ export interface operations {
             };
         };
     };
-    getCategories: {
-        parameters: {
-            query?: {
-                /** @description Zero-based page index (0..N) */
-                page?: number;
-                /** @description The size of the page to be returned */
-                size?: number;
-                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-                sort?: string[];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PagePayloadCategoryDto"];
-                };
-            };
-            /** @description Bad Request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataVoid"];
-                };
-            };
-        };
-    };
-    createCategory: {
+    create_4: {
         parameters: {
             query?: never;
             header?: never;
@@ -3223,7 +3191,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["CategoryDto"];
+                    "*/*": components["schemas"]["CategoryTreeDto"];
                 };
             };
             /** @description Bad Request */
@@ -3349,6 +3317,72 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RsDataUserDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getSkills: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                searchKeyword?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PagePayloadSkillDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getTreeAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RegionTreeDto"][];
                 };
             };
             /** @description Bad Request */
@@ -3639,6 +3673,35 @@ export interface operations {
             };
         };
     };
+    getTreeAll_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CategoryTreeDto"][];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     downloadFile: {
         parameters: {
             query?: never;
@@ -3762,7 +3825,7 @@ export interface operations {
             };
         };
     };
-    deleteSkill: {
+    delete_7: {
         parameters: {
             query?: never;
             header?: never;
@@ -3791,7 +3854,7 @@ export interface operations {
             };
         };
     };
-    deleteRegion: {
+    delete_8: {
         parameters: {
             query?: never;
             header?: never;
@@ -3820,7 +3883,7 @@ export interface operations {
             };
         };
     };
-    deleteCategory: {
+    delete_9: {
         parameters: {
             query?: never;
             header?: never;
