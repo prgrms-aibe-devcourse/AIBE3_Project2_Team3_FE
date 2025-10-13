@@ -33,8 +33,7 @@ export function ProfileForm() {
   const { mutate, isPending } = useModifyUser();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
-  const { mutateAsync: removeMutateAsync, isPending: isRemovePending } =
-    useRemoveUser();
+  const { mutate: removeMutate, isPending: isRemovePending } = useRemoveUser();
 
   const onSave = async () => {
     const form = formRef.current!;
@@ -60,6 +59,27 @@ export function ProfileForm() {
   const onCancel = () => {
     formRef.current?.reset(); // ← 입력값을 초기값으로 원복
     setIsEditMode(false); // ← 편집모드 종료
+  };
+
+  const handleRemoveUser = async (password: string) => {
+    removeMutate(
+      { password },
+      {
+        onSuccess: () => {
+          toast({
+            title: "탈퇴가 완료되었습니다.",
+            description: "다음에 다시 이용해주세요...",
+          });
+          router.replace("/");
+        },
+        onError: (res) => {
+          toast({
+            title: "실패",
+            description: res.message,
+          });
+        },
+      },
+    );
   };
 
   return (
@@ -126,19 +146,9 @@ export function ProfileForm() {
                 onConfirm={async (password) => {
                   if (!password.trim()) return;
                   try {
-                    await removeMutateAsync({ password }); // 성공 시에만 아래 실행
-                    toast({
-                      title: "탈퇴가 완료되었습니다.",
-                      description: "다음에 다시 이용해주세요...",
-                    });
-                    router.replace("/");
+                    await handleRemoveUser(password); // 성공 시에만 아래 실행
                   } catch (e) {
-                    // 실패 시엔 아무 것도 하지 않고 throw → 모달 내부에서 에러 메시지 표시
-                    const msg = e instanceof Error ? e.message : "실패했습니다";
-                    toast({
-                      title: "실패",
-                      description: msg,
-                    });
+                    throw e;
                   }
                 }}
               />
