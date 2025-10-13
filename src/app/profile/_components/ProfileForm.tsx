@@ -18,6 +18,8 @@ import { Label } from "@/global/components/ui/label";
 import { toast } from "@/global/hooks/useToast";
 import { useRef, useState } from "react";
 
+import Link from "next/link";
+
 export function ProfileForm() {
   const [isEditMode, setIsEditMode] = useState(false);
   const { data, isLoading } = useFetchMe();
@@ -135,6 +137,11 @@ export function ProfileForm() {
             </Button>
           </>
         )}
+        <Link href="/profile/updatepw">
+          <Button type="button" variant="outline" size="lg">
+            비밀번호 수정
+          </Button>
+        </Link>
       </div>
     </form>
   );

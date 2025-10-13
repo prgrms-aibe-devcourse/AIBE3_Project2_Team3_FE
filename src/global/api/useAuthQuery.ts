@@ -9,6 +9,7 @@ import {
   UserJoinReqBody,
   UserLoginReqBody,
   UserModifyReqBody,
+  UserPasswordUpdateReqBody,
 } from "../types/auth.types";
 
 const me = async () => unwrap(await client.GET("/api/v1/users/me"));
@@ -27,6 +28,9 @@ const modifyUser = async (body: UserModifyReqBody) =>
 const findPw = async (body: UserFindPasswordReqBody) =>
   unwrap(await client.POST("/api/v1/users/findPw", { body }));
 
+const updatePassword = async (body: UserPasswordUpdateReqBody) =>
+  unwrap(await client.PATCH("/api/v1/users/password", { body }));
+
 export const authQueryKeys = createQueryKeys("auth", {
   me: () => ["me"],
   login: () => ["login"],
@@ -34,6 +38,7 @@ export const authQueryKeys = createQueryKeys("auth", {
   join: () => ["join"],
   modifyUser: () => ["modifyUser"],
   findPw: () => ["findPw"],
+  updatePassword: () => ["updatePassword"],
 });
 
 export const useFetchMe = () => {
@@ -94,3 +99,9 @@ export const useFindPw = () => {
     onSuccess: () => {},
   });
 };
+
+export const useUpdatePassword = () =>
+  useMutation({
+    mutationKey: authQueryKeys.updatePassword().queryKey,
+    mutationFn: updatePassword,
+  });
