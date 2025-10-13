@@ -70,12 +70,12 @@ export function UpdatePw() {
     mutate(
       { oldPassword: oldPw, newPassword: newPw },
       {
-        onSuccess: () => {
+        onSuccess: (res) => {
           toast({
             title: "변경 완료",
-            description: "비밀번호가 안전하게 변경되었습니다.",
+            description: res.message,
           });
-          router.replace("/profile");
+          router.replace("/auth/login");
         },
         onError: (err: any) => {
           const msg =
