@@ -118,10 +118,10 @@ export default function ApplicationWritePage({
                   </div>
                 </div>
                 <div className="mt-4">
-                  <h3 className="font-semibold mb-3">프로젝트 시작일</h3>
+                  <h3 className="font-semibold mb-3">공고 마감일</h3>
                   <div className="prose prose-sm max-w-none">
                     <p className="text-muted-foreground leading-relaxed">
-                      {format(project.startedDate, "yyyy-MM-dd")}
+                      {format(project.deadlineDate, "yyyy-MM-dd")}
                     </p>
                   </div>
                 </div>
