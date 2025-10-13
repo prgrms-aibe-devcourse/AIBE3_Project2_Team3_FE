@@ -75,6 +75,16 @@ export function Header() {
               </Link>
             </>
           )}
+          {!!data && data.data.role === "관리자" && (
+            <>
+              <Link
+                href="/admin"
+                className="text-sm font-medium hover:text-primary transition-colors"
+              >
+                관리자
+              </Link>
+            </>
+          )}
         </nav>
 
         {/* Desktop Actions */}
@@ -253,6 +263,17 @@ export function Header() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   메시지
+                </Link>
+              </>
+            )}
+            {!!data && data.data.role === "관리자" && (
+              <>
+                <Link
+                  href="/admin"
+                  className="block text-sm font-medium hover:text-primary transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  관리자
                 </Link>
               </>
             )}

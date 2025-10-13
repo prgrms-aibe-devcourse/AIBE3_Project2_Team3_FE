@@ -105,12 +105,6 @@ export default function OfferWritePage({
               <div className="flex flex-col">
                 <h1 className="text-xl font-bold mb-2">주문 내역</h1>
                 <div className="flex items-start space-x-6 mb-4">
-                  <Avatar className="h-22 w-22">
-                    <AvatarImage src={"https://picsum.photos/200"} />
-                    <AvatarFallback className="text-2xl">
-                      {"이미지"}
-                    </AvatarFallback>
-                  </Avatar>
                   <div className="flex flex-col flex-1 space-y-3">
                     <h1 className="text-2xl font-bold mb-2">
                       {freelancer.title}
