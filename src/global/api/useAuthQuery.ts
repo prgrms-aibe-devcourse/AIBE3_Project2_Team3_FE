@@ -1,9 +1,11 @@
 import { createQueryKeys } from "@lukemorales/query-key-factory";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { use } from "react";
 
 import client from "../backend/client";
 import { unwrap } from "../backend/unwrap";
 import {
+  UserFindPasswordReqBody,
   UserJoinReqBody,
   UserLoginReqBody,
   UserModifyReqBody,
@@ -22,12 +24,16 @@ const join = async (body: UserJoinReqBody) =>
 const modifyUser = async (body: UserModifyReqBody) =>
   unwrap(await client.PUT("/api/v1/users", { body }));
 
+const findPw = async (body: UserFindPasswordReqBody) =>
+  unwrap(await client.POST("/api/v1/users/findPw", { body }));
+
 export const authQueryKeys = createQueryKeys("auth", {
   me: () => ["me"],
   login: () => ["login"],
   logout: () => ["logout"],
   join: () => ["join"],
   modifyUser: () => ["modifyUser"],
+  findPw: () => ["findPw"],
 });
 
 export const useFetchMe = () => {
@@ -78,5 +84,13 @@ export const useModifyUser = () => {
     onSuccess: (res) => {
       qc.setQueryData(authQueryKeys.me().queryKey, res);
     },
+  });
+};
+
+export const useFindPw = () => {
+  return useMutation({
+    mutationKey: authQueryKeys.findPw().queryKey,
+    mutationFn: findPw,
+    onSuccess: () => {},
   });
 };

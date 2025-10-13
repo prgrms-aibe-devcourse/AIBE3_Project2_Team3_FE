@@ -101,7 +101,7 @@ export function LoginForm() {
 
           <div className="flex items-center justify-between">
             <Link
-              href="/forgot-password"
+              href="/auth/forgot-password"
               className="text-sm text-primary hover:underline"
             >
               비밀번호를 잊으셨나요?
