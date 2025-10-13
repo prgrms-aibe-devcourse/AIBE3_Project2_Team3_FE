@@ -1,10 +1,10 @@
 import { createQueryKeys } from "@lukemorales/query-key-factory";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { use } from "react";
 
 import client from "../backend/client";
 import { unwrap } from "../backend/unwrap";
 import {
+  UserDeleteReqBody,
   UserFindPasswordReqBody,
   UserJoinReqBody,
   UserLoginReqBody,
@@ -31,6 +31,9 @@ const findPw = async (body: UserFindPasswordReqBody) =>
 const updatePassword = async (body: UserPasswordUpdateReqBody) =>
   unwrap(await client.PATCH("/api/v1/users/password", { body }));
 
+const remove = async (body: UserDeleteReqBody) =>
+  unwrap(await client.DELETE("/api/v1/users/me", { body }));
+
 export const authQueryKeys = createQueryKeys("auth", {
   me: () => ["me"],
   login: () => ["login"],
@@ -39,6 +42,7 @@ export const authQueryKeys = createQueryKeys("auth", {
   modifyUser: () => ["modifyUser"],
   findPw: () => ["findPw"],
   updatePassword: () => ["updatePassword"],
+  remove: () => ["remove"],
 });
 
 export const useFetchMe = () => {
@@ -105,3 +109,14 @@ export const useUpdatePassword = () =>
     mutationKey: authQueryKeys.updatePassword().queryKey,
     mutationFn: updatePassword,
   });
+
+export const useRemoveUser = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: authQueryKeys.remove().queryKey,
+    mutationFn: remove,
+    onSuccess: () => {
+      qc.setQueryData(authQueryKeys.me().queryKey, null);
+    },
+  });
+};

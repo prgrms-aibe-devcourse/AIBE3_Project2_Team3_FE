@@ -9,3 +9,4 @@ export type UserFindPasswordReqBody =
   components["schemas"]["UserFindPasswordReqBody"];
 export type UserPasswordUpdateReqBody =
   components["schemas"]["UserPasswordUpdateReqBody"];
+export type UserDeleteReqBody = components["schemas"]["UserDeleteReqBody"];
