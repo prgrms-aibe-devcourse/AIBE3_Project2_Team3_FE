@@ -77,7 +77,8 @@ export const useLogout = () => {
     mutationKey: authQueryKeys.logout().queryKey,
     mutationFn: logout,
     onSuccess: () => {
-      qc.setQueryData(authQueryKeys.me().queryKey, null);
+      qc.cancelQueries();
+      qc.clear();
 
       if (!isAllowedPath(pathname)) {
         router.replace("/auth/login"); // 히스토리 대체(뒤로가기 방지)

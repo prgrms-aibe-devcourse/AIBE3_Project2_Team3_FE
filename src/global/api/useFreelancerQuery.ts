@@ -5,6 +5,8 @@ import { useMemo } from "react";
 import client from "../backend/client";
 import { unwrap } from "../backend/unwrap";
 import { useFreelancerListStore } from "../stores/useFreelancerListStore";
+import { useMyFreelancerListStore } from "../stores/useMyFreelancerListStore";
+import { Pageable } from "../types/common.types";
 import {
   FreelancerListParam,
   FreelancerModifyReqBody,
@@ -41,6 +43,13 @@ const remove = async (id: number) =>
     }),
   );
 
+const myList = async (param: Pageable) =>
+  unwrap(
+    await client.GET("/api/v1/freelancers/my", {
+      params: { query: param },
+    }),
+  );
+
 export const freelancerQueryKeys = createQueryKeys("freelancer", {
   lists: () => ["list"],
   list: (param: FreelancerListParam) => ["list", param],
@@ -49,6 +58,7 @@ export const freelancerQueryKeys = createQueryKeys("freelancer", {
   create: () => ["create"],
   modify: (id) => ["modify", id],
   remove: (id) => ["remove", id],
+  myList: () => ["myList"],
 });
 
 export const useListFreelancer = () => {
@@ -139,5 +149,17 @@ export const useRemoveFreelancer = (id: number) => {
     onSuccess: () => {
       qc.setQueryData(freelancerQueryKeys.detail(id).queryKey, null);
     },
+  });
+};
+
+export const useListMyFreelancers = () => {
+  const { page, size, sort } = useMyFreelancerListStore((state) => state);
+  const param = useMemo(() => ({ page, size, sort }), [page, size, sort]);
+  return useQuery({
+    queryKey: freelancerQueryKeys.myList().queryKey,
+    queryFn: () => myList(param),
+    staleTime: 5 * 60 * 1000 - 1,
+    gcTime: 5 * 60 * 1000 - 1,
+    retry: 0,
   });
 };

@@ -123,7 +123,7 @@ export function Header() {
                     <DropdownMenuSubContent className="w-56">
                       <DropdownMenuItem asChild>
                         <Link
-                          href="/dashboard/posts/projects"
+                          href="/projects/my"
                           className="flex items-center gap-2"
                         >
                           <FileText className="h-4 w-4" />
@@ -149,7 +149,7 @@ export function Header() {
                     <DropdownMenuSubContent className="w-56">
                       <DropdownMenuItem asChild>
                         <Link
-                          href="/dashboard/posts/freelancers"
+                          href="/freelancers/my"
                           className="flex items-center gap-2"
                         >
                           <UserCircle className="h-4 w-4" />
