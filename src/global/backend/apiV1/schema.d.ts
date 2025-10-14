@@ -1547,8 +1547,8 @@ export interface components {
         };
         UserInviteDto: {
             /** Format: int64 */
-            userId: number;
-            userName: string;
+            id: number;
+            nickname: string;
         };
         PageMeta: {
             /** Format: int32 */

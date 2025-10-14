@@ -37,3 +37,11 @@ export type Rounding = "ceil" | "floor" | "round";
 export const DEFAULT_FEE_RATE = 0.03; // 3.5%
 export const DEFAULT_FEE_MIN = 900; // 최소 900원
 export const DEFAULT_FEE_ROUNDING: Rounding = "ceil"; // 소수 발생 시 올림 권장
+
+export const PUBLIC_ROUTES = [
+  "/auth/login",
+  "/auth/join",
+  "/",
+  "/projects",
+  "/freelancers",
+];

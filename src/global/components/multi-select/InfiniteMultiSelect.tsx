@@ -65,7 +65,7 @@ export function AsyncInfiniteMultiSelect({
   const fetched: Item[] = useMemo(
     () =>
       (data?.pages ?? []).flatMap((p) =>
-        (p.content ?? []).map((s: any) => ({ id: s.id, name: s.name })),
+        (p.content ?? []).map((s) => ({ id: s.id, name: s.name })),
       ),
     [data],
   );

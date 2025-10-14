@@ -1,8 +1,12 @@
 "use client";
 
 import { useFetchMe } from "@/global/api/useAuthQuery";
-import { useCreateChatRoom, useListChatRoom } from "@/global/api/useChatQuery";
-import { searchUsersToInvite, useInviteUsers } from "@/global/api/useChatQuery";
+import {
+  searchUsersToInvite,
+  useCreateChatRoom,
+  useInviteUsers,
+  useListChatRoom,
+} from "@/global/api/useChatQuery";
 import {
   Avatar,
   AvatarFallback,
@@ -29,7 +33,7 @@ import { ScrollArea } from "@/global/components/ui/scroll-area";
 import { Separator } from "@/global/components/ui/separator";
 import { formatChatTimestamp } from "@/global/lib/utils";
 import { useChatRoomListStore } from "@/global/stores/useChatRoomListStore";
-import type { InviteUserSummary } from "@/global/types/chat.types";
+import type { UserInviteDto } from "@/global/types/chat.types";
 import { ChatRoomDto } from "@/global/types/chat.types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -62,14 +66,14 @@ function CreateChatRoomDialog() {
       });
 
       // 응답 스키마 유연 처리
-      const newId = (res as any)?.data?.id ?? (res as any)?.id;
+      const newId = res?.data?.id;
       setOpen(false);
       setName("");
 
       if (newId) router.push(`/chat/${newId}`);
       else router.refresh?.();
-    } catch (e: any) {
-      setError(e?.message ?? "생성 중 오류가 발생했습니다");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "생성 중 오류가 발생했습니다");
     }
   };
 
@@ -133,8 +137,8 @@ function InviteUsersDialog({
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [results, setResults] = useState<InviteUserSummary[]>([]);
-  const [selected, setSelected] = useState<InviteUserSummary[]>([]);
+  const [results, setResults] = useState<UserInviteDto[]>([]);
+  const [selected, setSelected] = useState<UserInviteDto[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const { mutateAsync: invite, isPending: inviting } = useInviteUsers(chatId);
@@ -143,7 +147,7 @@ function InviteUsersDialog({
     (id: number) => selected.some((u) => u.id === id),
     [selected],
   );
-  const addUser = (u: InviteUserSummary) => {
+  const addUser = (u: UserInviteDto) => {
     if (isPicked(u.id)) return;
     setSelected((prev) => [...prev, u]);
   };
@@ -157,8 +161,8 @@ function InviteUsersDialog({
       setIsSearching(true);
       const data = await searchUsersToInvite(q);
       setResults(data);
-    } catch (e: any) {
-      setError(e?.message ?? "검색 중 오류가 발생했습니다");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "검색 중 오류가 발생했습니다");
       setResults([]);
     } finally {
       setIsSearching(false);
@@ -186,8 +190,8 @@ function InviteUsersDialog({
       setQ("");
       setResults([]);
       setOpen(false);
-    } catch (e: any) {
-      setError(e?.message ?? "초대에 실패했습니다");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "초대에 실패했습니다");
     }
   };
 
@@ -247,7 +251,7 @@ function InviteUsersDialog({
                 variant="secondary"
                 className="flex items-center gap-1"
               >
-                {u.username}
+                {u.nickname}
                 <button
                   aria-label="remove"
                   onClick={() => removeUser(u.id)}
@@ -279,7 +283,7 @@ function InviteUsersDialog({
                     className="flex items-center justify-between rounded-lg border p-2"
                   >
                     <div className="min-w-0">
-                      <div className="truncate font-medium">{u.username}</div>
+                      <div className="truncate font-medium">{u.nickname}</div>
                     </div>
                     <Button
                       type="button"

@@ -11,5 +11,5 @@ export type PagePayloadChatMessageDto =
 export type ChatInviteReqBody = components["schemas"]["ChatInviteReqBody"];
 export type RsDataChatInviteResBody =
   components["schemas"]["RsDataChatInviteResBody"];
-export type InviteUserSummary = { id: number; username: string };
-export type CreateRoomReqBody = { roomName: string; inviteeIds: number[] };
+export type UserInviteDto = components["schemas"]["UserInviteDto"];
+export type ChatCreateReqBody = components["schemas"]["ChatCreateReqBody"];

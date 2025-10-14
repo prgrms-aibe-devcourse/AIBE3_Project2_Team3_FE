@@ -19,7 +19,9 @@ import { FormEvent, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
+import { Mail, User } from "lucide-react";
+
+// src/app/(auth)/forgot-password/ForgotPassword.tsx
 
 // src/app/(auth)/forgot-password/ForgotPassword.tsx
 
@@ -103,10 +105,11 @@ export function ForgotPassword() {
         description:
           "입력하신 계정으로 비밀번호 재설정 안내를 발송했습니다. 메일함(스팸함 포함)을 확인해 주세요.",
       });
-    } catch (err: any) {
+    } catch (err) {
       toast({
         title: "실패",
-        description: err?.message ?? "요청 처리 중 오류가 발생했습니다.",
+        description:
+          e instanceof Error ? e.message : "요청 처리 중 오류가 발생했습니다.",
       });
     }
   };
