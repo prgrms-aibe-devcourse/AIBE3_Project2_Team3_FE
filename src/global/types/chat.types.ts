@@ -13,3 +13,5 @@ export type RsDataChatInviteResBody =
   components["schemas"]["RsDataChatInviteResBody"];
 export type UserInviteDto = components["schemas"]["UserInviteDto"];
 export type ChatCreateReqBody = components["schemas"]["ChatCreateReqBody"];
+export type PagePayloadChatRoomDto =
+  components["schemas"]["PagePayloadChatRoomDto"];

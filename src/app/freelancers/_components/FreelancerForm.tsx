@@ -18,26 +18,95 @@ import { Input } from "@/global/components/ui/input";
 import { Label } from "@/global/components/ui/label";
 import { Textarea } from "@/global/components/ui/textarea";
 import { SALARY_UNITS, TIME_UNITS } from "@/global/consts";
-import { toUnit } from "@/global/lib/utils";
-import { FreelancerWriteReqBody } from "@/global/types/freelancer.types";
-import { useState } from "react";
+import { fromUnit, toUnit } from "@/global/lib/utils";
+import {
+  FreelancerDto,
+  FreelancerWriteReqBody,
+} from "@/global/types/freelancer.types";
+import { useEffect, useState } from "react";
 
 type FreelancerFormProps = {
   onSubmit: (param: FreelancerWriteReqBody) => void;
   onCancel: () => void;
+  defaultValues?: FreelancerDto;
 };
-export function FreelancerForm({ onSubmit, onCancel }: FreelancerFormProps) {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [attachments, setAttachments] = useState<File[]>([]);
+export function FreelancerForm({
+  onSubmit,
+  onCancel,
+  defaultValues,
+}: FreelancerFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedRegion, setSelectedRegion] = useState<number[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<number[]>([]);
-  const [selectedSkillIds, setSelectedSkillIds] = useState<number[]>([]);
-  const [period, setPeriod] = useState({ amount: 7, unit: "day" });
-  const [salary, setSalary] = useState({ amount: 1, unit: "krw_10k" });
+  const [title, setTitle] = useState(defaultValues?.title ?? "");
+  const [content, setContent] = useState(defaultValues?.content ?? "");
+  const [selectedRegion, setSelectedRegion] = useState<number[]>(
+    defaultValues?.regions
+      ? defaultValues.regions.map((region) => region.id)
+      : [],
+  );
+  const [selectedCategory, setSelectedCategory] = useState<number[]>(
+    defaultValues?.categories
+      ? defaultValues.categories.map((category) => category.id)
+      : [],
+  );
+  const [selectedSkillIds, setSelectedSkillIds] = useState<number[]>(
+    defaultValues?.skills ? defaultValues.skills.map((skill) => skill.id) : [],
+  );
+  const [period, setPeriod] = useState(
+    defaultValues?.period
+      ? {
+          amount: fromUnit(TIME_UNITS, defaultValues.period, "hour"),
+          unit: "hour",
+        }
+      : { amount: 7, unit: "day" },
+  );
+  const [salary, setSalary] = useState(
+    defaultValues?.salary
+      ? {
+          amount: fromUnit(SALARY_UNITS, defaultValues.salary, "krw"),
+          unit: "krw",
+        }
+      : { amount: 1, unit: "krw_10k" },
+  );
+  const [attachments, setAttachments] = useState<File[]>([]);
   const { data: categoryTree, isLoading: catLoading } = useListCategory();
   const { data: regionTree, isLoading: regLoading } = useListRegion();
+
+  useEffect(() => {
+    if (!defaultValues) return;
+    setTitle(defaultValues.title ?? "");
+    setContent(defaultValues.content ?? "");
+    setSelectedRegion(
+      defaultValues.regions
+        ? defaultValues.regions.map((region) => region.id)
+        : [],
+    );
+    setSelectedCategory(
+      defaultValues?.categories
+        ? defaultValues.categories.map((category) => category.id)
+        : [],
+    );
+    setSelectedSkillIds(
+      defaultValues?.skills
+        ? defaultValues.skills.map((skill) => skill.id)
+        : [],
+    );
+    setPeriod(
+      defaultValues.period
+        ? {
+            amount: fromUnit(TIME_UNITS, defaultValues.period, "hour"),
+            unit: "hour",
+          }
+        : { amount: 7, unit: "day" },
+    );
+    setSalary(
+      defaultValues.salary
+        ? {
+            amount: fromUnit(SALARY_UNITS, defaultValues.salary, "krw"),
+            unit: "krw",
+          }
+        : { amount: 1, unit: "krw_10k" },
+    );
+  }, [defaultValues]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

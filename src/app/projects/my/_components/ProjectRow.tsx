@@ -4,7 +4,6 @@ import { ConfirmDelete } from "@/app/admin/_components/ConfirmDeleteDialog";
 import { useRemoveProject } from "@/global/api/useProjectQuery";
 import { Badge } from "@/global/components/ui/badge";
 import { Button } from "@/global/components/ui/button";
-import { formatTimeAgo } from "@/global/lib/utils";
 import { ProjectDto } from "@/global/types/project.types";
 import { format } from "date-fns";
 
@@ -55,7 +54,7 @@ export default function ProjectRow({
             <span>
               공고 마감:{" "}
               <span className="font-medium text-foreground">
-                {formatTimeAgo(project.deadlineDate)}
+                {format(project.deadlineDate, "yyyy-MM-dd")}
               </span>
             </span>
             <span>
