@@ -16,13 +16,12 @@ import { Input } from "@/global/components/ui/input";
 import { ScrollArea, ScrollBar } from "@/global/components/ui/scroll-area";
 import { Separator } from "@/global/components/ui/separator";
 import { useSkillListStore } from "@/global/stores/useSkillListStore";
+import { SkillDto } from "@/global/types/skill.types";
 import { useEffect, useMemo, useState } from "react";
 
 import { AddDialog } from "../_components/AddDialog";
 import AdminLayout from "../_components/AdminLayout";
 import { ConfirmDelete } from "../_components/ConfirmDeleteDialog";
-
-type Skill = { id: number; name: string; isActive: boolean };
 
 export default function SkillsPage() {
   // 검색/정렬/페이지 사이즈 스토어
@@ -39,8 +38,8 @@ export default function SkillsPage() {
   const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useListSkill();
 
-  const skills: Skill[] = useMemo(
-    () => (data?.pages ?? []).flatMap((p: any) => p.content ?? []),
+  const skills: SkillDto[] = useMemo(
+    () => (data?.pages ?? []).flatMap((p) => p.content ?? []),
     [data],
   );
 

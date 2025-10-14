@@ -10,7 +10,12 @@ export type PagePayloadProjectDto =
   components["schemas"]["PagePayloadProjectDto"];
 
 export type ProjectListParam = Pageable & {
-  searchKeyword: string;
+  regionIds: number[];
+  categoryIds: number[];
+  skillIds: number[];
+  minSalary: number;
+  maxSalary: number;
+  keyword: string;
 };
 
 export type HirerType = "individual" | "corporate"; // 고용인 유형

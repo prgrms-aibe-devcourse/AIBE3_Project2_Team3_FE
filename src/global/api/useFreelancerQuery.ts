@@ -52,10 +52,40 @@ export const freelancerQueryKeys = createQueryKeys("freelancer", {
 });
 
 export const useListFreelancer = () => {
-  const { page, size, sort, search } = useFreelancerListStore((state) => state);
+  const {
+    page,
+    size,
+    sort,
+    keyword,
+    categoryIds,
+    regionIds,
+    skillIds,
+    minSalary,
+    maxSalary,
+  } = useFreelancerListStore((state) => state);
   const param = useMemo(
-    () => ({ page, size, sort, searchKeyword: search }),
-    [page, size, sort, search],
+    () => ({
+      page,
+      size,
+      sort,
+      keyword,
+      categoryIds,
+      regionIds,
+      skillIds,
+      minSalary,
+      maxSalary,
+    }),
+    [
+      page,
+      size,
+      sort,
+      keyword,
+      categoryIds,
+      regionIds,
+      skillIds,
+      minSalary,
+      maxSalary,
+    ],
   );
   return useQuery({
     queryKey: freelancerQueryKeys.list(param).queryKey,

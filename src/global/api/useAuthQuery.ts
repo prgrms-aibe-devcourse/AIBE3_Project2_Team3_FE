@@ -1,8 +1,11 @@
 import { createQueryKeys } from "@lukemorales/query-key-factory";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { usePathname, useRouter } from "next/navigation";
+
 import client from "../backend/client";
 import { unwrap } from "../backend/unwrap";
+import { isAllowedPath } from "../lib/utils";
 import {
   UserDeleteReqBody,
   UserFindPasswordReqBody,
@@ -68,11 +71,17 @@ export const useLogin = () => {
 
 export const useLogout = () => {
   const qc = useQueryClient();
+  const router = useRouter();
+  const pathname = usePathname();
   return useMutation({
     mutationKey: authQueryKeys.logout().queryKey,
     mutationFn: logout,
     onSuccess: () => {
       qc.setQueryData(authQueryKeys.me().queryKey, null);
+
+      if (!isAllowedPath(pathname)) {
+        router.replace("/auth/login"); // 히스토리 대체(뒤로가기 방지)
+      }
     },
   });
 };

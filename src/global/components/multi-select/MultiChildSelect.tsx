@@ -2,18 +2,14 @@
 
 import { Checkbox } from "@/global/components/ui/checkbox";
 import { cn } from "@/global/lib/utils";
+import { CategoryTreeDto } from "@/global/types/category.types";
+import { RegionTreeDto } from "@/global/types/region.types";
 import { useCallback, useMemo, useState } from "react";
 
 import { ChevronDown, ChevronRight } from "lucide-react";
 
-type ChildNode = {
-  id: number;
-  name: string;
-  children?: ChildNode[]; // depth=2 기준: 부모는 children 존재, leaf는 없음
-};
-
 type Props = {
-  data: ChildNode[]; // 1뎁스 목록
+  data: (CategoryTreeDto | RegionTreeDto)[]; // 1뎁스 목록
   value: number[]; // 선택된 leaf id 배열
   onChange: (ids: number[]) => void;
   className?: string;
@@ -39,7 +35,7 @@ export function MultiChildSelect({ data, value, onChange, className }: Props) {
     onChange(Array.from(next));
   };
 
-  const toggleParent = (node: ChildNode) => {
+  const toggleParent = (node: CategoryTreeDto | RegionTreeDto) => {
     const leafIds = collectLeaves(node);
     const next = new Set(selectedSet);
     const allSelected = leafIds.every((id) => next.has(id));
@@ -49,7 +45,7 @@ export function MultiChildSelect({ data, value, onChange, className }: Props) {
   };
 
   const parentState = useCallback(
-    (node: ChildNode) => {
+    (node: CategoryTreeDto | RegionTreeDto) => {
       const leafIds = collectLeaves(node);
       const sel = leafIds.filter((id) => selectedSet.has(id)).length;
       const all = sel === leafIds.length && leafIds.length > 0;
@@ -152,7 +148,7 @@ export function MultiChildSelect({ data, value, onChange, className }: Props) {
 }
 
 /** 해당 노드의 leaf id 수집 (depth=2 가정, 안전하게 재귀 지원) */
-function collectLeaves(node: ChildNode): number[] {
+function collectLeaves(node: CategoryTreeDto | RegionTreeDto): number[] {
   if (!node.children || node.children.length === 0) return [node.id];
   const out: number[] = [];
   for (const c of node.children) {

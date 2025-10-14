@@ -49,9 +49,11 @@ export function ConfirmWithPassword({
       await onConfirm(pw);
       setOpen(false);
       setPw("");
-    } catch (e: any) {
+    } catch (e) {
       // 서버 에러 메시지 있으면 노출
-      setError(e?.message ?? "요청 처리 중 오류가 발생했습니다.");
+      setError(
+        e instanceof Error ? e.message : "요청 처리 중 오류가 발생했습니다.",
+      );
     } finally {
       setSubmitting(false);
     }

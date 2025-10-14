@@ -14,6 +14,7 @@ import {
   DEFAULT_FEE_MIN,
   DEFAULT_FEE_RATE,
   DEFAULT_FEE_ROUNDING,
+  PUBLIC_ROUTES,
   Rounding,
 } from "../consts";
 import { UnitOption } from "../types/common.types";
@@ -159,4 +160,28 @@ export function calcTotals(
   const fee = calcFee(subtotal, opts);
   const total = subtotal + fee;
   return { subtotal, fee, total };
+}
+
+export function computeStep(minBound: number, maxBound: number) {
+  const range = Math.max(0, maxBound - minBound);
+  if (range <= 1_000_000) return 10_000; // 1백만 이하면 1만
+  if (range <= 5_000_000) return 50_000; // 5백만 이하면 5만
+  if (range <= 20_000_000) return 100_000; // 2천만 이하면 10만
+  return 500_000; // 그 이상은 50만
+}
+
+export const clamp = (n: number, lo: number, hi: number) =>
+  Math.min(Math.max(n, lo), hi);
+export const roundTo = (n: number, step: number) => Math.round(n / step) * step;
+
+export function isAllowedPath(pathname: string): boolean {
+  // 기본 화이트리스트(정확히 일치만 허용)
+  const exact = new Set(PUBLIC_ROUTES);
+  if (exact.has(pathname)) return true;
+
+  // /freelancer/:id 또는 /project/:id 형태만 허용 (하위 경로 불가)
+  const isFreelancerDetail = /^\/freelancer\/[^/]+\/?$/.test(pathname);
+  const isProjectDetail = /^\/project\/[^/]+\/?$/.test(pathname);
+
+  return isFreelancerDetail || isProjectDetail;
 }

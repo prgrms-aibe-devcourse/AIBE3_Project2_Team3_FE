@@ -8,7 +8,7 @@ import ClientLayout from "./ClientLayout";
 const ContextLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <QueryClientCustomProvider>
-      <ClientLayout children={children} />
+      <ClientLayout>{children}</ClientLayout>
     </QueryClientCustomProvider>
   );
 };
