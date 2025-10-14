@@ -229,7 +229,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/reviews/{contractId}": {
+    "/api/v1/reviews/{postId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -322,7 +322,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 프리랜서 글 다건 조회 */
+        /** 프리랜서 글 다건 조회 (필터 + 검색 자동 분기) */
         get: operations["getItems_1"];
         put?: never;
         /** 프리랜서 글 작성 */
@@ -598,6 +598,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/reviews/project/{projectId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getProjectReviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reviews/freelancer/{freelancerId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getFreelancerReviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/regions": {
         parameters: {
             query?: never;
@@ -624,23 +656,6 @@ export interface paths {
         };
         /** 본인이 등록한 문의 및 답변 조회 */
         get: operations["getMyQuestionsWithAnswers"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/projects/search": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 프로젝트 글 검색 및 다건조회 */
-        get: operations["getProjects"];
         put?: never;
         post?: never;
         delete?: never;
@@ -954,12 +969,17 @@ export interface components {
         ReviewDto: {
             /** Format: int64 */
             id: number;
-            writerNickname: string;
             /** Format: int32 */
             rating: number;
+            userNickname: string;
+            targetNickname: string;
             comment: string;
             /** Format: date-time */
             createdAt: string;
+            /** Format: date-time */
+            modifiedAt: string;
+            /** Format: int64 */
+            postId: number;
         };
         RsDataReviewDto: {
             resultCode: string;
@@ -1445,6 +1465,15 @@ export interface components {
             /** Format: int32 */
             size: number;
             sort: string[];
+        };
+        PagePayloadReviewDto: {
+            content: components["schemas"]["ReviewDto"][];
+            page: components["schemas"]["PageMeta"];
+        };
+        RsDataPagePayloadReviewDto: {
+            resultCode: string;
+            message: string;
+            data: components["schemas"]["PagePayloadReviewDto"];
         };
         PagePayloadQuestionDto: {
             content: components["schemas"]["QuestionDto"][];
@@ -2533,7 +2562,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                contractId: number;
+                postId: number;
             };
             cookie?: never;
         };
@@ -2670,7 +2699,12 @@ export interface operations {
                 size?: number;
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
-                searchKeyword?: string;
+                keyword?: string;
+                categoryIds?: number[];
+                regionIds?: number[];
+                skillIds?: number[];
+                minSalary?: number;
+                maxSalary?: number;
             };
             header?: never;
             path?: never;
@@ -2773,7 +2807,12 @@ export interface operations {
                 size?: number;
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
-                searchKeyword?: string;
+                keyword?: string;
+                categoryIds?: number[];
+                regionIds?: number[];
+                skillIds?: number[];
+                minSalary?: number;
+                maxSalary?: number;
             };
             header?: never;
             path?: never;
@@ -3502,6 +3541,72 @@ export interface operations {
             };
         };
     };
+    getProjectReviews: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path: {
+                projectId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataPagePayloadReviewDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getFreelancerReviews: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path: {
+                freelancerId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataPagePayloadReviewDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     getTreeAll: {
         parameters: {
             query?: never;
@@ -3549,41 +3654,6 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PagePayloadQuestionDto"];
-                };
-            };
-            /** @description Bad Request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataVoid"];
-                };
-            };
-        };
-    };
-    getProjects: {
-        parameters: {
-            query?: {
-                status?: string;
-                regionIds?: number[];
-                categoryIds?: number[];
-                skillIds?: number[];
-                keyword?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ProjectDto"][];
                 };
             };
             /** @description Bad Request */

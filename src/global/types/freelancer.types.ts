@@ -11,5 +11,10 @@ export type PagePayloadFreelancerDto =
   components["schemas"]["PagePayloadFreelancerDto"];
 
 export type FreelancerListParam = Pageable & {
-  searchKeyword: string;
+  regionIds: number[];
+  categoryIds: number[];
+  skillIds: number[];
+  minSalary: number;
+  maxSalary: number;
+  keyword: string;
 };

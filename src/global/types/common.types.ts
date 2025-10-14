@@ -7,3 +7,11 @@ export type PageQuery = {
   size?: number; // ex) 100
   sort?: string[]; // ex) ["id,desc", "name,asc"]
 };
+
+export type applyParams = {
+  categoryIds: number[];
+  regionIds: number[];
+  skillIds: number[];
+  minSalary: number;
+  maxSalary: number;
+};
