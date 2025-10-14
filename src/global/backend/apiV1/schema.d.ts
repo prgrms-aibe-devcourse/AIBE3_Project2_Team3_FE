@@ -1713,18 +1713,18 @@ export interface components {
         PageableObject: {
             /** Format: int64 */
             offset: number;
-            unpaged: boolean;
+            paged: boolean;
             /** Format: int32 */
             pageNumber: number;
             /** Format: int32 */
             pageSize: number;
             sort: components["schemas"]["SortObject"];
-            paged: boolean;
+            unpaged: boolean;
         };
         SortObject: {
             empty: boolean;
-            unsorted: boolean;
             sorted: boolean;
+            unsorted: boolean;
         };
         UserDeleteReqBody: {
             password: string;
