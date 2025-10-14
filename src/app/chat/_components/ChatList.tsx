@@ -1,6 +1,7 @@
 "use client";
 
 import { useListChatRoom } from "@/global/api/useChatQuery";
+import { searchUsersToInvite, useInviteUsers } from "@/global/api/useChatQuery";
 import {
   Avatar,
   AvatarFallback,
@@ -27,61 +28,17 @@ import { ScrollArea } from "@/global/components/ui/scroll-area";
 import { Separator } from "@/global/components/ui/separator";
 import { formatChatTimestamp } from "@/global/lib/utils";
 import { useChatRoomListStore } from "@/global/stores/useChatRoomListStore";
+import type { InviteUserSummary } from "@/global/types/chat.types";
 import { ChatRoomDto } from "@/global/types/chat.types";
-// ──────────────────────────────────────────────────────────────
-// 기존 ChatList 컴포넌트에 하단 버튼 추가
-import { ChatRoomDto as _ChatRoomDto } from "@/global/types/chat.types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import Link from "next/link";
 
 import { MessageCircle, Plus, Search, Users, X } from "lucide-react";
 
-// 간단한 타입
-type UserSummary = {
-  id: number;
-  username: string;
-};
-
-async function searchUsersByNickname(q: string): Promise<UserSummary[]> {
-  if (!q.trim()) return [];
-  const res = await fetch("http://localhost:8080/api/v1/users/searchToInvite", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
-    body: JSON.stringify({ username: q.trim() }),
-    credentials: "include",
-  });
-  if (!res.ok) throw new Error("유저 검색 실패");
-  const body = await res.json(); // RsData<List<UserInviteDto>>
-  // body.data: [{ userId }, ...]
-  return (body.data ?? []).map((u: any) => ({
-    id: u.userId,
-    username: u.userName,
-  }));
-}
-
-// 초대 API 예시: POST /api/chat/{chatId}/invites  body: { userIds: number[] }
-async function inviteUsers(chatId: number, userIds: number[]): Promise<void> {
-  const res = await fetch(
-    `http://localhost:8080/api/v1/chat/rooms/${chatId}/invites`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({ inviteeIds: userIds }),
-      credentials: "include",
-    },
-  );
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(text || "초대 요청 실패");
-  }
-}
-
-// ──────────────────────────────────────────────────────────────
-// 초대 다이얼로그
+/* ─────────────────────────────────────────────
+ * 초대 다이얼로그
+ * ───────────────────────────────────────────── */
 function InviteUsersDialog({
   chatId,
   disabled,
@@ -92,30 +49,29 @@ function InviteUsersDialog({
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [results, setResults] = useState<UserSummary[]>([]);
-  const [selected, setSelected] = useState<UserSummary[]>([]);
+  const [results, setResults] = useState<InviteUserSummary[]>([]);
+  const [selected, setSelected] = useState<InviteUserSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [inviting, setInviting] = useState(false);
 
-  // 중복 선택 방지
+  const { mutateAsync: invite, isPending: inviting } = useInviteUsers(chatId);
+
   const isPicked = useCallback(
     (id: number) => selected.some((u) => u.id === id),
     [selected],
   );
-
-  const addUser = (u: UserSummary) => {
+  const addUser = (u: InviteUserSummary) => {
     if (isPicked(u.id)) return;
     setSelected((prev) => [...prev, u]);
   };
   const removeUser = (id: number) =>
     setSelected((prev) => prev.filter((u) => u.id !== id));
 
-  // 검색 실행
+  // 검색
   const runSearch = async () => {
     try {
       setError(null);
       setIsSearching(true);
-      const data = await searchUsersByNickname(q);
+      const data = await searchUsersToInvite(q);
       setResults(data);
     } catch (e: any) {
       setError(e?.message ?? "검색 중 오류가 발생했습니다");
@@ -124,8 +80,6 @@ function InviteUsersDialog({
       setIsSearching(false);
     }
   };
-
-  // Enter로 검색
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -141,12 +95,8 @@ function InviteUsersDialog({
       return;
     }
     try {
-      setInviting(true);
       setError(null);
-      await inviteUsers(
-        chatId,
-        selected.map((u) => u.id),
-      );
+      await invite(selected.map((u) => u.id)); // ← useInviteUsers 사용
       // 초기화
       setSelected([]);
       setQ("");
@@ -154,12 +104,10 @@ function InviteUsersDialog({
       setOpen(false);
     } catch (e: any) {
       setError(e?.message ?? "초대에 실패했습니다");
-    } finally {
-      setInviting(false);
     }
   };
 
-  // 다이얼로그 열릴 때 초기화
+  // 다이얼로그 닫힐 때 정리
   useEffect(() => {
     if (!open) {
       setQ("");
@@ -167,7 +115,6 @@ function InviteUsersDialog({
       setSelected([]);
       setError(null);
       setIsSearching(false);
-      setInviting(false);
     }
   }, [open]);
 
@@ -179,6 +126,7 @@ function InviteUsersDialog({
           채팅 초대
         </Button>
       </DialogTrigger>
+
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>유저 초대</DialogTitle>
@@ -207,7 +155,7 @@ function InviteUsersDialog({
             </Button>
           </div>
 
-          {/* 선택된 사용자 표시 */}
+          {/* 선택된 사용자 */}
           <div className="flex flex-wrap gap-2 min-h-9">
             {selected.map((u) => (
               <Badge
@@ -234,7 +182,7 @@ function InviteUsersDialog({
 
           <Separator />
 
-          {/* 검색 결과 리스트 */}
+          {/* 검색 결과 */}
           <div>
             <div className="mb-2 text-sm text-muted-foreground">
               검색 결과 {isSearching ? "조회 중…" : `(${results.length}명)`}
@@ -246,10 +194,8 @@ function InviteUsersDialog({
                     key={u.id}
                     className="flex items-center justify-between rounded-lg border p-2"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="truncate">
-                        <div className="truncate font-medium">{u.username}</div>
-                      </div>
+                    <div className="min-w-0">
+                      <div className="truncate font-medium">{u.username}</div>
                     </div>
                     <Button
                       type="button"
@@ -309,13 +255,14 @@ function InviteUsersDialog({
   );
 }
 
-// ──────────────────────────────────────────────────────────────
-
+/* ─────────────────────────────────────────────
+ * 채팅 리스트
+ * ───────────────────────────────────────────── */
 interface ChatListProps {
   selectedChatId?: number;
 }
 export function ChatList({ selectedChatId }: ChatListProps) {
-  const { search, setSearch } = useChatRoomListStore((state) => state);
+  const { search, setSearch } = useChatRoomListStore((s) => s);
   const { data, status, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useListChatRoom();
   const loaderRef = useRef<HTMLDivElement | null>(null);
