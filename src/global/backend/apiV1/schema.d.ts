@@ -165,6 +165,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/users/searchToInvite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/login": {
         parameters: {
             query?: never;
@@ -374,7 +390,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["invite"];
+        post: operations["invite_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -740,6 +756,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getMembers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/chat/invites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getInvites"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1129,6 +1161,19 @@ export interface components {
             resultCode: string;
             message: string;
             data: components["schemas"]["AnswerDto"];
+        };
+        UserInviteSearchReqBody: {
+            username: string;
+        };
+        RsDataListUserInviteDto: {
+            resultCode: string;
+            message: string;
+            data: components["schemas"]["UserInviteDto"][];
+        };
+        UserInviteDto: {
+            /** Format: int64 */
+            userId: number;
+            userName: string;
         };
         UserLoginReqBody: {
             username: string;
@@ -1573,6 +1618,13 @@ export interface components {
             content: components["schemas"]["ChatMemberDto"][];
             page: components["schemas"]["PageMeta"];
         };
+        ChatInviteDto: {
+            /** Format: int64 */
+            roomId: number;
+            roomName: string;
+            /** Format: date-time */
+            invitedDate: string;
+        };
         ApplicationWithPostDto: {
             /** Format: int64 */
             id: number;
@@ -1635,12 +1687,12 @@ export interface components {
             /** Format: int64 */
             offset: number;
             sort: components["schemas"]["SortObject"];
-            unpaged: boolean;
+            paged: boolean;
             /** Format: int32 */
             pageNumber: number;
             /** Format: int32 */
             pageSize: number;
-            paged: boolean;
+            unpaged: boolean;
         };
         SortObject: {
             empty: boolean;
@@ -2373,6 +2425,39 @@ export interface operations {
             };
         };
     };
+    invite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserInviteSearchReqBody"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataListUserInviteDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     login: {
         parameters: {
             query?: never;
@@ -2961,7 +3046,7 @@ export interface operations {
             };
         };
     };
-    invite: {
+    invite_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3780,6 +3865,35 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PagePayloadChatMemberDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getInvites: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ChatInviteDto"][];
                 };
             };
             /** @description Bad Request */
