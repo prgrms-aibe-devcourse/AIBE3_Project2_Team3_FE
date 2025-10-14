@@ -1,8 +1,13 @@
 "use client";
 
+import { useListCategory } from "@/global/api/useCategoryQuery";
 import { useListFreelancer } from "@/global/api/useFreelancerQuery";
+import { useListRegion } from "@/global/api/useRegionQuery";
+import { useListSkill } from "@/global/api/useSkillQuery";
 import { PaginationBar } from "@/global/components/ui/paginationBar";
 import { useFreelancerListStore } from "@/global/stores/useFreelancerListStore";
+import { PagePayloadSkillDto } from "@/global/types/skill.types";
+import { useMemo } from "react";
 
 import { FreelancerCard } from "./_components/FreelancerCard";
 import { FreelancerFilters } from "./_components/FreelancerFilters";
@@ -10,6 +15,15 @@ import { FreelancerFilters } from "./_components/FreelancerFilters";
 export default function FreelancersPage() {
   const { data, isLoading } = useListFreelancer();
   const { page, setPage } = useFreelancerListStore((state) => state);
+  const { data: categoryTree, isLoading: catLoading } = useListCategory();
+  const { data: regionTree, isLoading: regLoading } = useListRegion();
+  const { data: skillsPages, isLoading: skillLoading } = useListSkill();
+  const skills = useMemo(() => {
+    if (!skillsPages?.pages) return [];
+    return skillsPages.pages.flatMap((pg: PagePayloadSkillDto) => {
+      return pg.content ?? [];
+    });
+  }, [skillsPages]);
   return (
     <div className="min-h-screen">
       <main className="container py-8 px-4">
@@ -21,7 +35,14 @@ export default function FreelancersPage() {
         </div>
 
         <div className="space-y-6">
-          <FreelancerFilters />
+          <FreelancerFilters
+            categories={categoryTree ?? []}
+            regions={regionTree ?? []}
+            skills={skills}
+            onApply={(f) => {
+              console.log(f);
+            }}
+          />
 
           <div className="flex items-center justify-between">
             <p className="text-sm text-muted-foreground">

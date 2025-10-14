@@ -6,3 +6,4 @@ export type SkillListParam = PageQuery & {
 };
 export type SkillDto = components["schemas"]["SkillDto"];
 export type SkillCreateReqBody = components["schemas"]["SkillCreateReqBody"];
+export type PagePayloadSkillDto = components["schemas"]["PagePayloadSkillDto"];
