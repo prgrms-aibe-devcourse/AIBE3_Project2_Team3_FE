@@ -230,7 +230,25 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/reviews/{contractId}": {
+    "/api/v1/skills": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 전체 스킬 조회 */
+        get: operations["getSkills"];
+        put?: never;
+        /** 스킬 생성 */
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reviews/{postId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -323,7 +341,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 프리랜서 글 다건 조회 */
+        /** 프리랜서 글 다건 조회 (필터 + 검색 자동 분기) */
         get: operations["getItems_1"];
         put?: never;
         /** 프리랜서 글 작성 */
@@ -580,15 +598,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/skills": {
+    "/api/v1/reviews/project/{projectId}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** 전체 스킬 조회 */
-        get: operations["getSkills"];
+        get: operations["getProjectReviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reviews/freelancer/{freelancerId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getFreelancerReviews"];
         put?: never;
         post?: never;
         delete?: never;
@@ -631,15 +664,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/projects/search": {
+    "/api/v1/projects/me": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** 프로젝트 글 검색 및 다건조회 */
-        get: operations["getProjects"];
+        /** 내가 쓴 프로젝트 글 다건 조회 */
+        get: operations["getMyItems"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/posts/{postId}/offers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 다건 조회 */
+        get: operations["getItems_2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -690,7 +740,7 @@ export interface paths {
             cookie?: never;
         };
         /** 내가 등록한 구인 다건 조회 */
-        get: operations["getMyItems"];
+        get: operations["getMyItems_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -708,6 +758,23 @@ export interface paths {
         };
         /** JSON 알림 다건 조회 */
         get: operations["getItems_5"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/freelancers/my": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 내가 작성한 프리랜서 글 조회 */
+        get: operations["getMyFreelancers"];
         put?: never;
         post?: never;
         delete?: never;
@@ -823,7 +890,7 @@ export interface paths {
             cookie?: never;
         };
         /** 내가 등록한 구직 다건 조회 */
-        get: operations["getMyItems_1"];
+        get: operations["getMyItems_2"];
         put?: never;
         post?: never;
         delete?: never;
@@ -987,12 +1054,17 @@ export interface components {
         ReviewDto: {
             /** Format: int64 */
             id: number;
-            writerNickname: string;
             /** Format: int32 */
             rating: number;
+            userNickname: string;
+            targetNickname: string;
             comment: string;
             /** Format: date-time */
             createdAt: string;
+            /** Format: date-time */
+            modifiedAt: string;
+            /** Format: int64 */
+            postId: number;
         };
         RsDataReviewDto: {
             resultCode: string;
@@ -1508,6 +1580,15 @@ export interface components {
             size: number;
             sort: string[];
         };
+        PagePayloadReviewDto: {
+            content: components["schemas"]["ReviewDto"][];
+            page: components["schemas"]["PageMeta"];
+        };
+        RsDataPagePayloadReviewDto: {
+            resultCode: string;
+            message: string;
+            data: components["schemas"]["PagePayloadReviewDto"];
+        };
         PagePayloadQuestionDto: {
             content: components["schemas"]["QuestionDto"][];
             page: components["schemas"]["PageMeta"];
@@ -1628,6 +1709,13 @@ export interface components {
             content: components["schemas"]["ChatMemberDto"][];
             page: components["schemas"]["PageMeta"];
         };
+        ChatInviteDto: {
+            /** Format: int64 */
+            roomId: number;
+            roomName: string;
+            /** Format: date-time */
+            invitedDate: string;
+        };
         ApplicationDto: {
             /** Format: int64 */
             id: number;
@@ -1676,37 +1764,9 @@ export interface components {
             content: components["schemas"]["ApplicationWithPostDto"][];
             page: components["schemas"]["PageMeta"];
         };
-        PageReportDto: {
-            /** Format: int32 */
-            totalPages: number;
-            /** Format: int64 */
-            totalElements: number;
-            /** Format: int32 */
-            size: number;
+        PagePayloadReportDto: {
             content: components["schemas"]["ReportDto"][];
-            /** Format: int32 */
-            number: number;
-            first: boolean;
-            last: boolean;
-            /** Format: int32 */
-            numberOfElements: number;
-            pageable: components["schemas"]["PageableObject"];
-            sort: components["schemas"]["SortObject"];
-            empty: boolean;
-        };
-        PageableObject: {
-            /** Format: int64 */
-            offset: number;
-            sort: components["schemas"]["SortObject"];
-            /** Format: int32 */
-            pageSize: number;
-            paged: boolean;
-            unpaged: boolean;
-        };
-        SortObject: {
-            empty: boolean;
-            sorted: boolean;
-            unsorted: boolean;
+            page: components["schemas"]["PageMeta"];
         };
         UserDeleteReqBody: {
             password: string;
@@ -2125,7 +2185,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["RsDataOfferModifyStatusResBody"];
+                    "*/*": components["schemas"]["RsDataVoid"];
                 };
             };
             /** @description Bad Request */
@@ -2161,6 +2221,37 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RsDataOfferModifyStatusResBody"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getItem_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FreelancerDto"];
                 };
             };
             /** @description Bad Request */
@@ -2340,7 +2431,7 @@ export interface operations {
             };
         };
     };
-    modify_5: {
+    modifyStatus_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -2349,12 +2440,9 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
-                "multipart/form-data": {
-                    reqBody: components["schemas"]["ApplicationModifyReqBody"];
-                    files?: string[];
-                };
+                "application/json": components["schemas"]["ApplicationModifyStatusReqBody"];
             };
         };
         responses: {
@@ -2413,42 +2501,7 @@ export interface operations {
             };
         };
     };
-    modifyStatus_1: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ApplicationModifyStatusReqBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataApplicationModifyStatusResBody"];
-                };
-            };
-            /** @description Bad Request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataVoid"];
-                };
-            };
-        };
-    };
-    modifyAnswer: {
+    deleteAnswer: {
         parameters: {
             query?: never;
             header?: never;
@@ -2653,7 +2706,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                contractId: number;
+                postId: number;
             };
             cookie?: never;
         };
@@ -2790,7 +2843,12 @@ export interface operations {
                 size?: number;
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
-                searchKeyword?: string;
+                keyword?: string;
+                categoryIds?: number[];
+                regionIds?: number[];
+                skillIds?: number[];
+                minSalary?: number;
+                maxSalary?: number;
             };
             header?: never;
             path?: never;
@@ -2893,7 +2951,12 @@ export interface operations {
                 size?: number;
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
-                searchKeyword?: string;
+                keyword?: string;
+                categoryIds?: number[];
+                regionIds?: number[];
+                skillIds?: number[];
+                minSalary?: number;
+                maxSalary?: number;
             };
             header?: never;
             path?: never;
@@ -3579,6 +3642,39 @@ export interface operations {
             };
         };
     };
+    getFreelancerReviews: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path: {
+                freelancerId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataPagePayloadReviewDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     getTreeAll: {
         parameters: {
             query?: never;
@@ -3610,7 +3706,9 @@ export interface operations {
     };
     getMyQuestionsWithAnswers: {
         parameters: {
-            query?: never;
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -3637,14 +3735,52 @@ export interface operations {
             };
         };
     };
-    getProjects: {
+    getMyItems: {
         parameters: {
             query?: {
-                status?: string;
-                regionIds?: number[];
-                categoryIds?: number[];
-                skillIds?: number[];
-                keyword?: string;
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PagePayloadProjectDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getItems_2: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                status?: "PENDING" | "ACCEPTED" | "REJECTED";
             };
             header?: never;
             path: {
@@ -3660,7 +3796,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ProjectDto"][];
+                    "*/*": components["schemas"]["PagePayloadOfferWithUserDto"];
                 };
             };
             /** @description Bad Request */
@@ -3725,9 +3861,7 @@ export interface operations {
                 status?: "PENDING" | "ACCEPTED" | "REJECTED";
             };
             header?: never;
-            path: {
-                postId: number;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -3752,7 +3886,7 @@ export interface operations {
             };
         };
     };
-    getMyItems: {
+    getMyItems_1: {
         parameters: {
             query?: {
                 /** @description Zero-based page index (0..N) */
@@ -3812,6 +3946,42 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PagePayloadNotificationDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getMyFreelancers: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PagePayloadFreelancerDto"];
                 };
             };
             /** @description Bad Request */
@@ -4022,7 +4192,7 @@ export interface operations {
             };
         };
     };
-    getMyItems_1: {
+    getMyItems_2: {
         parameters: {
             query?: {
                 /** @description Zero-based page index (0..N) */
@@ -4061,8 +4231,13 @@ export interface operations {
     };
     getReports: {
         parameters: {
-            query: {
-                pageable: components["schemas"]["Pageable"];
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
             };
             header?: never;
             path?: never;
@@ -4076,7 +4251,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["PageReportDto"];
+                    "*/*": components["schemas"]["PagePayloadReportDto"];
                 };
             };
             /** @description Bad Request */
