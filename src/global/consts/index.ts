@@ -14,6 +14,9 @@ export const SALARY_UNITS = [
   { value: "krw_10k", label: "만원", factor: 10_000 },
 ];
 
+export const SALARY_MIN_RANGE = 0;
+export const SALARY_MAX_RANGE = 100_000_000;
+
 export type ExperienceRange = {
   id: string;
   label: string;
