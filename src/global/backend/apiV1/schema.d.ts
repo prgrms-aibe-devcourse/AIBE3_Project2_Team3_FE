@@ -182,22 +182,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/searchToInvite": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["invite"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/users/login": {
         parameters: {
             query?: never;
@@ -246,25 +230,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/skills": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 전체 스킬 조회 */
-        get: operations["getSkills"];
-        put?: never;
-        /** 스킬 생성 */
-        post: operations["create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/reviews/{postId}": {
+    "/api/v1/reviews/{contractId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -357,7 +323,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 프리랜서 글 다건 조회 (필터 + 검색 자동 분기) */
+        /** 프리랜서 글 다건 조회 */
         get: operations["getItems_1"];
         put?: never;
         /** 프리랜서 글 작성 */
@@ -425,7 +391,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["invite_1"];
+        post: operations["invite"];
         delete?: never;
         options?: never;
         head?: never;
@@ -582,6 +548,22 @@ export interface paths {
         patch: operations["changePostViewedStatus"];
         trace?: never;
     };
+    "/api/v1/users/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["search"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/me": {
         parameters: {
             query?: never;
@@ -598,30 +580,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/reviews/project/{projectId}": {
+    "/api/v1/skills": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getProjectReviews"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/reviews/freelancer/{freelancerId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getFreelancerReviews"];
+        /** 전체 스킬 조회 */
+        get: operations["getSkills"];
         put?: never;
         post?: never;
         delete?: never;
@@ -664,15 +631,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/posts/{postId}/offers": {
+    "/api/v1/projects/search": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** 다건 조회 */
-        get: operations["getItems_2"];
+        /** 프로젝트 글 검색 및 다건조회 */
+        get: operations["getProjects"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1020,17 +987,12 @@ export interface components {
         ReviewDto: {
             /** Format: int64 */
             id: number;
+            writerNickname: string;
             /** Format: int32 */
             rating: number;
-            userNickname: string;
-            targetNickname: string;
             comment: string;
             /** Format: date-time */
             createdAt: string;
-            /** Format: date-time */
-            modifiedAt: string;
-            /** Format: int64 */
-            postId: number;
         };
         RsDataReviewDto: {
             resultCode: string;
@@ -1259,19 +1221,6 @@ export interface components {
             resultCode: string;
             message: string;
             data: components["schemas"]["AnswerDto"];
-        };
-        UserInviteSearchReqBody: {
-            username: string;
-        };
-        RsDataListUserInviteDto: {
-            resultCode: string;
-            message: string;
-            data: components["schemas"]["UserInviteDto"][];
-        };
-        UserInviteDto: {
-            /** Format: int64 */
-            userId: number;
-            userName: string;
         };
         UserLoginReqBody: {
             username: string;
@@ -1519,6 +1468,16 @@ export interface components {
             oldPassword: string;
             newPassword: string;
         };
+        RsDataUserInviteDto: {
+            resultCode: string;
+            message: string;
+            data: components["schemas"]["UserInviteDto"];
+        };
+        UserInviteDto: {
+            /** Format: int64 */
+            userId: number;
+            userName: string;
+        };
         PageMeta: {
             /** Format: int32 */
             page: number;
@@ -1548,15 +1507,6 @@ export interface components {
             /** Format: int32 */
             size: number;
             sort: string[];
-        };
-        PagePayloadReviewDto: {
-            content: components["schemas"]["ReviewDto"][];
-            page: components["schemas"]["PageMeta"];
-        };
-        RsDataPagePayloadReviewDto: {
-            resultCode: string;
-            message: string;
-            data: components["schemas"]["PagePayloadReviewDto"];
         };
         PagePayloadQuestionDto: {
             content: components["schemas"]["QuestionDto"][];
@@ -1748,11 +1698,9 @@ export interface components {
             /** Format: int64 */
             offset: number;
             sort: components["schemas"]["SortObject"];
-            paged: boolean;
             /** Format: int32 */
             pageSize: number;
-            /** Format: int32 */
-            pageNumber: number;
+            paged: boolean;
             unpaged: boolean;
         };
         SortObject: {
@@ -2531,39 +2479,6 @@ export interface operations {
             };
         };
     };
-    invite: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UserInviteSearchReqBody"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataListUserInviteDto"];
-                };
-            };
-            /** @description Bad Request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataVoid"];
-                };
-            };
-        };
-    };
     login: {
         parameters: {
             query?: never;
@@ -2738,7 +2653,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                postId: number;
+                contractId: number;
             };
             cookie?: never;
         };
@@ -2875,12 +2790,7 @@ export interface operations {
                 size?: number;
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
-                keyword?: string;
-                categoryIds?: number[];
-                regionIds?: number[];
-                skillIds?: number[];
-                minSalary?: number;
-                maxSalary?: number;
+                searchKeyword?: string;
             };
             header?: never;
             path?: never;
@@ -2983,12 +2893,7 @@ export interface operations {
                 size?: number;
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
-                keyword?: string;
-                categoryIds?: number[];
-                regionIds?: number[];
-                skillIds?: number[];
-                minSalary?: number;
-                maxSalary?: number;
+                searchKeyword?: string;
             };
             header?: never;
             path?: never;
@@ -3222,7 +3127,7 @@ export interface operations {
             };
         };
     };
-    invite_1: {
+    invite: {
         parameters: {
             query?: never;
             header?: never;
@@ -3550,6 +3455,37 @@ export interface operations {
             };
         };
     };
+    search: {
+        parameters: {
+            query?: {
+                username?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataUserInviteDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     me: {
         parameters: {
             query?: never;
@@ -3643,39 +3579,6 @@ export interface operations {
             };
         };
     };
-    getFreelancerReviews: {
-        parameters: {
-            query: {
-                pageable: components["schemas"]["Pageable"];
-            };
-            header?: never;
-            path: {
-                freelancerId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataPagePayloadReviewDto"];
-                };
-            };
-            /** @description Bad Request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataVoid"];
-                };
-            };
-        };
-    };
     getTreeAll: {
         parameters: {
             query?: never;
@@ -3707,9 +3610,7 @@ export interface operations {
     };
     getMyQuestionsWithAnswers: {
         parameters: {
-            query: {
-                pageable: components["schemas"]["Pageable"];
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -3736,16 +3637,14 @@ export interface operations {
             };
         };
     };
-    getItems_2: {
+    getProjects: {
         parameters: {
             query?: {
-                /** @description Zero-based page index (0..N) */
-                page?: number;
-                /** @description The size of the page to be returned */
-                size?: number;
-                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
-                sort?: string[];
-                status?: "PENDING" | "ACCEPTED" | "REJECTED";
+                status?: string;
+                regionIds?: number[];
+                categoryIds?: number[];
+                skillIds?: number[];
+                keyword?: string;
             };
             header?: never;
             path: {
@@ -3761,7 +3660,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["PagePayloadOfferWithUserDto"];
+                    "*/*": components["schemas"]["ProjectDto"][];
                 };
             };
             /** @description Bad Request */
