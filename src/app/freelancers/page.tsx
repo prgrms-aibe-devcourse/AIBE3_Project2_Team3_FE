@@ -6,6 +6,7 @@ import { useListRegion } from "@/global/api/useRegionQuery";
 import { useListSkill } from "@/global/api/useSkillQuery";
 import { PaginationBar } from "@/global/components/ui/paginationBar";
 import { useFreelancerListStore } from "@/global/stores/useFreelancerListStore";
+import { applyParams } from "@/global/types/common.types";
 import { PagePayloadSkillDto } from "@/global/types/skill.types";
 import { useMemo } from "react";
 
@@ -14,7 +15,16 @@ import { FreelancerFilters } from "./_components/FreelancerFilters";
 
 export default function FreelancersPage() {
   const { data, isLoading } = useListFreelancer();
-  const { page, setPage } = useFreelancerListStore((state) => state);
+  const {
+    page,
+    setPage,
+    categoryIds,
+    regionIds,
+    skillIds,
+    minSalary,
+    maxSalary,
+    setFilter,
+  } = useFreelancerListStore((state) => state);
   const { data: categoryTree, isLoading: catLoading } = useListCategory();
   const { data: regionTree, isLoading: regLoading } = useListRegion();
   const { data: skillsPages, isLoading: skillLoading } = useListSkill();
@@ -24,6 +34,9 @@ export default function FreelancersPage() {
       return pg.content ?? [];
     });
   }, [skillsPages]);
+  const handleApply = (filter: applyParams) => {
+    setFilter(filter);
+  };
   return (
     <div className="min-h-screen">
       <main className="container py-8 px-4">
@@ -39,9 +52,14 @@ export default function FreelancersPage() {
             categories={categoryTree ?? []}
             regions={regionTree ?? []}
             skills={skills}
-            onApply={(f) => {
-              console.log(f);
+            defaultValues={{
+              categoryIds,
+              regionIds,
+              skillIds,
+              minSalary,
+              maxSalary,
             }}
+            onApply={(f) => handleApply(f)}
           />
 
           <div className="flex items-center justify-between">

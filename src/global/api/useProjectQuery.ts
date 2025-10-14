@@ -52,10 +52,40 @@ export const projectQueryKeys = createQueryKeys("project", {
 });
 
 export const useListProject = () => {
-  const { page, size, sort, search } = useProjectListStore((state) => state);
+  const {
+    page,
+    size,
+    sort,
+    keyword,
+    categoryIds,
+    regionIds,
+    skillIds,
+    minSalary,
+    maxSalary,
+  } = useProjectListStore((state) => state);
   const param = useMemo(
-    () => ({ page, size, sort, searchKeyword: search }),
-    [page, size, sort, search],
+    () => ({
+      page,
+      size,
+      sort,
+      keyword,
+      categoryIds,
+      regionIds,
+      skillIds,
+      minSalary,
+      maxSalary,
+    }),
+    [
+      page,
+      size,
+      sort,
+      keyword,
+      categoryIds,
+      regionIds,
+      skillIds,
+      minSalary,
+      maxSalary,
+    ],
   );
   return useQuery({
     queryKey: projectQueryKeys.list(param).queryKey,
