@@ -8,3 +8,8 @@ export type ChatRoomListParam = Pageable;
 export type ChatMessageListParam = Pageable;
 export type PagePayloadChatMessageDto =
   components["schemas"]["PagePayloadChatMessageDto"];
+export type ChatInviteReqBody = components["schemas"]["ChatInviteReqBody"];
+export type RsDataChatInviteResBody =
+  components["schemas"]["RsDataChatInviteResBody"];
+export type InviteUserSummary = { id: number; username: string };
+export type CreateRoomReqBody = { roomName: string; inviteeIds: number[] };
