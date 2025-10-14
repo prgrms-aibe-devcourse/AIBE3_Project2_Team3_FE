@@ -25,6 +25,10 @@ import { Mail, User } from "lucide-react";
 
 // src/app/(auth)/forgot-password/ForgotPassword.tsx
 
+// src/app/(auth)/forgot-password/ForgotPassword.tsx
+
+// src/app/(auth)/forgot-password/ForgotPassword.tsx
+
 export function ForgotPassword() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");

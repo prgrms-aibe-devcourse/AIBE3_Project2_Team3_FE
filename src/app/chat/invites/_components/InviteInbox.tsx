@@ -24,6 +24,10 @@ import { useQueryClient } from "@tanstack/react-query";
 
 // src/app/chat/invites/_components/InviteInbox.tsx
 
+// src/app/chat/invites/_components/InviteInbox.tsx
+
+// src/app/chat/invites/_components/InviteInbox.tsx
+
 type InviteItem = {
   id: number;
   roomId: number;
