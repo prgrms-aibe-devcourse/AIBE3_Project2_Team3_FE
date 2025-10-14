@@ -1,8 +1,10 @@
 "use client";
 
+import { useListCategory } from "@/global/api/useCategoryQuery";
+import { useListRegion } from "@/global/api/useRegionQuery";
 import { UnitInput } from "@/global/components/custom-input/UnitInput";
+import { AsyncInfiniteMultiSelect } from "@/global/components/multi-select/InfiniteMultiSelect";
 import { MultiChildSelect } from "@/global/components/multi-select/MultiChildSelect";
-import { MultiSearchSelect } from "@/global/components/multi-select/MultiSearchSelect";
 import { Button } from "@/global/components/ui/button";
 import {
   Card,
@@ -20,8 +22,6 @@ import { toUnit } from "@/global/lib/utils";
 import { FreelancerWriteReqBody } from "@/global/types/freelancer.types";
 import { useState } from "react";
 
-import { sample } from "./test";
-
 type FreelancerFormProps = {
   onSubmit: (param: FreelancerWriteReqBody) => void;
   onCancel: () => void;
@@ -33,36 +33,30 @@ export function FreelancerForm({ onSubmit, onCancel }: FreelancerFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState<number[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number[]>([]);
-  const [selectedSkill, setSelectedSkill] = useState<number[]>([]);
-  const [master, setMaster] = useState<{ id: number; name: string }[]>([
-    { id: 1, name: "JavaScript" },
-    { id: 2, name: "React" },
-    { id: 3, name: "Angular" },
-    { id: 4, name: "TypeScript" },
-    { id: 5, name: "Node.js" },
-    { id: 6, name: "Spring" },
-  ]);
+  const [selectedSkillIds, setSelectedSkillIds] = useState<number[]>([]);
   const [period, setPeriod] = useState({ amount: 7, unit: "day" });
   const [salary, setSalary] = useState({ amount: 1, unit: "krw_10k" });
+  const { data: categoryTree, isLoading: catLoading } = useListCategory();
+  const { data: regionTree, isLoading: regLoading } = useListRegion();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    const form = e.currentTarget;
     const submitter = (e.nativeEvent as SubmitEvent).submitter as
       | HTMLButtonElement
       | HTMLInputElement
       | null;
 
-    let fd: FormData;
-    try {
-      fd = new FormData(e.currentTarget);
-    } catch {
-      fd = new FormData(e.currentTarget);
-      if (submitter) {
-        const name = submitter.getAttribute("name");
-        if (name) fd.append(name, submitter.getAttribute("value") ?? "");
-      }
+    // 1) 무조건 FormData 생성
+    const fd = new FormData(form);
+
+    // 2) 눌린 버튼의 name/value를 수동으로 넣어준다
+    if (submitter) {
+      const name = submitter.getAttribute("name");
+      const value = submitter.getAttribute("value");
+      if (name && value != null) fd.set(name, value);
     }
 
     const isViewed = fd.get("isViewed") === "true";
@@ -76,7 +70,7 @@ export function FreelancerForm({ onSubmit, onCancel }: FreelancerFormProps) {
         },
         regionIds: selectedRegion,
         categoryIds: selectedCategory,
-        skillIds: selectedSkill,
+        skillIds: selectedSkillIds,
       });
     } finally {
       setIsSubmitting(false);
@@ -86,20 +80,6 @@ export function FreelancerForm({ onSubmit, onCancel }: FreelancerFormProps) {
   const handleFileSelect = (files: File[]) => {
     setAttachments((prev) => [...prev, ...files]);
   };
-
-  async function handleCreate(
-    name: string,
-  ): Promise<{ id: number; name: string }> {
-    // const res = await fetch("/api/skills", { method: "POST", body: JSON.stringify({ name }) });
-    // const created = await res.json(); // { id, name }
-    // setMaster((prev) => [...prev, created]);
-    // return created;
-
-    // 데모용 가짜 생성
-    const created = { id: Math.max(0, ...master.map((s) => s.id)) + 1, name };
-    setMaster((prev) => [...prev, created]);
-    return created;
-  }
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -141,7 +121,7 @@ export function FreelancerForm({ onSubmit, onCancel }: FreelancerFormProps) {
           <div className="space-y-2">
             <Label htmlFor="title">지역 (다중선택 가능)</Label>
             <MultiChildSelect
-              data={sample}
+              data={regionTree ?? []}
               value={selectedRegion}
               onChange={setSelectedRegion}
               className="max-h-64" // 필요 시 높이 조절
@@ -152,7 +132,7 @@ export function FreelancerForm({ onSubmit, onCancel }: FreelancerFormProps) {
           <div className="space-y-2">
             <Label htmlFor="title">카테고리 (다중선택 가능)</Label>
             <MultiChildSelect
-              data={sample}
+              data={categoryTree ?? []}
               value={selectedCategory}
               onChange={setSelectedCategory}
               className="max-h-64" // 필요 시 높이 조절
@@ -162,13 +142,12 @@ export function FreelancerForm({ onSubmit, onCancel }: FreelancerFormProps) {
           {/* 기술 */}
           <div className="space-y-2">
             <Label htmlFor="title">기술 (다중선택 가능)</Label>
-            <MultiSearchSelect
-              options={master}
-              value={selectedSkill}
-              onChange={setSelectedSkill}
-              allowCreate={true}
-              onCreate={handleCreate} // 자유입력 저장(없으면 로컬 임시ID)
+            <AsyncInfiniteMultiSelect
+              value={selectedSkillIds}
+              onChange={setSelectedSkillIds}
+              allowCreate
               maxSelected={20}
+              placeholder="스킬을 검색/선택하세요"
             />
           </div>
 

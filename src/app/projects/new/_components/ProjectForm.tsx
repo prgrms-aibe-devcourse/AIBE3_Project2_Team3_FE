@@ -1,9 +1,11 @@
 "use client";
 
+import { useListCategory } from "@/global/api/useCategoryQuery";
+import { useListRegion } from "@/global/api/useRegionQuery";
 import { NumberInput } from "@/global/components/custom-input/NumberInput";
 import { UnitInput } from "@/global/components/custom-input/UnitInput";
+import { AsyncInfiniteMultiSelect } from "@/global/components/multi-select/InfiniteMultiSelect";
 import { MultiChildSelect } from "@/global/components/multi-select/MultiChildSelect";
-import { MultiSearchSelect } from "@/global/components/multi-select/MultiSearchSelect";
 import { CustomDatepicker } from "@/global/components/ui/CustomDatepicker";
 import { Button } from "@/global/components/ui/button";
 import {
@@ -34,8 +36,6 @@ import {
 import { addDays, startOfDay } from "date-fns";
 import { useState } from "react";
 
-import { sample } from "./test";
-
 type ProjectFormProps = {
   onSubmit: (param: ProjectWriteReqBody) => void;
   onCancel: () => void;
@@ -48,21 +48,15 @@ export function ProjectForm({ onSubmit, onCancel }: ProjectFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState<number[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number[]>([]);
-  const [selectedSkill, setSelectedSkill] = useState<number[]>([]);
-  const [master, setMaster] = useState<{ id: number; name: string }[]>([
-    { id: 1, name: "JavaScript" },
-    { id: 2, name: "React" },
-    { id: 3, name: "Angular" },
-    { id: 4, name: "TypeScript" },
-    { id: 5, name: "Node.js" },
-    { id: 6, name: "Spring" },
-  ]);
+  const [selectedSkillIds, setSelectedSkillIds] = useState<number[]>([]);
   const [hirerType, setHirerType] = useState<HirerType>("individual");
   const [employmentType, setEmploymentType] =
     useState<EmploymentType>("onsite");
   const [salary, setSalary] = useState({ amount: 1, unit: "krw_10k" });
   const [personnel, setPersonel] = useState({ amount: 0, unit: "person" });
   const [skillLevel, setSkillLevel] = useState(EXPERIENCE_OPTIONS[0].id);
+  const { data: categoryTree, isLoading: catLoading } = useListCategory();
+  const { data: regionTree, isLoading: regLoading } = useListRegion();
   const [deadlineDate, setDeadlineDate] = useState<Date>(
     startOfDay(addDays(new Date(), 7)),
   );
@@ -77,38 +71,24 @@ export function ProjectForm({ onSubmit, onCancel }: ProjectFormProps) {
     setAttachments((prev) => [...prev, ...files]);
   };
 
-  async function handleCreate(
-    name: string,
-  ): Promise<{ id: number; name: string }> {
-    // const res = await fetch("/api/skills", { method: "POST", body: JSON.stringify({ name }) });
-    // const created = await res.json(); // { id, name }
-    // setMaster((prev) => [...prev, created]);
-    // return created;
-
-    // 데모용 가짜 생성
-    const created = { id: Math.max(0, ...master.map((s) => s.id)) + 1, name };
-    setMaster((prev) => [...prev, created]);
-    return created;
-  }
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    const form = e.currentTarget;
     const submitter = (e.nativeEvent as SubmitEvent).submitter as
       | HTMLButtonElement
       | HTMLInputElement
       | null;
 
-    let fd: FormData;
-    try {
-      fd = new FormData(e.currentTarget);
-    } catch {
-      fd = new FormData(e.currentTarget);
-      if (submitter) {
-        const name = submitter.getAttribute("name");
-        if (name) fd.append(name, submitter.getAttribute("value") ?? "");
-      }
+    // 1) 무조건 FormData 생성
+    const fd = new FormData(form);
+
+    // 2) 눌린 버튼의 name/value를 수동으로 넣어준다
+    if (submitter) {
+      const name = submitter.getAttribute("name");
+      const value = submitter.getAttribute("value");
+      if (name && value != null) fd.set(name, value);
     }
 
     const isViewed = fd.get("isViewed") === "true";
@@ -129,7 +109,7 @@ export function ProjectForm({ onSubmit, onCancel }: ProjectFormProps) {
         },
         regionIds: selectedRegion,
         categoryIds: selectedCategory,
-        skillIds: selectedSkill,
+        skillIds: selectedSkillIds,
       });
     } finally {
       setIsSubmitting(false);
@@ -176,7 +156,7 @@ export function ProjectForm({ onSubmit, onCancel }: ProjectFormProps) {
           <div className="space-y-2">
             <Label htmlFor="title">지역 (다중선택 가능)</Label>
             <MultiChildSelect
-              data={sample}
+              data={regionTree ?? []}
               value={selectedRegion}
               onChange={setSelectedRegion}
               className="max-h-64" // 필요 시 높이 조절
@@ -187,7 +167,7 @@ export function ProjectForm({ onSubmit, onCancel }: ProjectFormProps) {
           <div className="space-y-2">
             <Label htmlFor="title">카테고리 (다중선택 가능)</Label>
             <MultiChildSelect
-              data={sample}
+              data={categoryTree ?? []}
               value={selectedCategory}
               onChange={setSelectedCategory}
               className="max-h-64" // 필요 시 높이 조절
@@ -197,13 +177,12 @@ export function ProjectForm({ onSubmit, onCancel }: ProjectFormProps) {
           {/* 기술 */}
           <div className="space-y-2">
             <Label htmlFor="title">기술 (다중선택 가능)</Label>
-            <MultiSearchSelect
-              options={master}
-              value={selectedSkill}
-              onChange={setSelectedSkill}
-              allowCreate={true}
-              onCreate={handleCreate} // 자유입력 저장(없으면 로컬 임시ID)
+            <AsyncInfiniteMultiSelect
+              value={selectedSkillIds}
+              onChange={setSelectedSkillIds}
+              allowCreate
               maxSelected={20}
+              placeholder="스킬을 검색/선택하세요"
             />
           </div>
 

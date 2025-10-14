@@ -6,7 +6,7 @@ import { ProjectWriteReqBody } from "@/global/types/project.types";
 
 import { useRouter } from "next/navigation";
 
-import { ProjectForm } from "./_components/ProjectFrom";
+import { ProjectForm } from "./_components/ProjectForm";
 
 export default function ProjectWritePage() {
   const router = useRouter();
