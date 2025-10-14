@@ -28,8 +28,8 @@ export default function ApplicationWritePage({
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [attachments, setAttachments] = useState<File[]>([]);
-  const [salary, setSalary] = useState<number | "">("");
-  const [period, setPeriod] = useState<number | "">("");
+  const [salary, setSalary] = useState<number>(0);
+  const [period, setPeriod] = useState<number>(0);
   const router = useRouter();
   const { mutateAsync } = useCreateApplication();
   const handleFileSelect = (files: File[]) => {
@@ -47,7 +47,6 @@ export default function ApplicationWritePage({
     e.preventDefault();
     setIsSubmitting(true);
 
-    // basic validation
     if (content.trim().length < 50) {
       toast({
         title: "지원 내용이 짧습니다",
@@ -58,8 +57,7 @@ export default function ApplicationWritePage({
       return;
     }
 
-    // salary/period simple validation
-    if (salary !== "" && Number(salary) < 0) {
+    if (salary !== 0 && Number(salary) < 0) {
       toast({
         title: "유효하지 않은 급여",
         description: "급여는 0 이상이어야 합니다.",
@@ -68,7 +66,8 @@ export default function ApplicationWritePage({
       setIsSubmitting(false);
       return;
     }
-    if (period !== "" && Number(period) < 1) {
+
+    if (period !== 0 && Number(period) < 1) {
       toast({
         title: "유효하지 않은 기간",
         description: "기간은 1 이상이어야 합니다.",
@@ -78,24 +77,18 @@ export default function ApplicationWritePage({
       return;
     }
 
-    // Build FormData according to ApplicationWriteReqBody
     const fd = new FormData();
-    // The OpenAPI schema expects a multipart part named `reqBody` containing the JSON
-    // ApplicationWriteReqBody and file parts named `files`.
     const reqBody = {
       postId: project.id,
       content,
-      // include salary and period if provided
-      salary: salary === "" ? undefined : Number(salary),
-      period: period === "" ? undefined : Number(period),
+      salary,
+      period,
     };
-    // append JSON part as application/json so server can parse reqBody
     fd.append(
       "reqBody",
       new Blob([JSON.stringify(reqBody)], { type: "application/json" }),
     );
 
-    // append files under the `files` key
     attachments.forEach((file) => fd.append("files", file));
 
     try {
@@ -105,8 +98,7 @@ export default function ApplicationWritePage({
         description: "지원이 정상적으로 등록되었습니다.",
         open: true,
       });
-      // redirect to applications list for this post
-      router.replace(`/applications/${project.id}`);
+      router.replace(`/projects/${project.id}`);
     } catch (err) {
       console.error(err);
       toast({
@@ -238,6 +230,46 @@ export default function ApplicationWritePage({
           <Card>
             <CardContent className="pt-2 space-y-4">
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* 희망 급여 및 기간 */}
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="salary">희망 급여</Label>
+                    <input
+                      id="salary"
+                      type="number"
+                      value={salary}
+                      onChange={(e) =>
+                        setSalary(
+                          e.target.value === "" ? 0 : Number(e.target.value),
+                        )
+                      }
+                      placeholder="예: 3000000"
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      월 급여 또는 총액 (원)
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="period">희망 기간</Label>
+                    <input
+                      id="period"
+                      type="number"
+                      value={period}
+                      onChange={(e) =>
+                        setPeriod(
+                          e.target.value === "" ? 0 : Number(e.target.value),
+                        )
+                      }
+                      placeholder="예: 3"
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      프로젝트 참여 가능 기간(개월)
+                    </p>
+                  </div>
+                </div>
+                {/* 지원 내용 */}
                 <div className="space-y-2">
                   <Label htmlFor="content">지원 내용</Label>
                   <Textarea
@@ -252,44 +284,6 @@ export default function ApplicationWritePage({
                   <p className="text-xs text-muted-foreground">
                     최소 50자 이상 작성해주세요 ({content.length} / 2000)
                   </p>
-                </div>
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="salary">희망 급여 (원)</Label>
-                    <input
-                      id="salary"
-                      type="number"
-                      value={salary}
-                      onChange={(e) =>
-                        setSalary(
-                          e.target.value === "" ? "" : Number(e.target.value),
-                        )
-                      }
-                      placeholder="예: 3000000"
-                      className="input input-bordered w-full"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      선택사항: 월 급여 또는 총액을 숫자로 입력하세요.
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="period">희망 기간 (개월)</Label>
-                    <input
-                      id="period"
-                      type="number"
-                      value={period}
-                      onChange={(e) =>
-                        setPeriod(
-                          e.target.value === "" ? "" : Number(e.target.value),
-                        )
-                      }
-                      placeholder="예: 3"
-                      className="input input-bordered w-full"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      선택사항: 프로젝트 참여 예상 기간(개월)
-                    </p>
-                  </div>
                 </div>
                 {/* 포트폴리오 */}
                 <div className="space-y-2 mt-4">

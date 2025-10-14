@@ -22,7 +22,6 @@ export const useCreateApplication = () => {
     mutationKey: applicationQueryKeys.create().queryKey,
     mutationFn: (fd: FormData) => create(fd),
     onSuccess: (res) => {
-      // optionally update caches or invalidate lists
       qc.invalidateQueries();
     },
   });
