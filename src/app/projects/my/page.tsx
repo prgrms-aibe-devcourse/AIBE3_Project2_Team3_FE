@@ -47,6 +47,12 @@ export default function MyProjectsPage() {
           />
         )}
       </div>
+
+      {isFetching && (
+        <div className="text-center text-sm text-muted-foreground py-2">
+          불러오는 중…
+        </div>
+      )}
     </main>
   );
 }
