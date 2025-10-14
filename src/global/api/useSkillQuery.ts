@@ -19,7 +19,7 @@ const list = async (param: SkillListParam) =>
   );
 
 const create = async (body: SkillCreateReqBody) =>
-  unwrap(await client.POST("/api/v1/admin/skills", { body }));
+  unwrap(await client.POST("/api/v1/skills", { body }));
 
 const remove = async (id: number) =>
   unwrap(
