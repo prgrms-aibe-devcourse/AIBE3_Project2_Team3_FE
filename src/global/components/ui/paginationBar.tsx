@@ -53,13 +53,13 @@ function PaginationBar({
   const displayPage = pageIndex + 1; // 1..pageCount
   const totalPages = pageCount; // 그대로 개수 = 최대 표시 페이지
 
-  // pageCount가 0이면 아예 렌더 안함(선택)
-  if (pageCount <= 0) return null;
-
   const items = useMemo(
     () => getPageItems(totalPages, displayPage, siblingCount),
     [totalPages, displayPage, siblingCount],
   );
+
+  // pageCount가 0이면 아예 렌더 안함(선택)
+  if (pageCount <= 0) return null;
 
   const prevDisabled = pageIndex <= 0;
   const nextDisabled = pageIndex >= pageCount - 1;

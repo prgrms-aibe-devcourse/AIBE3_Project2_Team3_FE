@@ -20,7 +20,7 @@ export default function RootLayout({
       <body
         className={`font-sans ${GeistSans.variable} ${GeistMono.variable} antialiased`}
       >
-        <ContextLayout children={children} />
+        <ContextLayout>{children}</ContextLayout>
       </body>
     </html>
   );

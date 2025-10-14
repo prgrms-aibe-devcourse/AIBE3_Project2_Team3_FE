@@ -3,11 +3,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import client from "../backend/client";
 import { unwrap } from "../backend/unwrap";
+import { CreateAppReq } from "../types/application.types";
 
 const create = async (formData: FormData) =>
   unwrap(
     await client.POST("/api/v1/applications", {
-      body: formData,
+      body: formData as unknown as CreateAppReq,
       // openapi-fetch will set content-type for FormData automatically
     }),
   );

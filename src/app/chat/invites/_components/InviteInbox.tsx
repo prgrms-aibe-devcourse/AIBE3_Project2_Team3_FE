@@ -20,6 +20,14 @@ import { useQueryClient } from "@tanstack/react-query";
 
 // src/app/chat/invites/_components/InviteInbox.tsx
 
+// src/app/chat/invites/_components/InviteInbox.tsx
+
+// src/app/chat/invites/_components/InviteInbox.tsx
+
+// src/app/chat/invites/_components/InviteInbox.tsx
+
+// src/app/chat/invites/_components/InviteInbox.tsx
+
 type InviteItem = {
   id: number;
   roomId: number;
@@ -102,7 +110,7 @@ export function InviteInbox() {
                         });
                         qc.invalidateQueries({ queryKey: ["room", "list"] });
                       },
-                      onError: (e: any) =>
+                      onError: (e) =>
                         toast({
                           title: "실패",
                           description: e?.message ?? "처리에 실패했습니다.",
@@ -127,7 +135,7 @@ export function InviteInbox() {
                           queryKey: ["chat", "invites", userId],
                         });
                       },
-                      onError: (e: any) =>
+                      onError: (e) =>
                         toast({
                           title: "실패",
                           description: e?.message ?? "처리에 실패했습니다.",

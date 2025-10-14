@@ -13,15 +13,15 @@ import { unwrap } from "../backend/unwrap";
 import { useChatMessageListStore } from "../stores/useChatMessageListStore";
 import { useChatRoomListStore } from "../stores/useChatRoomListStore";
 import {
+  ChatCreateReqBody,
   ChatInviteReqBody,
   ChatMessageDto,
   ChatMessageListParam,
   ChatRoomListParam,
   ChatSendReqBody,
-  CreateRoomReqBody,
-  InviteUserSummary,
   PagePayloadChatMessageDto,
   RsDataChatInviteResBody,
+  UserInviteDto,
 } from "../types/chat.types";
 
 const chatRoomList = async (param: ChatRoomListParam) =>
@@ -54,16 +54,16 @@ const invite = async (roomId: number, body: ChatInviteReqBody) =>
     }),
   );
 
-const searchInvitees = async (q: string): Promise<InviteUserSummary[]> => {
+const searchInvitees = async (q: string): Promise<UserInviteDto[]> => {
   if (!q.trim()) return [];
   const res = unwrap(
     await client.GET("/api/v1/users/search", {
       params: { query: { username: q.trim() } },
     }),
   );
-  const item = (res as any)?.data ?? null;
+  const item = res?.data ?? null;
   if (!item) return [];
-  return [{ id: item.userId, username: item.userName }]; // ← 단일을 배열로
+  return [{ ...res?.data }]; // ← 단일을 배열로
 };
 
 const inviteInbox = async () =>
@@ -83,7 +83,7 @@ const refuseRoomInvite = async (roomId: number) =>
     }),
   );
 
-const createRoom = async (body: CreateRoomReqBody) =>
+const createRoom = async (body: ChatCreateReqBody) =>
   unwrap(await client.POST("/api/v1/chat/rooms", { body }));
 
 export const chatQueryKeys = createQueryKeys("chat", {
@@ -194,8 +194,15 @@ export const useRefuseInvite = () =>
   });
 
 // 채팅방 생성
-export const useCreateChatRoom = () =>
-  useMutation({
+export const useCreateChatRoom = () => {
+  const qc = useQueryClient();
+  return useMutation({
     mutationKey: chatQueryKeys.create().queryKey,
-    mutationFn: (body: CreateRoomReqBody) => createRoom(body),
+    mutationFn: (body: ChatCreateReqBody) => createRoom(body),
+    onSuccess: (res) => {
+      qc.invalidateQueries({
+        queryKey: chatQueryKeys.chatRoomLists().queryKey,
+      });
+    },
   });
+};

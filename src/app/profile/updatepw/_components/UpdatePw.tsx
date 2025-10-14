@@ -77,12 +77,11 @@ export function UpdatePw() {
           });
           router.replace("/auth/login");
         },
-        onError: (err: any) => {
-          const msg =
-            err?.message ??
-            err?.data?.message ??
-            "비밀번호 변경에 실패했습니다.";
-          toast({ title: "실패", description: msg });
+        onError: (err) => {
+          toast({
+            title: "실패",
+            description: err.message ?? "비밀번호 변경에 실패했습니다.",
+          });
         },
       },
     );
