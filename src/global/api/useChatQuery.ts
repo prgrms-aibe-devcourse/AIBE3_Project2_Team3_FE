@@ -3,6 +3,7 @@ import {
   InfiniteData,
   useInfiniteQuery,
   useMutation,
+  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 import { useMemo } from "react";
@@ -17,6 +18,7 @@ import {
   ChatMessageListParam,
   ChatRoomListParam,
   ChatSendReqBody,
+  CreateRoomReqBody,
   InviteUserSummary,
   PagePayloadChatMessageDto,
   RsDataChatInviteResBody,
@@ -67,6 +69,26 @@ const searchInvitees = async (q: string): Promise<InviteUserSummary[]> => {
   }));
 };
 
+const inviteInbox = async () =>
+  unwrap(await client.GET("/api/v1/chat/invites"));
+
+const acceptRoomInvite = async (roomId: number) =>
+  unwrap(
+    await client.POST("/api/v1/chat/rooms/{roomId}/invites/accept", {
+      params: { path: { roomId } },
+    }),
+  );
+
+const refuseRoomInvite = async (roomId: number) =>
+  unwrap(
+    await client.POST("/api/v1/chat/rooms/{roomId}/invites/refuse", {
+      params: { path: { roomId } },
+    }),
+  );
+
+const createRoom = async (body: CreateRoomReqBody) =>
+  unwrap(await client.POST("/api/v1/chat/rooms", { body }));
+
 export const chatQueryKeys = createQueryKeys("chat", {
   chatRoomLists: () => ["room", "list"],
   chatRoomList: (param) => ["room", "list", param],
@@ -76,6 +98,10 @@ export const chatQueryKeys = createQueryKeys("chat", {
   rooms: () => ["rooms"],
   searchInvitees: (q: string) => ["searchInvitees", q],
   invite: (roomId: number) => ["invite", roomId],
+  invites: (userId: number | undefined) => ["invites", userId],
+  acceptInvite: (roomId: number) => ["invite", "accept", roomId],
+  refuseInvite: (roomId: number) => ["invite", "refuse", roomId],
+  create: () => ["rooms", "create"],
 });
 
 export const useListChatRoom = () => {
@@ -147,3 +173,32 @@ export function useInviteUsers(roomId: number | undefined) {
 export async function searchUsersToInvite(q: string) {
   return searchInvitees(q);
 }
+
+export const useInviteInbox = (userId: number | undefined) =>
+  useQuery({
+    queryKey: chatQueryKeys.invites(userId).queryKey,
+    queryFn: inviteInbox,
+    enabled: !!userId,
+    // 필요시 staleTime 등 옵션 추가 가능 (기능 동일 원하면 생략해도 됨)
+  });
+
+// 초대 수락
+export const useAcceptInvite = () =>
+  useMutation({
+    mutationKey: chatQueryKeys.acceptInvite(0).queryKey, // roomId는 실행 시 인자로
+    mutationFn: (roomId: number) => acceptRoomInvite(roomId),
+  });
+
+// 초대 거절
+export const useRefuseInvite = () =>
+  useMutation({
+    mutationKey: chatQueryKeys.refuseInvite(0).queryKey,
+    mutationFn: (roomId: number) => refuseRoomInvite(roomId),
+  });
+
+// 채팅방 생성
+export const useCreateChatRoom = () =>
+  useMutation({
+    mutationKey: chatQueryKeys.create().queryKey,
+    mutationFn: (body: CreateRoomReqBody) => createRoom(body),
+  });

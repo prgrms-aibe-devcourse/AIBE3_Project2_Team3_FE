@@ -1,7 +1,7 @@
 "use client";
 
 import { useFetchMe } from "@/global/api/useAuthQuery";
-import { useListChatRoom } from "@/global/api/useChatQuery";
+import { useCreateChatRoom, useListChatRoom } from "@/global/api/useChatQuery";
 import { searchUsersToInvite, useInviteUsers } from "@/global/api/useChatQuery";
 import {
   Avatar,
@@ -42,10 +42,12 @@ function CreateChatRoomDialog() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
-  const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { data: meRes, isLoading: meLoading } = useFetchMe();
-  const myId = meRes?.data?.id;
+
+  const { data: meRes } = useFetchMe();
+  const myId = meRes?.data?.id ?? 0;
+
+  const { mutateAsync: createRoom, isPending: creating } = useCreateChatRoom();
 
   const onCreate = async () => {
     if (!name.trim()) {
@@ -53,44 +55,21 @@ function CreateChatRoomDialog() {
       return;
     }
     try {
-      setCreating(true);
       setError(null);
+      const res = await createRoom({
+        roomName: name.trim(),
+        inviteeIds: [myId], // 본인 포함
+      });
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/chat/rooms`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({ roomName: name.trim(), inviteeIds: [myId] }),
-          credentials: "include",
-        },
-      );
-
-      if (!res.ok) {
-        const text = await res.text().catch(() => "");
-        throw new Error(text || "채팅방 생성 실패");
-      }
-
-      const body = await res.json().catch(() => ({}));
-      // 응답 스키마에 따라 아래 두 줄 중 맞는 걸로 사용
-      const newId = body?.data?.id ?? body?.id; // ← 서버 응답에 맞게 조정
-
+      // 응답 스키마 유연 처리
+      const newId = (res as any)?.data?.id ?? (res as any)?.id;
       setOpen(false);
       setName("");
 
-      if (newId) {
-        router.push(`/chat/${newId}`);
-      } else {
-        // id가 없다면 리스트 새로고침(선택)
-        router.refresh?.();
-      }
+      if (newId) router.push(`/chat/${newId}`);
+      else router.refresh?.();
     } catch (e: any) {
       setError(e?.message ?? "생성 중 오류가 발생했습니다");
-    } finally {
-      setCreating(false);
     }
   };
 
@@ -105,7 +84,6 @@ function CreateChatRoomDialog() {
         <DialogHeader>
           <DialogTitle>새 채팅방 만들기</DialogTitle>
         </DialogHeader>
-
         <div className="space-y-3">
           <Input
             placeholder="채팅방 이름"
@@ -120,7 +98,6 @@ function CreateChatRoomDialog() {
           />
           {error && <div className="text-sm text-red-600">{error}</div>}
         </div>
-
         <DialogFooter>
           <div className="flex w-full justify-end gap-2">
             <Button
