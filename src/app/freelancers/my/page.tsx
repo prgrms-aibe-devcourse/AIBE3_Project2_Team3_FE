@@ -4,6 +4,7 @@ import { useListMyFreelancers } from "@/global/api/useFreelancerQuery";
 import { Card } from "@/global/components/ui/card";
 import { PaginationBar } from "@/global/components/ui/paginationBar";
 import { useMyFreelancerListStore } from "@/global/stores/useMyFreelancerListStore";
+import { FreelancerDto } from "@/global/types/freelancer.types";
 import { useMemo } from "react";
 
 import FreelancerRow from "./_components/FreelancerRow";
@@ -31,7 +32,7 @@ export default function MyFreelancersPage() {
           </div>
         )}
 
-        {items.map((it: any) => (
+        {items.map((it: FreelancerDto) => (
           <FreelancerRow
             key={it.id}
             freelancer={it}

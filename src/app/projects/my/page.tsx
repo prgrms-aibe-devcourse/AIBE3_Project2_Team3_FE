@@ -4,6 +4,7 @@ import { useListMyProjects } from "@/global/api/useProjectQuery";
 import { Card } from "@/global/components/ui/card";
 import { PaginationBar } from "@/global/components/ui/paginationBar";
 import { useMyProjectListStore } from "@/global/stores/useMyProjectListStore";
+import { ProjectDto } from "@/global/types/project.types";
 import { useMemo } from "react";
 
 import ProjectRow from "./_components/ProjectRow";
@@ -32,7 +33,7 @@ export default function MyProjectsPage() {
           </div>
         )}
 
-        {items.map((it: any) => (
+        {items.map((it: ProjectDto) => (
           <ProjectRow key={it.id} project={it} onDeleted={() => refetch()} />
         ))}
       </div>
