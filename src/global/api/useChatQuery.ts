@@ -56,17 +56,14 @@ const invite = async (roomId: number, body: ChatInviteReqBody) =>
 
 const searchInvitees = async (q: string): Promise<InviteUserSummary[]> => {
   if (!q.trim()) return [];
-  const res = await unwrap(
-    await client.POST("/api/v1/users/searchToInvite", {
-      body: { username: q.trim() },
+  const res = unwrap(
+    await client.GET("/api/v1/users/search", {
+      params: { query: { username: q.trim() } },
     }),
   );
-
-  const list = (res as any)?.data ?? (res as any) ?? [];
-  return (list as Array<{ userId: number; userName: string }>).map((u) => ({
-    id: u.userId,
-    username: u.userName,
-  }));
+  const item = (res as any)?.data ?? null;
+  if (!item) return [];
+  return [{ id: item.userId, username: item.userName }]; // ← 단일을 배열로
 };
 
 const inviteInbox = async () =>
