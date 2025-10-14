@@ -49,6 +49,7 @@ export function formatTimeAgo(input: InputDate): string {
   const date = toDate(input);
 
   const sec = differenceInSeconds(now, date);
+  if (sec < 0) return "마감";
   if (sec < 5) return "방금 전";
   if (sec < 60) return `${sec}초 전`;
 

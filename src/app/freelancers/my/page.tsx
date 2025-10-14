@@ -32,7 +32,11 @@ export default function MyFreelancersPage() {
         )}
 
         {items.map((it: any) => (
-          <FreelancerRow key={it.id} item={it} onDeleted={() => refetch()} />
+          <FreelancerRow
+            key={it.id}
+            freelancer={it}
+            onDeleted={() => refetch()}
+          />
         ))}
       </div>
 

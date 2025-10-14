@@ -4,24 +4,28 @@ import { ConfirmDelete } from "@/app/admin/_components/ConfirmDeleteDialog";
 import { useRemoveProject } from "@/global/api/useProjectQuery";
 import { Badge } from "@/global/components/ui/badge";
 import { Button } from "@/global/components/ui/button";
+import { formatTimeAgo } from "@/global/lib/utils";
 import { ProjectDto } from "@/global/types/project.types";
+import { format } from "date-fns";
 
 import { useRouter } from "next/navigation";
 
 export default function ProjectRow({
-  item,
+  project,
   onDeleted,
 }: {
-  item: ProjectDto;
+  project: ProjectDto;
   onDeleted: () => void;
 }) {
   const router = useRouter();
-  const removeMut = useRemoveProject(item.id);
+  const removeMut = useRemoveProject(project.id);
 
   const salaryText =
-    typeof item.salary === "number" ? `${item.salary.toLocaleString()}원` : "-";
-  const deadlineShort = item.deadlineDate
-    ? new Date(item.deadlineDate).toLocaleDateString()
+    typeof project.salary === "number"
+      ? `${project.salary.toLocaleString()}원`
+      : "-";
+  const deadlineShort = project.deadlineDate
+    ? new Date(project.deadlineDate).toLocaleDateString()
     : "-";
 
   return (
@@ -30,14 +34,18 @@ export default function ProjectRow({
         {/* 좌측: 제목/메타/태그/내용 */}
         <div className="min-w-0 flex-1 space-y-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="font-semibold text-lg line-clamp-1">{item.title}</h3>
-            {!item.isViewed && <Badge variant="secondary">비공개</Badge>}
-            {item.employmentType && (
-              <Badge>{item.employmentType == "onsite" ? "상주" : "외주"}</Badge>
+            <h3 className="font-semibold text-lg line-clamp-1">
+              {project.title}
+            </h3>
+            {!project.isViewed && <Badge variant="secondary">비공개</Badge>}
+            {project.employmentType && (
+              <Badge>
+                {project.employmentType == "onsite" ? "상주" : "외주"}
+              </Badge>
             )}
-            {item.hirerType && (
+            {project.hirerType && (
               <Badge variant="outline">
-                {item.hirerType == "individual" ? "개인" : "법인"}
+                {project.hirerType == "individual" ? "개인" : "법인"}
               </Badge>
             )}
           </div>
@@ -45,20 +53,36 @@ export default function ProjectRow({
           {/* 메타 */}
           <div className="text-sm text-muted-foreground flex gap-4 flex-wrap">
             <span>
-              예산:{" "}
-              <span className="font-medium text-foreground">{salaryText}</span>
-            </span>
-            <span>
-              마감:{" "}
+              공고 마감:{" "}
               <span className="font-medium text-foreground">
-                {deadlineShort}
+                {formatTimeAgo(project.deadlineDate)}
               </span>
             </span>
-            {item.modifiedDate && (
+            <span>
+              프로젝트 시작일:{" "}
+              <span className="font-medium text-foreground">
+                {format(project.startedDate, "yyyy-MM-dd")}
+              </span>
+            </span>
+            <span>
+              프로젝트 마감일:{" "}
+              <span className="font-medium text-foreground">
+                {format(project.endedDate, "yyyy-MM-dd")}
+              </span>
+            </span>
+          </div>
+          <div className="text-sm text-muted-foreground flex gap-4 flex-wrap">
+            <span>
+              예산:{" "}
+              <span className="font-medium text-foreground">
+                {project.salary.toLocaleString()}
+              </span>
+            </span>
+            {project.modifiedDate && (
               <span>
                 수정:{" "}
                 <span className="text-foreground">
-                  {new Date(item.modifiedDate).toLocaleString()}
+                  {new Date(project.modifiedDate).toLocaleString()}
                 </span>
               </span>
             )}
@@ -66,39 +90,39 @@ export default function ProjectRow({
 
           {/* 태그 */}
           <div className="flex flex-wrap gap-1.5">
-            {item.categories.slice(0, 3).map((c) => (
+            {project.categories.slice(0, 3).map((c) => (
               <Badge key={`c-${c.id}`} variant="outline">
                 #{c.name}
               </Badge>
             ))}
-            {item.categories.length > 3 && (
-              <Badge variant="outline">+{item.categories.length - 3}</Badge>
+            {project.categories.length > 3 && (
+              <Badge variant="outline">+{project.categories.length - 3}</Badge>
             )}
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {item.regions.slice(0, 3).map((r) => (
+            {project.regions.slice(0, 3).map((r) => (
               <Badge key={`r-${r.id}`} variant="outline">
                 {r.name}
               </Badge>
             ))}
-            {item.regions.length > 3 && (
-              <Badge variant="outline">+{item.regions.length - 3}</Badge>
+            {project.regions.length > 3 && (
+              <Badge variant="outline">+{project.regions.length - 3}</Badge>
             )}
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {item.skills.slice(0, 6).map((s) => (
+            {project.skills.slice(0, 6).map((s) => (
               <Badge key={`s-${s.id}`} variant="secondary">
                 {s.name}
               </Badge>
             ))}
-            {item.skills.length > 6 && (
-              <Badge variant="secondary">+{item.skills.length - 6}</Badge>
+            {project.skills.length > 6 && (
+              <Badge variant="secondary">+{project.skills.length - 6}</Badge>
             )}
           </div>
 
           {/* 내용 한 줄 요약 */}
           <p className="text-sm text-muted-foreground line-clamp-2">
-            {item.content}
+            {project.content}
           </p>
         </div>
 
@@ -106,7 +130,7 @@ export default function ProjectRow({
         <div className="shrink-0 flex md:flex-col gap-2 self-stretch md:self-start">
           <Button
             variant="outline"
-            onClick={() => router.push(`/projects/${item.id}/edit`)}
+            onClick={() => router.push(`/projects/${project.id}/edit`)}
           >
             수정
           </Button>

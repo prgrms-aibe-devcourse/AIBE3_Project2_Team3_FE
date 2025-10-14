@@ -33,7 +33,7 @@ export default function MyProjectsPage() {
         )}
 
         {items.map((it: any) => (
-          <ProjectRow key={it.id} item={it} onDeleted={() => refetch()} />
+          <ProjectRow key={it.id} project={it} onDeleted={() => refetch()} />
         ))}
       </div>
 
