@@ -1528,16 +1528,6 @@ export interface components {
             content: components["schemas"]["QuestionDto"][];
             page: components["schemas"]["PageMeta"];
         };
-        ProjectSearchReqDto: {
-            regionIds: number[];
-            categoryIds: number[];
-            skillIds: number[];
-            /** Format: int64 */
-            minSalary: number;
-            /** Format: int64 */
-            maxSalary: number;
-            keyword: string;
-        };
         PagePayloadProjectDto: {
             content: components["schemas"]["ProjectDto"][];
             page: components["schemas"]["PageMeta"];
@@ -1712,29 +1702,29 @@ export interface components {
             content: components["schemas"]["ReportDto"][];
             /** Format: int32 */
             number: number;
-            /** Format: int32 */
-            numberOfElements: number;
-            sort: components["schemas"]["SortObject"];
-            pageable: components["schemas"]["PageableObject"];
             first: boolean;
             last: boolean;
+            /** Format: int32 */
+            numberOfElements: number;
+            pageable: components["schemas"]["PageableObject"];
+            sort: components["schemas"]["SortObject"];
             empty: boolean;
         };
         PageableObject: {
             /** Format: int64 */
             offset: number;
-            sort: components["schemas"]["SortObject"];
-            paged: boolean;
             unpaged: boolean;
             /** Format: int32 */
             pageNumber: number;
             /** Format: int32 */
             pageSize: number;
+            sort: components["schemas"]["SortObject"];
+            paged: boolean;
         };
         SortObject: {
             empty: boolean;
-            sorted: boolean;
             unsorted: boolean;
+            sorted: boolean;
         };
         UserDeleteReqBody: {
             password: string;
@@ -2734,14 +2724,19 @@ export interface operations {
     };
     getItems: {
         parameters: {
-            query: {
+            query?: {
                 /** @description Zero-based page index (0..N) */
                 page?: number;
                 /** @description The size of the page to be returned */
                 size?: number;
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
-                searchCondition: components["schemas"]["ProjectSearchReqDto"];
+                keyword?: string;
+                categoryIds?: number[];
+                regionIds?: number[];
+                skillIds?: number[];
+                minSalary?: number;
+                maxSalary?: number;
             };
             header?: never;
             path?: never;
@@ -2844,9 +2839,9 @@ export interface operations {
                 size?: number;
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
-                searchKeyword?: string;
-                categoryId?: number;
-                regionId?: number;
+                keyword?: string;
+                categoryIds?: number[];
+                regionIds?: number[];
                 skillIds?: number[];
                 minSalary?: number;
                 maxSalary?: number;
