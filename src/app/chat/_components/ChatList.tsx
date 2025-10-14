@@ -1,5 +1,6 @@
 "use client";
 
+import { useFetchMe } from "@/global/api/useAuthQuery";
 import { useListChatRoom } from "@/global/api/useChatQuery";
 import { searchUsersToInvite, useInviteUsers } from "@/global/api/useChatQuery";
 import {
@@ -33,9 +34,115 @@ import { ChatRoomDto } from "@/global/types/chat.types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-import { MessageCircle, Plus, Search, Users, X } from "lucide-react";
+import { Inbox, MessageCircle, Plus, Search, Users, X } from "lucide-react";
 
+function CreateChatRoomDialog() {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { data: meRes, isLoading: meLoading } = useFetchMe();
+  const myId = meRes?.data?.id;
+
+  const onCreate = async () => {
+    if (!name.trim()) {
+      setError("채팅방 이름을 입력해 주세요");
+      return;
+    }
+    try {
+      setCreating(true);
+      setError(null);
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/chat/rooms`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ roomName: name.trim(), inviteeIds: [myId] }),
+          credentials: "include",
+        },
+      );
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(text || "채팅방 생성 실패");
+      }
+
+      const body = await res.json().catch(() => ({}));
+      // 응답 스키마에 따라 아래 두 줄 중 맞는 걸로 사용
+      const newId = body?.data?.id ?? body?.id; // ← 서버 응답에 맞게 조정
+
+      setOpen(false);
+      setName("");
+
+      if (newId) {
+        router.push(`/chat/${newId}`);
+      } else {
+        // id가 없다면 리스트 새로고침(선택)
+        router.refresh?.();
+      }
+    } catch (e: any) {
+      setError(e?.message ?? "생성 중 오류가 발생했습니다");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="w-full" variant="outline">
+          + 채팅방 만들기
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>새 채팅방 만들기</DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-3">
+          <Input
+            placeholder="채팅방 이름"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                void onCreate();
+              }
+            }}
+          />
+          {error && <div className="text-sm text-red-600">{error}</div>}
+        </div>
+
+        <DialogFooter>
+          <div className="flex w-full justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+            >
+              취소
+            </Button>
+            <Button
+              type="button"
+              onClick={onCreate}
+              disabled={creating || !name.trim()}
+            >
+              {creating ? "생성 중…" : "생성"}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 /* ─────────────────────────────────────────────
  * 초대 다이얼로그
  * ───────────────────────────────────────────── */
@@ -294,11 +401,23 @@ export function ChatList({ selectedChatId }: ChatListProps) {
   return (
     <Card className="h-full flex flex-col">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MessageCircle className="h-5 w-5" />
-          메시지
-        </CardTitle>
-        <div className="relative">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <MessageCircle className="h-5 w-5" />
+            메시지
+          </CardTitle>
+
+          <Link href="/chat/invites">
+            <Button variant="secondary" size="sm" className="gap-1">
+              <Inbox className="h-4 w-4" />
+              초대함
+              {/* (선택) <Badge className="ml-1 h-5 px-2">{count}</Badge> */}
+            </Button>
+          </Link>
+        </div>
+
+        {/* 기존 검색 입력란 유지 */}
+        <div className="relative mt-3">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="대화 검색..."
@@ -382,6 +501,8 @@ export function ChatList({ selectedChatId }: ChatListProps) {
             chatId={selectedChatId}
             disabled={!selectedChatId}
           />
+          <div className="mt-2 mb-2"></div>
+          <CreateChatRoomDialog />
           {!selectedChatId && (
             <p className="mt-2 text-xs text-muted-foreground">
               좌측 목록에서 채팅을 하나 선택하시면 초대할 수 있습니다
