@@ -1,5 +1,6 @@
 "use client";
 
+import { useCreateApplication } from "@/global/api/useApplicationQuery";
 import { useDetailProject } from "@/global/api/useProjectQuery";
 import LoadingScreen from "@/global/components/loading/loading";
 import { Badge } from "@/global/components/ui/badge";
@@ -9,8 +10,11 @@ import { FileUpload } from "@/global/components/ui/file-upload";
 import { Label } from "@/global/components/ui/label";
 import { Separator } from "@/global/components/ui/separator";
 import { Textarea } from "@/global/components/ui/textarea";
+import { toast } from "@/global/hooks/useToast";
 import { format } from "date-fns";
 import { use, useState } from "react";
+
+import { useRouter } from "next/navigation";
 
 import { MapPin, Tag } from "lucide-react";
 
@@ -24,6 +28,10 @@ export default function ApplicationWritePage({
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [attachments, setAttachments] = useState<File[]>([]);
+  const [salary, setSalary] = useState<number | "">("");
+  const [period, setPeriod] = useState<number | "">("");
+  const router = useRouter();
+  const { mutateAsync } = useCreateApplication();
   const handleFileSelect = (files: File[]) => {
     setAttachments((prev) => [...prev, ...files]);
   };
@@ -38,7 +46,77 @@ export default function ApplicationWritePage({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setIsSubmitting(false);
+
+    // basic validation
+    if (content.trim().length < 50) {
+      toast({
+        title: "지원 내용이 짧습니다",
+        description: "최소 50자 이상 작성해주세요",
+        open: true,
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    // salary/period simple validation
+    if (salary !== "" && Number(salary) < 0) {
+      toast({
+        title: "유효하지 않은 급여",
+        description: "급여는 0 이상이어야 합니다.",
+        open: true,
+      });
+      setIsSubmitting(false);
+      return;
+    }
+    if (period !== "" && Number(period) < 1) {
+      toast({
+        title: "유효하지 않은 기간",
+        description: "기간은 1 이상이어야 합니다.",
+        open: true,
+      });
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Build FormData according to ApplicationWriteReqBody
+    const fd = new FormData();
+    // The OpenAPI schema expects a multipart part named `reqBody` containing the JSON
+    // ApplicationWriteReqBody and file parts named `files`.
+    const reqBody = {
+      postId: project.id,
+      content,
+      // include salary and period if provided
+      salary: salary === "" ? undefined : Number(salary),
+      period: period === "" ? undefined : Number(period),
+    };
+    // append JSON part as application/json so server can parse reqBody
+    fd.append(
+      "reqBody",
+      new Blob([JSON.stringify(reqBody)], { type: "application/json" }),
+    );
+
+    // append files under the `files` key
+    attachments.forEach((file) => fd.append("files", file));
+
+    try {
+      await mutateAsync(fd);
+      toast({
+        title: "지원 완료",
+        description: "지원이 정상적으로 등록되었습니다.",
+        open: true,
+      });
+      // redirect to applications list for this post
+      router.replace(`/applications/${project.id}`);
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: "지원 실패",
+        description: "서버와 통신 중 오류가 발생했습니다.",
+        open: true,
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   return (
     <div className="py-4 px-4">
@@ -175,6 +253,44 @@ export default function ApplicationWritePage({
                     최소 50자 이상 작성해주세요 ({content.length} / 2000)
                   </p>
                 </div>
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="salary">희망 급여 (원)</Label>
+                    <input
+                      id="salary"
+                      type="number"
+                      value={salary}
+                      onChange={(e) =>
+                        setSalary(
+                          e.target.value === "" ? "" : Number(e.target.value),
+                        )
+                      }
+                      placeholder="예: 3000000"
+                      className="input input-bordered w-full"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      선택사항: 월 급여 또는 총액을 숫자로 입력하세요.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="period">희망 기간 (개월)</Label>
+                    <input
+                      id="period"
+                      type="number"
+                      value={period}
+                      onChange={(e) =>
+                        setPeriod(
+                          e.target.value === "" ? "" : Number(e.target.value),
+                        )
+                      }
+                      placeholder="예: 3"
+                      className="input input-bordered w-full"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      선택사항: 프로젝트 참여 예상 기간(개월)
+                    </p>
+                  </div>
+                </div>
                 {/* 포트폴리오 */}
                 <div className="space-y-2 mt-4">
                   <Label>첨부파일 (선택사항)</Label>
@@ -190,7 +306,11 @@ export default function ApplicationWritePage({
                   </p>
                 </div>
                 <Separator />
-                <Button className="w-full cursor-pointer" size="lg">
+                <Button
+                  type="submit"
+                  className="w-full cursor-pointer"
+                  size="lg"
+                >
                   {isSubmitting ? "지원하는 중..." : "지원하기"}
                 </Button>
               </form>
