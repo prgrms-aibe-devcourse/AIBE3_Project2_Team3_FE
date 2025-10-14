@@ -1,6 +1,10 @@
 "use client";
 
-import { useFetchMe, useModifyUser } from "@/global/api/useAuthQuery";
+import {
+  useFetchMe,
+  useModifyUser,
+  useRemoveUser,
+} from "@/global/api/useAuthQuery";
 import {
   Avatar,
   AvatarFallback,
@@ -18,11 +22,18 @@ import { Label } from "@/global/components/ui/label";
 import { toast } from "@/global/hooks/useToast";
 import { useRef, useState } from "react";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+import { ConfirmWithPassword } from "./ConfirmWithPassword";
+
 export function ProfileForm() {
   const [isEditMode, setIsEditMode] = useState(false);
   const { data, isLoading } = useFetchMe();
   const { mutate, isPending } = useModifyUser();
+  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+  const { mutate: removeMutate, isPending: isRemovePending } = useRemoveUser();
 
   const onSave = async () => {
     const form = formRef.current!;
@@ -48,6 +59,27 @@ export function ProfileForm() {
   const onCancel = () => {
     formRef.current?.reset(); // ← 입력값을 초기값으로 원복
     setIsEditMode(false); // ← 편집모드 종료
+  };
+
+  const handleRemoveUser = async (password: string) => {
+    removeMutate(
+      { password },
+      {
+        onSuccess: () => {
+          toast({
+            title: "탈퇴가 완료되었습니다.",
+            description: "다음에 다시 이용해주세요...",
+          });
+          router.replace("/");
+        },
+        onError: (res) => {
+          toast({
+            title: "실패",
+            description: res.message,
+          });
+        },
+      },
+    );
   };
 
   return (
@@ -102,7 +134,12 @@ export function ProfileForm() {
       </Card>
 
       {/* Save Button */}
-      <div className="flex justify-end">
+      <div className="flex justify-end space-x-4">
+        <Link href="/profile/updatepw">
+          <Button type="button" variant="outline" size="lg">
+            비밀번호 수정
+          </Button>
+        </Link>
         {isEditMode ? (
           <>
             <Button
@@ -115,6 +152,7 @@ export function ProfileForm() {
             </Button>
             <Button
               type="button"
+              variant="outline"
               disabled={isLoading}
               size="lg"
               onClick={onCancel}
@@ -135,6 +173,31 @@ export function ProfileForm() {
           </>
         )}
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            <div className="w-full flex justify-between items-center">
+              <h1>회원 탈퇴</h1>
+              <ConfirmWithPassword
+                title="회원 탈퇴"
+                description="삭제된 계정은 복구할 수 없습니다. 정말 탈퇴하시겠습니까?"
+                triggerText="탈퇴"
+                confirmText="탈퇴하기"
+                loadingText="탈퇴 중..."
+                onConfirm={async (password) => {
+                  if (!password.trim()) return;
+                  try {
+                    await handleRemoveUser(password); // 성공 시에만 아래 실행
+                  } catch (e) {
+                    throw e;
+                  }
+                }}
+              />
+            </div>
+          </CardTitle>
+        </CardHeader>
+      </Card>
     </form>
   );
 }
