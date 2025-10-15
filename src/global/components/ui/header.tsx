@@ -125,20 +125,20 @@ export function Header() {
                     <DropdownMenuSubContent className="w-56">
                       <DropdownMenuItem asChild>
                         <Link
-                          href="/projects/my"
-                          className="flex items-center gap-2"
-                        >
-                          <FileText className="h-4 w-4" />
-                          내가 작성한 글
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link
                           href="/projects/new"
                           className="flex items-center gap-2"
                         >
                           <FilePlus2 className="h-4 w-4" />
                           프로젝트 작성
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href="/projects/my"
+                          className="flex items-center gap-2"
+                        >
+                          <FileText className="h-4 w-4" />
+                          내가 작성한 글
                         </Link>
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
@@ -151,20 +151,20 @@ export function Header() {
                     <DropdownMenuSubContent className="w-56">
                       <DropdownMenuItem asChild>
                         <Link
-                          href="/freelancers/my"
-                          className="flex items-center gap-2"
-                        >
-                          <UserCircle className="h-4 w-4" />
-                          내가 작성한 글
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link
                           href="/freelancers/new"
                           className="flex items-center gap-2"
                         >
                           <UserRoundPlus className="h-4 w-4" />
                           프리랜서 작성
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href="/freelancers/my"
+                          className="flex items-center gap-2"
+                        >
+                          <UserCircle className="h-4 w-4" />
+                          내가 작성한 글
                         </Link>
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
@@ -264,6 +264,20 @@ export function Header() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   프리랜서 작성
+                </Link>
+                <Link
+                  href="/projects/my"
+                  className="block text-sm font-medium hover:text-primary transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  작성한 프로젝트
+                </Link>
+                <Link
+                  href="/freelancers/my"
+                  className="block text-sm font-medium hover:text-primary transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  작성한 프리랜서
                 </Link>
                 <div className="flex flex-col py-4 space-y-4 border-y">
                   <Link

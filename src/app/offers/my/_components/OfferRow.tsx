@@ -46,6 +46,16 @@ export default function OfferRow({
             #{index} · {item.postTitle}
           </div>
         </div>
+        {tab == "received" && (
+          <div className="text-sm text-muted-foreground flex gap-4 flex-wrap">
+            <span>
+              작성자:{" "}
+              <span className="font-medium text-foreground">
+                {item.userNickname}
+              </span>
+            </span>
+          </div>
+        )}
         <div className="text-sm text-muted-foreground flex gap-4 flex-wrap">
           <span>
             제안일:{" "}
@@ -59,14 +69,18 @@ export default function OfferRow({
           </span>
         </div>
       </div>
-      <div className="flex gap-2 shrink-0">
+      <div className="flex flex-col gap-2">
         {["ACCEPTED", "COMPLETED"].includes(item.status) && (
           <Button size="sm" onClick={onChat}>
             채팅
           </Button>
         )}
         {tab == "my" && item.status === "ACCEPTED" && (
-          <Button size="sm" onClick={() => handleModifyStatus("COMPLETED")}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleModifyStatus("COMPLETED")}
+          >
             완료
           </Button>
         )}

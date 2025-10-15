@@ -6,6 +6,7 @@ type CreateReqBody = NonNullable<
 type ModifyReqBody = NonNullable<
   paths["/api/v1/applications/{id}"]["put"]["requestBody"]
 >;
+export type ApplicationDto = components["schemas"]["ApplicationDto"];
 export type CreateAppReqBody = CreateReqBody["content"]["multipart/form-data"];
 export type ModifyAppReqBody = ModifyReqBody["content"]["multipart/form-data"];
 export type AppMyListParam =

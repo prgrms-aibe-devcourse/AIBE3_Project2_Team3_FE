@@ -2424,7 +2424,9 @@ export interface operations {
     };
     modify_5: {
         parameters: {
-            query?: never;
+            query?: {
+                removeIds?: number[];
+            };
             header?: never;
             path: {
                 id: number;

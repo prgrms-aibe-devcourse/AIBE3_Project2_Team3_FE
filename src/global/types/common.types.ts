@@ -15,3 +15,5 @@ export type applyParams = {
   minSalary: number;
   maxSalary: number;
 };
+
+export type ExistingFile = { id: number; url: string; fileName: string };
