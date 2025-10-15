@@ -34,19 +34,18 @@ export function TossPaymentsButton({
             amount: Number(qty),
           });
 
-          const successParams = new URLSearchParams(window.location.search);
           await widgets?.requestPayment({
             orderId: crypto.randomUUID(),
             orderName: `${freelancer.title} ${qty}건`,
             customerName: "김토스",
             customerEmail: "customer123@gmail.com",
-            successUrl: `${window.location.origin}/sandbox/success?${successParams.toString()}`,
-            failUrl: `${window.location.origin}/sandbox/fail?${successParams.toString()}`,
+            successUrl: `${window.location.origin}/sandbox/success?freelancerId=${freelancer.id}`,
+            failUrl: `${window.location.origin}/sandbox/fail`,
           });
         } catch (error) {
           toast({
-            title: "결제 준비 실패",
-            description: "서버와 통신 중 오류가 발생했습니다.",
+            title: "결제 실패",
+            description: "결제 요청에 실패했습니다.",
             open: true,
           });
         }
