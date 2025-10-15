@@ -23,8 +23,8 @@ export default function ApplicationWritePage({
 }: {
   params: Promise<{ id: number }>;
 }) {
-  const { id } = use(params);
-  const { data: project, isLoading } = useDetailProject(id);
+  const { id: postId } = use(params);
+  const { data: project, isLoading } = useDetailProject(postId);
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [attachments, setAttachments] = useState<File[]>([]);

@@ -16,9 +16,9 @@ import { cn } from "@/global/lib/utils";
 import { RegionTreeDto } from "@/global/types/region.types";
 import { useEffect, useMemo, useState } from "react";
 
+import { ConfirmDelete } from "../../../global/components/dialog/ConfirmDeleteDialog";
 import { AddDialog } from "../_components/AddDialog";
 import AdminLayout from "../_components/AdminLayout";
-import { ConfirmDelete } from "../_components/ConfirmDeleteDialog";
 
 export default function RegionsPage() {
   const { data, isLoading } = useListRegion();
