@@ -8,6 +8,7 @@ import {
 import { Badge } from "@/global/components/ui/badge";
 import { Button } from "@/global/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/global/components/ui/card";
+import { DEFAULT_AVATAR } from "@/global/consts";
 import { formatCustomDuration } from "@/global/lib/utils";
 import { ProjectDto } from "@/global/types/project.types";
 import { MouseEvent, useState } from "react";
@@ -142,7 +143,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
         <div className="flex items-center justify-between pt-4 border-t">
           <div className="flex items-center space-x-3">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={"https://picsum.photos/200"} />
+              <AvatarImage
+                src={project.author.profileImageUrl || DEFAULT_AVATAR}
+              />
               <AvatarFallback>{"이미지"}</AvatarFallback>
             </Avatar>
             <div>

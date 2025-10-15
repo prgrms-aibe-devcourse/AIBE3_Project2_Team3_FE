@@ -305,7 +305,7 @@ export function MatchingDashboard() {
                 >
                   <Avatar className="h-12 w-12">
                     <AvatarImage src={"https://picsum.photos/200"} />
-                    <AvatarFallback>이미지</AvatarFallback>
+                    <AvatarFallback>아바타</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center justify-between">

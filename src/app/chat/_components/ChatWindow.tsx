@@ -10,6 +10,7 @@ import {
 import { Button } from "@/global/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/global/components/ui/card";
 import { Input } from "@/global/components/ui/input";
+import { DEFAULT_AVATAR } from "@/global/consts";
 import { useStompRoom } from "@/global/hooks/useStompRoom";
 import { formatChatTime } from "@/global/lib/utils";
 import {
@@ -273,9 +274,9 @@ export function ChatWindow({ selectedChatId }: ChatWindowProps) {
               {!isMe && (
                 <Avatar className="h-8 w-8 mt-[2px]">
                   <AvatarImage
-                    src={m.senderProfileImageUrl ?? "https://picsum.photos/200"}
+                    src={m.senderProfileImageUrl ?? DEFAULT_AVATAR}
                   />
-                  <AvatarFallback>이미지</AvatarFallback>
+                  <AvatarFallback>아바타</AvatarFallback>
                 </Avatar>
               )}
 

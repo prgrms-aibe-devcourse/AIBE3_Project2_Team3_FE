@@ -54,3 +54,5 @@ export const DEAL_STATUS_MAP: Record<DealStatus, string> = {
   REJECTED: "거절",
   COMPLETED: "완료",
 };
+
+export const DEFAULT_AVATAR = "/images/default-avatar.svg";

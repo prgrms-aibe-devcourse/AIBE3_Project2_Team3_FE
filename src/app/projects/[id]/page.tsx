@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/global/components/ui/card";
 import { Separator } from "@/global/components/ui/separator";
+import { DEFAULT_AVATAR } from "@/global/consts";
 import { formatCustomDuration, formatTimeAgo } from "@/global/lib/utils";
 import { format } from "date-fns";
 import { use, useState } from "react";
@@ -186,7 +187,9 @@ export default function ProjectDetailPage({
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-3">
                 <Avatar className="h-12 w-12">
-                  <AvatarImage src={"https://picsum.photos/200"} />
+                  <AvatarImage
+                    src={project.author.profileImageUrl || DEFAULT_AVATAR}
+                  />
                   <AvatarFallback>{"이미지"}</AvatarFallback>
                 </Avatar>
                 <div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useFetchMe, useLogout } from "@/global/api/useAuthQuery";
+import { DEFAULT_AVATAR } from "@/global/consts";
 import { useState } from "react";
 
 import Link from "next/link";
@@ -16,12 +17,12 @@ import {
   LogOut,
   Menu,
   MessageCircle,
-  User,
   UserCircle,
   UserRoundPlus,
   X,
 } from "lucide-react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import {
@@ -107,7 +108,13 @@ export function Header() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-2">
-                    <User className="h-4 w-4" />
+                    <Avatar className="h-4 w-4">
+                      <AvatarImage
+                        src={data.data.profileImageUrl || DEFAULT_AVATAR}
+                        alt="프로필"
+                      />
+                      <AvatarFallback>프로필</AvatarFallback>
+                    </Avatar>
                     {data.data.nickname}님
                   </Button>
                 </DropdownMenuTrigger>
@@ -185,7 +192,13 @@ export function Header() {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link href="/profile">
-                      <User className="h-4 w-4" />
+                      <Avatar className="h-4 w-4">
+                        <AvatarImage
+                          src={data.data.profileImageUrl || DEFAULT_AVATAR}
+                          alt="프로필"
+                        />
+                        <AvatarFallback>프로필</AvatarFallback>
+                      </Avatar>
                       마이페이지
                     </Link>
                   </DropdownMenuItem>
@@ -332,7 +345,13 @@ export function Header() {
                     asChild
                   >
                     <Link href="/profile">
-                      <User className="h-4 w-4" />
+                      <Avatar className="h-4 w-4">
+                        <AvatarImage
+                          src={data.data.profileImageUrl || DEFAULT_AVATAR}
+                          alt="프로필"
+                        />
+                        <AvatarFallback>프로필</AvatarFallback>
+                      </Avatar>
                       마이페이지
                     </Link>
                   </Button>

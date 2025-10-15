@@ -1,5 +1,7 @@
-import { components } from "../backend/apiV1/schema";
+import { components, paths } from "../backend/apiV1/schema";
 
+type ModifyReqBody = NonNullable<paths["/api/v1/users"]["put"]["requestBody"]>;
+export type ModifyUserReqBody = ModifyReqBody["content"]["multipart/form-data"];
 export type RsDataUserDto = components["schemas"]["RsDataUserDto"];
 export type UserDto = components["schemas"]["UserDto"];
 export type UserLoginReqBody = components["schemas"]["UserLoginReqBody"];
