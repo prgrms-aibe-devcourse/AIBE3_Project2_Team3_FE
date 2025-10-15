@@ -817,6 +817,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/freelancers/{freelancerId}/files/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** 프리랜서 파일 다운로드 */
+        get: operations["downloadFile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/freelancers/my": {
         parameters: {
             query?: never;
@@ -907,7 +924,7 @@ export interface paths {
             cookie?: never;
         };
         /** 파일 다운로드 */
-        get: operations["downloadFile"];
+        get: operations["downloadFile_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1309,6 +1326,13 @@ export interface components {
             viewCount: number;
             /** Format: int32 */
             likeCount: number;
+            files: components["schemas"]["FreelancerFileDto"][];
+        };
+        FreelancerFileDto: {
+            /** Format: int64 */
+            id: number;
+            url: string;
+            fileName: string;
         };
         RsDataFreelancerDto: {
             resultCode: string;
@@ -2327,16 +2351,21 @@ export interface operations {
     };
     modify_4: {
         parameters: {
-            query?: never;
+            query?: {
+                removeIds?: number[];
+            };
             header?: never;
             path: {
                 id: number;
             };
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
-                "application/json": components["schemas"]["FreelancerModifyReqBody"];
+                "multipart/form-data": {
+                    reqBody: components["schemas"]["FreelancerModifyReqBody"];
+                    files?: string[];
+                };
             };
         };
         responses: {
@@ -3115,9 +3144,12 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
-                "application/json": components["schemas"]["FreelancerWriteReqBody"];
+                "multipart/form-data": {
+                    reqBody: components["schemas"]["FreelancerWriteReqBody"];
+                    files?: string[];
+                };
             };
         };
         responses: {
@@ -4112,6 +4144,38 @@ export interface operations {
             };
         };
     };
+    downloadFile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                freelancerId: number;
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     getMyFreelancers: {
         parameters: {
             query?: {
@@ -4276,7 +4340,7 @@ export interface operations {
             };
         };
     };
-    downloadFile: {
+    downloadFile_1: {
         parameters: {
             query?: never;
             header?: never;

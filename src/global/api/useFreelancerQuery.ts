@@ -8,9 +8,9 @@ import { useFreelancerListStore } from "../stores/useFreelancerListStore";
 import { useMyFreelancerListStore } from "../stores/useMyFreelancerListStore";
 import { Pageable } from "../types/common.types";
 import {
+  CreateFreelancerReqBody,
   FreelancerListParam,
-  FreelancerModifyReqBody,
-  FreelancerWriteReqBody,
+  ModifyFreelancerReqBody,
 } from "../types/freelancer.types";
 
 const list = async (param: FreelancerListParam) =>
@@ -25,14 +25,18 @@ const detail = async (id: number) =>
     await client.GET("/api/v1/freelancers/{id}", { params: { path: { id } } }),
   );
 
-const create = async (body: FreelancerWriteReqBody) =>
-  unwrap(await client.POST("/api/v1/freelancers", { body }));
+const create = async (formData: FormData) =>
+  unwrap(
+    await client.POST("/api/v1/freelancers", {
+      body: formData as unknown as CreateFreelancerReqBody,
+    }),
+  );
 
-const modify = async (id: number, body: FreelancerModifyReqBody) =>
+const modify = async (id: number, formData: FormData) =>
   unwrap(
     await client.PUT("/api/v1/freelancers/{id}", {
       params: { path: { id } },
-      body,
+      body: formData as unknown as ModifyFreelancerReqBody,
     }),
   );
 
@@ -134,7 +138,7 @@ export const useModifyFreelancer = (id: number) => {
   const qc = useQueryClient();
   return useMutation({
     mutationKey: freelancerQueryKeys.modify(id).queryKey,
-    mutationFn: (body: FreelancerModifyReqBody) => modify(id, body),
+    mutationFn: (formData: FormData) => modify(id, formData),
     onSuccess: (res) => {
       qc.setQueryData(freelancerQueryKeys.detail(id).queryKey, res.data);
     },
