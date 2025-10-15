@@ -317,6 +317,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{id}/view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 프로젝트 글 조회수 증가 */
+        post: operations["increaseViewCount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{id}/like": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 프로젝트 글 좋아요/취소 */
+        post: operations["toggleLike"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/offers": {
         parameters: {
             query?: never;
@@ -346,6 +380,40 @@ export interface paths {
         put?: never;
         /** 프리랜서 글 작성 */
         post: operations["write_2"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/freelancers/{id}/view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 프리랜서 글 조회수 증가 */
+        post: operations["increaseViewCount_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/freelancers/{id}/like": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 프리랜서 글 좋아요/취소 */
+        post: operations["toggleLike_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1148,6 +1216,10 @@ export interface components {
             personnel: number;
             /** Format: int32 */
             skillLevel: number;
+            /** Format: int32 */
+            viewCount: number;
+            /** Format: int32 */
+            likeCount: number;
         };
         RegionDto: {
             /** Format: int64 */
@@ -1233,6 +1305,10 @@ export interface components {
             salary: number;
             /** Format: int64 */
             period: number;
+            /** Format: int32 */
+            viewCount: number;
+            /** Format: int32 */
+            likeCount: number;
         };
         RsDataFreelancerDto: {
             resultCode: string;
@@ -1363,7 +1439,7 @@ export interface components {
             /** Format: int64 */
             postId: number;
             /** Format: int32 */
-            amount?: number;
+            amount: number;
         };
         FreelancerWriteDto: {
             /** Format: int64 */
@@ -1438,11 +1514,11 @@ export interface components {
         ApplicationWriteReqBody: {
             /** Format: int64 */
             postId: number;
-            content?: string;
+            content: string;
             /** Format: int64 */
-            salary?: number;
+            salary: number;
             /** Format: int32 */
-            period?: number;
+            period: number;
         };
         ApplicationWriteResBody: {
             /** Format: int64 */
@@ -1580,7 +1656,11 @@ export interface components {
             content: components["schemas"]["ProjectDto"][];
             page: components["schemas"]["PageMeta"];
         };
-        OfferWithUserDto: {
+        PagePayloadPostOfferWithUserDto: {
+            content: components["schemas"]["PostOfferWithUserDto"][];
+            page: components["schemas"]["PageMeta"];
+        };
+        PostOfferWithUserDto: {
             /** Format: int64 */
             id: number;
             status: string;
@@ -1591,10 +1671,6 @@ export interface components {
             /** Format: int64 */
             userId: number;
             userNickname: string;
-        };
-        PagePayloadOfferWithUserDto: {
-            content: components["schemas"]["OfferWithUserDto"][];
-            page: components["schemas"]["PageMeta"];
         };
         PagePayloadPostApplicationWithUserDto: {
             content: components["schemas"]["PostApplicationWithUserDto"][];
@@ -1614,21 +1690,39 @@ export interface components {
             userId: number;
             userNickname: string;
         };
-        OfferWithPostDto: {
+        OfferWithUserDto: {
             /** Format: int64 */
-            offerId: number;
+            id: number;
+            status: string;
             /** Format: int32 */
             amount: number;
-            offerStatus: string;
             /** Format: date-time */
-            offerCreatedDate: string;
+            createdDate: string;
             /** Format: int64 */
             postId: number;
             postType: string;
+            postTitle: string;
+            /** Format: int64 */
+            userId: number;
+            userNickname: string;
+        };
+        PagePayloadOfferWithUserDto: {
+            content: components["schemas"]["OfferWithUserDto"][];
+            page: components["schemas"]["PageMeta"];
+        };
+        OfferWithPostDto: {
+            /** Format: int64 */
+            id: number;
+            status: string;
+            /** Format: date-time */
+            createdDate: string;
+            /** Format: int64 */
+            postId: number;
+            postType: string;
+            postTitle: string;
             /** Format: int64 */
             postUserId: number;
             postUserNickname: string;
-            postTitle: string;
         };
         PagePayloadOfferWithPostDto: {
             content: components["schemas"]["OfferWithPostDto"][];
@@ -1725,9 +1819,10 @@ export interface components {
             url: string;
             fileName: string;
         };
-        ApplicationWithPostDto: {
+        ApplicationWithUserDto: {
             /** Format: int64 */
             id: number;
+            content: string;
             status: string;
             /** Format: int64 */
             salary: number;
@@ -1740,11 +1835,11 @@ export interface components {
             postType: string;
             postTitle: string;
             /** Format: int64 */
-            postUserId: number;
-            postUserNickname: string;
+            userId: number;
+            userNickname: string;
         };
-        PagePayloadApplicationWithPostDto: {
-            content: components["schemas"]["ApplicationWithPostDto"][];
+        PagePayloadApplicationWithUserDto: {
+            content: components["schemas"]["ApplicationWithUserDto"][];
             page: components["schemas"]["PageMeta"];
         };
         PagePayloadReportDto: {
@@ -2892,6 +2987,68 @@ export interface operations {
             };
         };
     };
+    increaseViewCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    toggleLike: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
     write_1: {
         parameters: {
             query?: never;
@@ -2987,6 +3144,68 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RsDataFreelancerDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    increaseViewCount_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    toggleLike_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
                 };
             };
             /** @description Bad Request */
@@ -3730,7 +3949,7 @@ export interface operations {
                 size?: number;
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
-                status?: "PENDING" | "ACCEPTED" | "REJECTED";
+                status?: "PENDING" | "ACCEPTED" | "REJECTED" | "COMPLETED";
             };
             header?: never;
             path: {
@@ -3746,7 +3965,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["PagePayloadOfferWithUserDto"];
+                    "*/*": components["schemas"]["PagePayloadPostOfferWithUserDto"];
                 };
             };
             /** @description Bad Request */
@@ -3769,7 +3988,7 @@ export interface operations {
                 size?: number;
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
-                status?: "PENDING" | "ACCEPTED" | "REJECTED";
+                status?: "PENDING" | "ACCEPTED" | "REJECTED" | "COMPLETED";
             };
             header?: never;
             path: {
@@ -3808,7 +4027,7 @@ export interface operations {
                 size?: number;
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
-                status?: "PENDING" | "ACCEPTED" | "REJECTED";
+                status?: "PENDING" | "ACCEPTED" | "REJECTED" | "COMPLETED";
             };
             header?: never;
             path?: never;
@@ -3845,7 +4064,7 @@ export interface operations {
                 size?: number;
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
-                status?: "PENDING" | "ACCEPTED" | "REJECTED";
+                status?: "PENDING" | "ACCEPTED" | "REJECTED" | "COMPLETED";
             };
             header?: never;
             path?: never;
@@ -4114,7 +4333,7 @@ export interface operations {
                 size?: number;
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
-                status?: "PENDING" | "ACCEPTED" | "REJECTED";
+                status?: "PENDING" | "ACCEPTED" | "REJECTED" | "COMPLETED";
             };
             header?: never;
             path?: never;
@@ -4128,7 +4347,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["PagePayloadPostApplicationWithUserDto"];
+                    "*/*": components["schemas"]["PagePayloadApplicationWithUserDto"];
                 };
             };
             /** @description Bad Request */
@@ -4151,7 +4370,7 @@ export interface operations {
                 size?: number;
                 /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
                 sort?: string[];
-                status?: "PENDING" | "ACCEPTED" | "REJECTED";
+                status?: "PENDING" | "ACCEPTED" | "REJECTED" | "COMPLETED";
             };
             header?: never;
             path?: never;
@@ -4165,7 +4384,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["PagePayloadApplicationWithPostDto"];
+                    "*/*": components["schemas"]["PagePayloadApplicationWithUserDto"];
                 };
             };
             /** @description Bad Request */

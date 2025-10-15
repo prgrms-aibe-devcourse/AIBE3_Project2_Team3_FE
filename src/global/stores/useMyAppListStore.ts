@@ -20,7 +20,7 @@ interface MyAppListAction {
 
 const initState: MyAppListState = {
   page: 0,
-  size: 20,
+  size: 10,
   sort: ["id,desc"],
   status: undefined,
 };

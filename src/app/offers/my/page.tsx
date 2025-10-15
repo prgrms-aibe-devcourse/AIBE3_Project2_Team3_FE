@@ -44,7 +44,7 @@ export default function MyOffersPage() {
             variant={tab === "received" ? "default" : "outline"}
             onClick={() => setTab("received")}
           >
-            내가 제안받은 목록
+            내가 받은 목록
           </Button>
         </div>
       </div>

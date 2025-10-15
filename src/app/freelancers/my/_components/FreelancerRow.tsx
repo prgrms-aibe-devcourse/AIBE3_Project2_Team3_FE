@@ -1,7 +1,7 @@
 "use client";
 
-import { ConfirmDelete } from "@/app/admin/_components/ConfirmDeleteDialog";
 import { useRemoveFreelancer } from "@/global/api/useFreelancerQuery";
+import { ConfirmDelete } from "@/global/components/dialog/ConfirmDeleteDialog";
 import { Badge } from "@/global/components/ui/badge";
 import { Button } from "@/global/components/ui/button";
 import { formatCustomDuration } from "@/global/lib/utils";

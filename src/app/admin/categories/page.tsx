@@ -16,9 +16,9 @@ import { cn } from "@/global/lib/utils";
 import { CategoryTreeDto } from "@/global/types/category.types";
 import { useEffect, useMemo, useState } from "react";
 
+import { ConfirmDelete } from "../../../global/components/dialog/ConfirmDeleteDialog";
 import { AddDialog } from "../_components/AddDialog";
 import AdminLayout from "../_components/AdminLayout";
-import { ConfirmDelete } from "../_components/ConfirmDeleteDialog";
 
 export default function CategoryPage() {
   const { data, isLoading } = useListCategory();

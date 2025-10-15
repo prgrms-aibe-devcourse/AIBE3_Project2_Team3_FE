@@ -9,13 +9,15 @@ import { useReceivedAppListStore } from "../stores/useReceivedAppListStore";
 import {
   AppMyListParam,
   AppReceivedListParam,
-  CreateAppReq,
+  ApplicationModifyStatusResBody,
+  CreateAppReqBody,
+  ModifyAppReqBody,
 } from "../types/application.types";
 
 const create = async (formData: FormData) =>
   unwrap(
     await client.POST("/api/v1/applications", {
-      body: formData as unknown as CreateAppReq,
+      body: formData as unknown as CreateAppReqBody,
       // openapi-fetch will set content-type for FormData automatically
     }),
   );
@@ -31,10 +33,36 @@ const received = async (param: AppReceivedListParam) =>
     }),
   );
 
+const modify = async (id: number, formData: FormData) =>
+  unwrap(
+    await client.PUT("/api/v1/applications/{id}", {
+      params: { path: { id } },
+      body: formData as unknown as ModifyAppReqBody,
+    }),
+  );
+
+const modifyStatus = async (id: number, body: ApplicationModifyStatusResBody) =>
+  unwrap(
+    await client.PUT("/api/v1/applications/{id}/status", {
+      params: { path: { id } },
+      body,
+    }),
+  );
+
+const remove = async (id: number) =>
+  unwrap(
+    await client.DELETE("/api/v1/applications/{id}", {
+      params: { path: { id } },
+    }),
+  );
+
 export const applicationQueryKeys = createQueryKeys("application", {
   create: () => ["create"],
   my: () => ["my"],
   received: () => ["received"],
+  modify: () => ["modify"],
+  modifyStatus: () => ["modifyStatus"],
+  remove: () => ["remove"],
 });
 
 export const useCreateApplication = () => {
@@ -79,6 +107,55 @@ export const useListReceivedApp = (enabled = true) => {
     gcTime: 5 * 60 * 1000 - 1,
     retry: 0,
     enabled,
+  });
+};
+
+export const useModifyApp = (id: number) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: applicationQueryKeys.modify().queryKey,
+    mutationFn: (fd: FormData) => modify(id, fd),
+    onSuccess: async (res) => {
+      await qc.invalidateQueries({
+        queryKey: applicationQueryKeys.my().queryKey,
+      });
+      await qc.invalidateQueries({
+        queryKey: applicationQueryKeys.received().queryKey,
+      });
+    },
+  });
+};
+
+export const useModifyAppStatus = (id: number) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: applicationQueryKeys.modifyStatus().queryKey,
+    mutationFn: (body: ApplicationModifyStatusResBody) =>
+      modifyStatus(id, body),
+    onSuccess: async (res) => {
+      await qc.invalidateQueries({
+        queryKey: applicationQueryKeys.my().queryKey,
+      });
+      await qc.invalidateQueries({
+        queryKey: applicationQueryKeys.received().queryKey,
+      });
+    },
+  });
+};
+
+export const useRemoveApp = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: applicationQueryKeys.remove().queryKey,
+    mutationFn: (id: number) => remove(id),
+    onSuccess: async (res) => {
+      await qc.invalidateQueries({
+        queryKey: applicationQueryKeys.my().queryKey,
+      });
+      await qc.invalidateQueries({
+        queryKey: applicationQueryKeys.received().queryKey,
+      });
+    },
   });
 };
 

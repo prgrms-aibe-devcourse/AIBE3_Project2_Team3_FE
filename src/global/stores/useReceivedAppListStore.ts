@@ -20,7 +20,7 @@ interface ReceivedAppListAction {
 
 const initState: ReceivedAppListState = {
   page: 0,
-  size: 20,
+  size: 10,
   sort: ["id,desc"],
   status: undefined,
 };

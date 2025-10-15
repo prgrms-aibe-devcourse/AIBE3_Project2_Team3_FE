@@ -1,3 +1,5 @@
+import { DealStatus } from "../components/deals/StatusBadge";
+
 export const HOUR_TO_MILLES = 60 * 60 * 1000;
 export const DAY_TO_MILLES = 24 * HOUR_TO_MILLES;
 export const WEEK_TO_MILLES = 7 * DAY_TO_MILLES;
@@ -45,3 +47,10 @@ export const PUBLIC_ROUTES = [
   "/projects",
   "/freelancers",
 ];
+
+export const DEAL_STATUS_MAP: Record<DealStatus, string> = {
+  PENDING: "대기",
+  ACCEPTED: "수락",
+  REJECTED: "거절",
+  COMPLETED: "완료",
+};

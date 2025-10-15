@@ -4,6 +4,7 @@ import {
   useListMyApp,
   useListReceivedApp,
 } from "@/global/api/useApplicationQuery";
+import LoadingScreen from "@/global/components/loading/loading";
 import { Button } from "@/global/components/ui/button";
 import {
   Card,
@@ -14,6 +15,7 @@ import {
 import { PaginationBar } from "@/global/components/ui/paginationBar";
 import { useMyAppListStore } from "@/global/stores/useMyAppListStore";
 import { useReceivedAppListStore } from "@/global/stores/useReceivedAppListStore";
+import { ApplicationWithUserDto } from "@/global/types/application.types";
 import { useState } from "react";
 
 import ApplicationRow from "./_components/AppRow";
@@ -29,6 +31,13 @@ export default function ApplicationsPage() {
   // 페이지네이션: 탭별 store 사용
   const { page: myPage, setPage: setMyPage } = useMyAppListStore();
   const { page: rcPage, setPage: setRcPage } = useReceivedAppListStore();
+  if (!data)
+    return (
+      <LoadingScreen
+        message="데이터를 불러오는 중입니다"
+        tips={["잠시만 기다려 주세요"]}
+      />
+    );
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 py-8 px-4">
@@ -63,19 +72,16 @@ export default function ApplicationsPage() {
               <div>로딩중…</div>
             ) : (
               <div className="flex flex-col">
-                {data?.content?.map((it: any) => (
+                {data?.content?.map((it: ApplicationWithUserDto, i) => (
                   <ApplicationRow
                     key={it.id}
                     item={it}
-                    onAccept={() => {
-                      /* mutate accept */
-                    }}
-                    onReject={() => {
-                      /* mutate reject */
-                    }}
-                    onChat={() => {
-                      /* open chat */
-                    }}
+                    tab={tab}
+                    index={
+                      data.page.totalElements -
+                      i -
+                      data.page.page * data.page.size
+                    }
                   />
                 ))}
               </div>

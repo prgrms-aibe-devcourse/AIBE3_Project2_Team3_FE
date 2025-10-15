@@ -81,14 +81,12 @@ export function FreelancerForm({
         : [],
     );
     setSelectedCategory(
-      defaultValues?.categories
+      defaultValues.categories
         ? defaultValues.categories.map((category) => category.id)
         : [],
     );
     setSelectedSkillIds(
-      defaultValues?.skills
-        ? defaultValues.skills.map((skill) => skill.id)
-        : [],
+      defaultValues.skills ? defaultValues.skills.map((skill) => skill.id) : [],
     );
     setPeriod(
       defaultValues.period
