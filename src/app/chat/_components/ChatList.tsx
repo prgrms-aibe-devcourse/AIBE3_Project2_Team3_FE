@@ -4,6 +4,7 @@ import { useFetchMe } from "@/global/api/useAuthQuery";
 import {
   searchUsersToInvite,
   useCreateChatRoom,
+  useGetRoomMembers,
   useInviteUsers,
   useListChatRoom,
 } from "@/global/api/useChatQuery";
@@ -366,6 +367,19 @@ export function ChatList({ selectedChatId }: ChatListProps) {
     return items.filter((chat) => chat.name.toLowerCase().includes(q));
   }, [items, search]);
 
+  const RoomMemberCount = ({ roomId }: { roomId: number }) => {
+    const { data, isLoading, isError } = useGetRoomMembers(roomId);
+    const members = (data as any)?.content ?? [];
+    const count = members.filter(
+      (m: any) => m?.membershipStatus == "ACTIVE",
+    ).length;
+    if (isLoading)
+      return <span className="text-xs text-muted-foreground">"..."</span>;
+    if (isError)
+      return <span className="text-xs text-muted-foreground">"!"</span>;
+    return <span className="text-xs text-muted-foreground">({count})</span>;
+  };
+
   useEffect(() => {
     if (!loaderRef.current) return;
     const io = new IntersectionObserver((entries) => {
@@ -431,7 +445,10 @@ export function ChatList({ selectedChatId }: ChatListProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-medium truncate">{chat.name}</h3>
+                      <h3 className="font-medium truncate">
+                        {chat.name}
+                        <RoomMemberCount roomId={chat.id} />
+                      </h3>
                       <div className="flex items-center space-x-2">
                         <span className="text-xs text-muted-foreground">
                           {formatChatTimestamp(chat.lastMessage.createdDate)}
