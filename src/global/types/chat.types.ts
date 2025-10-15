@@ -15,3 +15,5 @@ export type UserInviteDto = components["schemas"]["UserInviteDto"];
 export type ChatCreateReqBody = components["schemas"]["ChatCreateReqBody"];
 export type PagePayloadChatRoomDto =
   components["schemas"]["PagePayloadChatRoomDto"];
+export type ChatMemberDto = components["schemas"]["ChatMemberDto"];
+export type MemberStatus = ChatMemberDto["membershipStatus"];

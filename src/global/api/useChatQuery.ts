@@ -88,6 +88,13 @@ const refuseRoomInvite = async (roomId: number) =>
 const createRoom = async (body: ChatCreateReqBody) =>
   unwrap(await client.POST("/api/v1/chat/rooms", { body }));
 
+const getMembers = async (roomId: number) =>
+  unwrap(
+    await client.GET("/api/v1/chat/rooms/{roomId}/members", {
+      params: { path: { roomId } },
+    }),
+  );
+
 export const chatQueryKeys = createQueryKeys("chat", {
   chatRoomLists: () => ["room", "list"],
   chatRoomList: () => ["room", "list"],
@@ -101,6 +108,7 @@ export const chatQueryKeys = createQueryKeys("chat", {
   acceptInvite: (roomId: number) => ["invite", "accept", roomId],
   refuseInvite: (roomId: number) => ["invite", "refuse", roomId],
   create: () => ["rooms", "create"],
+  members: (roomId: number) => ["rooms", "members", roomId],
 });
 
 export const useListChatRoom = () => {
@@ -211,6 +219,20 @@ export const useCreateChatRoom = () => {
         queryKey: chatQueryKeys.chatRoomList().queryKey,
       });
     },
+  });
+};
+
+export const useGetRoomMembers = (roomId: number | undefined) => {
+  return useQuery({
+    queryKey: chatQueryKeys.members(roomId ?? 0).queryKey,
+    queryFn: () => {
+      if (!roomId) throw new Error("roomId가 없습니다.");
+      return getMembers(roomId);
+    },
+    enabled: !!roomId,
+    staleTime: 5 * 60 * 1000 - 1,
+    gcTime: 5 * 60 * 1000 - 1,
+    retry: 0,
   });
 };
 
