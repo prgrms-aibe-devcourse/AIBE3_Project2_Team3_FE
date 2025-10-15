@@ -17,17 +17,3 @@ export type PagePayloadChatRoomDto =
   components["schemas"]["PagePayloadChatRoomDto"];
 export type ChatMemberDto = components["schemas"]["ChatMemberDto"];
 export type MemberStatus = ChatMemberDto["membershipStatus"];
-export interface PagePayload<T> {
-  content: T[];
-  page: {
-    page: number;
-    size: number;
-    totalElements: number;
-    totalPages: number;
-    first: boolean;
-    last: boolean;
-    hasNext: boolean;
-    hasPrevious: boolean;
-    sort?: Array<{ property: string; direction: "ASC" | "DESC" }>;
-  };
-}
