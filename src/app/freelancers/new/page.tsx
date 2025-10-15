@@ -2,7 +2,6 @@
 
 import { useCreateFreelancer } from "@/global/api/useFreelancerQuery";
 import { toast } from "@/global/hooks/useToast";
-import { FreelancerWriteReqBody } from "@/global/types/freelancer.types";
 
 import { useRouter } from "next/navigation";
 
@@ -14,21 +13,19 @@ export default function FreelancerWritePage() {
   const handleCancel = () => {
     router.back();
   };
-  const handleSubmit = (param: FreelancerWriteReqBody) => {
-    mutate(
-      { ...param },
-      {
-        onSuccess: (res) => {
-          router.replace(`/freelancers/${res.data.id}`);
-        },
-        onError: (res) => {
-          toast({
-            title: "실패",
-            description: res.message,
-          });
-        },
+  const handleSubmit = (formData: FormData) => {
+    console.log(formData);
+    mutate(formData, {
+      onSuccess: (res) => {
+        router.replace(`/freelancers/${res.data.id}`);
       },
-    );
+      onError: (res) => {
+        toast({
+          title: "실패",
+          description: res.message,
+        });
+      },
+    });
   };
 
   return (
