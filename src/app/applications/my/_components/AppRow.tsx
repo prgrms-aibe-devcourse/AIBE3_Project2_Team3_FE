@@ -65,6 +65,16 @@ export default function ApplicationRow({
             #{index} · {item.postTitle}
           </div>
         </div>
+        {tab == "received" && (
+          <div className="text-sm text-muted-foreground flex gap-4 flex-wrap">
+            <span>
+              작성자:{" "}
+              <span className="font-medium text-foreground">
+                {item.userNickname}
+              </span>
+            </span>
+          </div>
+        )}
         <div className="text-sm text-muted-foreground flex gap-4 flex-wrap">
           <span>
             지원일:{" "}
@@ -106,7 +116,7 @@ export default function ApplicationRow({
             <Button
               size="sm"
               onClick={() =>
-                router.replace(`/application/${item.postId}/edit/${item.id}`)
+                router.replace(`/applications/${item.postId}/edit/${item.id}`)
               }
             >
               수정
@@ -140,7 +150,11 @@ export default function ApplicationRow({
           </Button>
         )}
         {tab == "received" && item.status === "ACCEPTED" && (
-          <Button size="sm" onClick={() => handleModifyStatus("COMPLETED")}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleModifyStatus("COMPLETED")}
+          >
             완료
           </Button>
         )}

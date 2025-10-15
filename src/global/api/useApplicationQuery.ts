@@ -32,12 +32,16 @@ const received = async (param: AppReceivedListParam) =>
       params: { query: param },
     }),
   );
+const detail = async (id: number) =>
+  unwrap(
+    await client.GET("/api/v1/applications/{id}", { params: { path: { id } } }),
+  );
 
-const modify = async (id: number, formData: FormData) =>
+const modify = async (param: { id: number; formData: FormData }) =>
   unwrap(
     await client.PUT("/api/v1/applications/{id}", {
-      params: { path: { id } },
-      body: formData as unknown as ModifyAppReqBody,
+      params: { path: { id: param.id } },
+      body: param.formData as unknown as ModifyAppReqBody,
     }),
   );
 
@@ -60,6 +64,7 @@ export const applicationQueryKeys = createQueryKeys("application", {
   create: () => ["create"],
   my: () => ["my"],
   received: () => ["received"],
+  detail: (id) => ["detail", id],
   modify: () => ["modify"],
   modifyStatus: () => ["modifyStatus"],
   remove: () => ["remove"],
@@ -110,11 +115,21 @@ export const useListReceivedApp = (enabled = true) => {
   });
 };
 
-export const useModifyApp = (id: number) => {
+export const useDetailApplication = (id: number) => {
+  return useQuery({
+    queryKey: applicationQueryKeys.detail(id).queryKey,
+    queryFn: () => detail(id),
+    staleTime: 5 * 60 * 1000 - 1,
+    gcTime: 5 * 60 * 1000 - 1,
+    retry: 0,
+  });
+};
+
+export const useModifyApplication = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationKey: applicationQueryKeys.modify().queryKey,
-    mutationFn: (fd: FormData) => modify(id, fd),
+    mutationFn: (param: { id: number; formData: FormData }) => modify(param),
     onSuccess: async (res) => {
       await qc.invalidateQueries({
         queryKey: applicationQueryKeys.my().queryKey,

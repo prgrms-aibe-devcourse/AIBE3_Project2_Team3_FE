@@ -1,33 +1,36 @@
 "use client";
 
+import { useDetailApplication } from "@/global/api/useApplicationQuery";
 import { useDetailProject } from "@/global/api/useProjectQuery";
 import LoadingScreen from "@/global/components/loading/loading";
 import { use, useCallback } from "react";
 
 import { useRouter } from "next/navigation";
 
-import { ApplicationFormCard } from "./_compoents/ApplicationForm";
-import { ProjectInfoCard } from "./_compoents/ProjectInfoCard";
+import { ApplicationFormCard } from "../../_compoents/ApplicationForm";
+import { ProjectInfoCard } from "../../_compoents/ProjectInfoCard";
 
 export default function ApplicationWritePage({
   params,
 }: {
-  params: Promise<{ id: number }>;
+  params: Promise<{ id: number; applicationId: number }>;
 }) {
-  const { id: postId } = use(params);
+  const { id: postId, applicationId } = use(params);
   const router = useRouter();
 
   const { data: project, isLoading: projectLoading } = useDetailProject(postId);
+  const { data: app, isLoading: appLoading } =
+    useDetailApplication(applicationId);
 
   const handleSuccess = useCallback(() => {
-    router.replace(`/projects/${postId}`);
+    router.replace(`/applications/my`);
   }, [router, postId]);
 
   const handleCancel = useCallback(() => {
-    router.replace(`/projects/${postId}`);
+    router.replace(`/applications/my`);
   }, [router, postId]);
 
-  if (projectLoading || !project) {
+  if (projectLoading || !project || (applicationId && appLoading)) {
     return (
       <LoadingScreen
         message="데이터를 불러오는 중입니다"
@@ -46,6 +49,7 @@ export default function ApplicationWritePage({
         <div className="lg:col-span-2 space-y-6">
           <ApplicationFormCard
             projectId={postId}
+            application={app}
             onSuccess={handleSuccess}
             onCancel={handleCancel}
           />
