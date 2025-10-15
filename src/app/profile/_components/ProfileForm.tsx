@@ -5,11 +5,6 @@ import {
   useModifyUser,
   useRemoveUser,
 } from "@/global/api/useAuthQuery";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/global/components/ui/avatar";
 import { Button } from "@/global/components/ui/button";
 import {
   Card,
@@ -26,6 +21,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { ConfirmWithPassword } from "./ConfirmWithPassword";
+import { ProfileImagePicker } from "./ProfileImagePicker";
 
 export function ProfileForm() {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -34,26 +30,36 @@ export function ProfileForm() {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const { mutate: removeMutate, isPending: isRemovePending } = useRemoveUser();
+  const [profileFile, setProfileFile] = useState<File | null>(null);
 
   const onSave = async () => {
     const form = formRef.current!;
     const fd = new FormData(form);
     const nickname = String(fd.get("nickname") || "");
     const email = String(fd.get("email") || "");
-    mutate(
-      { nickname, email },
-      {
-        onSuccess: () => {
-          setIsEditMode(false);
-        },
-        onError: (res) => {
-          toast({
-            title: "실패",
-            description: res.message,
-          });
-        },
-      },
+
+    const requestFormData = new FormData();
+    requestFormData.append(
+      "reqBody",
+      new Blob([JSON.stringify({ nickname, email })], {
+        type: "application/json",
+      }),
     );
+    if (profileFile) {
+      requestFormData.append("file", profileFile);
+    }
+
+    mutate(requestFormData, {
+      onSuccess: () => {
+        setIsEditMode(false);
+      },
+      onError: (res) => {
+        toast({
+          title: "실패",
+          description: res.message,
+        });
+      },
+    });
   };
 
   const onCancel = () => {
@@ -94,20 +100,11 @@ export function ProfileForm() {
           <CardTitle>프로필 정보</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="flex items-center space-x-6">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={"https://picsum.photos/200"} />
-              <AvatarFallback>이미지</AvatarFallback>
-            </Avatar>
-            <div className="space-y-2">
-              <Button variant="outline" size="sm" type="button">
-                프로필 사진 변경
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                JPG, PNG 파일만 업로드 가능 (최대 5MB)
-              </p>
-            </div>
-          </div>
+          <ProfileImagePicker
+            currentImageUrl={data?.data.profileImageUrl}
+            onFileChange={setProfileFile}
+            disabled={!isEditMode}
+          />
           <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
             <div className="space-y-2">
               <Label htmlFor="nickname">닉네임</Label>

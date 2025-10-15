@@ -1871,9 +1871,13 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
+        requestBody?: {
             content: {
-                "application/json": components["schemas"]["UserModifyReqBody"];
+                "multipart/form-data": {
+                    reqBody: components["schemas"]["UserModifyReqBody"];
+                    /** Format: binary */
+                    file?: string;
+                };
             };
         };
         responses: {

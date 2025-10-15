@@ -14,7 +14,6 @@ export default function FreelancerWritePage() {
     router.back();
   };
   const handleSubmit = (formData: FormData) => {
-    console.log(formData);
     mutate(formData, {
       onSuccess: (res) => {
         router.replace(`/freelancers/${res.data.id}`);

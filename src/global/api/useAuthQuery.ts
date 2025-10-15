@@ -7,11 +7,11 @@ import client from "../backend/client";
 import { unwrap } from "../backend/unwrap";
 import { isAllowedPath } from "../lib/utils";
 import {
+  ModifyUserReqBody,
   UserDeleteReqBody,
   UserFindPasswordReqBody,
   UserJoinReqBody,
   UserLoginReqBody,
-  UserModifyReqBody,
   UserPasswordUpdateReqBody,
 } from "../types/auth.types";
 
@@ -25,8 +25,12 @@ const logout = async () => unwrap(await client.DELETE("/api/v1/users/logout"));
 const join = async (body: UserJoinReqBody) =>
   unwrap(await client.POST("/api/v1/users/join", { body }));
 
-const modifyUser = async (body: UserModifyReqBody) =>
-  unwrap(await client.PUT("/api/v1/users", { body }));
+const modifyUser = async (formData: FormData) =>
+  unwrap(
+    await client.PUT("/api/v1/users", {
+      body: formData as unknown as ModifyUserReqBody,
+    }),
+  );
 
 const findPw = async (body: UserFindPasswordReqBody) =>
   unwrap(await client.POST("/api/v1/users/findPw", { body }));
