@@ -139,9 +139,14 @@ export default function ApplicationRow({
             채팅
           </Button>
         )}
-        {item.status === "ACCEPTED" && (
+        {tab == "received" && item.status === "ACCEPTED" && (
           <Button size="sm" onClick={() => handleModifyStatus("COMPLETED")}>
             완료
+          </Button>
+        )}
+        {tab == "my" && item.status === "COMPLETED" && (
+          <Button size="sm" variant="outline" onClick={() => null}>
+            리뷰 작성
           </Button>
         )}
       </div>

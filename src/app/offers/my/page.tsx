@@ -4,6 +4,7 @@ import {
   useListMyOffer,
   useListReceivedOffer,
 } from "@/global/api/useOfferQuery";
+import LoadingScreen from "@/global/components/loading/loading";
 import { Button } from "@/global/components/ui/button";
 import {
   Card,
@@ -14,6 +15,7 @@ import {
 import { PaginationBar } from "@/global/components/ui/paginationBar";
 import { useMyOfferListStore } from "@/global/stores/useMyOfferListStore";
 import { useReceivedOfferListStore } from "@/global/stores/useReceivedOfferListStore";
+import { OfferWithUserDto } from "@/global/types/offer.types";
 import { useState } from "react";
 
 import OfferRow from "./_components/OfferRow";
@@ -26,9 +28,17 @@ export default function MyOffersPage() {
   const data = tab === "my" ? myQ.data : rcQ.data;
   const isLoading = tab === "my" ? myQ.isLoading : rcQ.isLoading;
 
+  // 페이지네이션: 탭별 store 사용
   const { page: myPage, setPage: setMyPage } = useMyOfferListStore();
   const { page: rcPage, setPage: setRcPage } = useReceivedOfferListStore();
 
+  if (!data)
+    return (
+      <LoadingScreen
+        message="데이터를 불러오는 중입니다"
+        tips={["잠시만 기다려 주세요"]}
+      />
+    );
   return (
     <div className="max-w-4xl mx-auto space-y-6 py-8 px-4">
       <div className="flex items-center justify-between">
@@ -61,19 +71,16 @@ export default function MyOffersPage() {
               <div>로딩중…</div>
             ) : (
               <div className="flex flex-col">
-                {data?.content?.map((it: any) => (
+                {data?.content?.map((it: OfferWithUserDto, i) => (
                   <OfferRow
                     key={it.id}
                     item={it}
-                    onAccept={() => {
-                      /* mutate accept */
-                    }}
-                    onReject={() => {
-                      /* mutate reject */
-                    }}
-                    onChat={() => {
-                      /* open chat */
-                    }}
+                    tab={tab}
+                    index={
+                      data.page.totalElements -
+                      i -
+                      data.page.page * data.page.size
+                    }
                   />
                 ))}
               </div>

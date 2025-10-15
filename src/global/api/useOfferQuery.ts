@@ -1,12 +1,16 @@
 import { createQueryKeys } from "@lukemorales/query-key-factory";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 import client from "../backend/client";
 import { unwrap } from "../backend/unwrap";
 import { useMyOfferListStore } from "../stores/useMyOfferListStore";
 import { useReceivedOfferListStore } from "../stores/useReceivedOfferListStore";
-import { OfferMyListParam, OfferReceivedListParam } from "../types/offer.types";
+import {
+  OfferModifyStatusResBody,
+  OfferMyListParam,
+  OfferReceivedListParam,
+} from "../types/offer.types";
 
 const my = async (param: OfferMyListParam) =>
   unwrap(await client.GET("/api/v1/offers/my", { params: { query: param } }));
@@ -18,9 +22,18 @@ const received = async (param: OfferReceivedListParam) =>
     }),
   );
 
+const modifyStatus = async (id: number, body: OfferModifyStatusResBody) =>
+  unwrap(
+    await client.PUT("/api/v1/offers/{id}/status", {
+      params: { path: { id } },
+      body,
+    }),
+  );
+
 export const offerQueryKeys = createQueryKeys("offer", {
   my: () => ["my"],
   received: () => ["received"],
+  modifyStatus: () => ["modifyStatus"],
 });
 
 export const useListMyOffer = (enabled = true) => {
@@ -54,5 +67,21 @@ export const useListReceivedOffer = (enabled = true) => {
     gcTime: 5 * 60 * 1000 - 1,
     retry: 0,
     enabled,
+  });
+};
+
+export const useModifyOfferStatus = (id: number) => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: offerQueryKeys.modifyStatus().queryKey,
+    mutationFn: (body: OfferModifyStatusResBody) => modifyStatus(id, body),
+    onSuccess: async (res) => {
+      await qc.invalidateQueries({
+        queryKey: offerQueryKeys.my().queryKey,
+      });
+      await qc.invalidateQueries({
+        queryKey: offerQueryKeys.received().queryKey,
+      });
+    },
   });
 };

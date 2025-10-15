@@ -1710,24 +1710,6 @@ export interface components {
             content: components["schemas"]["OfferWithUserDto"][];
             page: components["schemas"]["PageMeta"];
         };
-        OfferWithPostDto: {
-            /** Format: int64 */
-            id: number;
-            status: string;
-            /** Format: date-time */
-            createdDate: string;
-            /** Format: int64 */
-            postId: number;
-            postType: string;
-            postTitle: string;
-            /** Format: int64 */
-            postUserId: number;
-            postUserNickname: string;
-        };
-        PagePayloadOfferWithPostDto: {
-            content: components["schemas"]["OfferWithPostDto"][];
-            page: components["schemas"]["PageMeta"];
-        };
         NotificationDto: {
             /** Format: int64 */
             id: number;
@@ -4078,7 +4060,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["PagePayloadOfferWithPostDto"];
+                    "*/*": components["schemas"]["PagePayloadOfferWithUserDto"];
                 };
             };
             /** @description Bad Request */

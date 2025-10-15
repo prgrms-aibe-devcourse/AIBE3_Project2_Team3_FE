@@ -5,4 +5,6 @@ export type OfferMyListParam =
 export type OfferReceivedListParam =
   paths["/api/v1/offers/received"]["get"]["parameters"]["query"];
 export type OfferStatus = NonNullable<OfferMyListParam>["status"];
-export type OfferDto = components["schemas"]["OfferDto"];
+export type OfferWithUserDto = components["schemas"]["OfferWithUserDto"];
+export type OfferModifyStatusResBody =
+  components["schemas"]["OfferModifyStatusResBody"];
