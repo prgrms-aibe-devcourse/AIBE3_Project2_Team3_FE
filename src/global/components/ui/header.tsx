@@ -7,9 +7,11 @@ import Link from "next/link";
 
 import {
   Bell,
+  ClipboardList,
   FilePlus2,
   FileText,
   Files,
+  Handshake,
   IdCardLanyardIcon,
   LogOut,
   Menu,
@@ -169,6 +171,19 @@ export function Header() {
                   </DropdownMenuSub>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
+                    <Link href="/applications/my">
+                      <ClipboardList className="h-4 w-4" />
+                      지원관리
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/offers/my">
+                      <Handshake className="h-4 w-4" />
+                      제안관리
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
                     <Link href="/profile">
                       <User className="h-4 w-4" />
                       마이페이지
@@ -250,6 +265,22 @@ export function Header() {
                 >
                   프리랜서 작성
                 </Link>
+                <div className="flex flex-col py-4 space-y-4 border-y">
+                  <Link
+                    href="/applications/my"
+                    className="block text-sm font-medium hover:text-primary transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    지원관리
+                  </Link>
+                  <Link
+                    href="/offers/my"
+                    className="block text-sm font-medium hover:text-primary transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    제안관리
+                  </Link>
+                </div>
                 <Link
                   href="/dashboard"
                   className="block text-sm font-medium hover:text-primary transition-colors"
