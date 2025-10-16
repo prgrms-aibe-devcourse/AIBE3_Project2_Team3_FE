@@ -1,6 +1,10 @@
 "use client";
 
-import { useDetailProject } from "@/global/api/useProjectQuery";
+import {
+  useDetailProject,
+  useToggleLikeProject,
+  useViewProject,
+} from "@/global/api/useProjectQuery";
 import LoadingScreen from "@/global/components/loading/loading";
 import {
   Avatar,
@@ -19,7 +23,7 @@ import { Separator } from "@/global/components/ui/separator";
 import { DEFAULT_AVATAR } from "@/global/consts";
 import { formatCustomDuration, formatTimeAgo } from "@/global/lib/utils";
 import { format } from "date-fns";
-import { use, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -41,8 +45,35 @@ export default function ProjectDetailPage({
 }) {
   const { id } = use(params);
   const { data: project, isLoading } = useDetailProject(id);
+  const { mutate: likeMutate } = useToggleLikeProject(id);
+  const { mutate: viewMutate } = useViewProject(id);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [viewCount, setViewCount] = useState(0);
+  const [likeCount, setLikeCount] = useState(0);
   const router = useRouter();
+  const firedRef = useRef(false);
+  useEffect(() => {
+    if (!project?.id) return;
+
+    // StrictMode 2회 실행 가드
+    if (firedRef.current) return;
+    firedRef.current = true;
+
+    // (선택) 세션 당 1회만 증가
+    const key = `viewed:project:${project.id}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+
+    viewMutate(project.id, {
+      onSuccess: (res) => setViewCount(res.data.viewCount),
+    });
+  }, [project?.id, viewMutate]);
+  useEffect(() => {
+    if (!project) return;
+    setIsFavorited(project.liked);
+    setViewCount(project.viewCount);
+    setLikeCount(project.likeCount);
+  }, [project]);
   if (!project)
     return (
       <LoadingScreen
@@ -113,7 +144,7 @@ export default function ProjectDetailPage({
                     </div>
                     <div className="flex items-center">
                       <Eye className="h-4 w-4 mr-2" />
-                      {0}
+                      {viewCount}
                     </div>
                   </div>
                 </div>
@@ -127,6 +158,7 @@ export default function ProjectDetailPage({
                     <Heart
                       className={`h-4 w-4 ${isFavorited ? "fill-red-500 text-primary" : ""}`}
                     />
+                    {likeCount ? likeCount : ""}
                   </Button>
                 </div>
               </div>
