@@ -8,3 +8,4 @@ export type OfferStatus = NonNullable<OfferMyListParam>["status"];
 export type OfferWithUserDto = components["schemas"]["OfferWithUserDto"];
 export type OfferModifyStatusResBody =
   components["schemas"]["OfferModifyStatusResBody"];
+export type OfferWriteReqBody = components["schemas"]["OfferWriteReqBody"];
