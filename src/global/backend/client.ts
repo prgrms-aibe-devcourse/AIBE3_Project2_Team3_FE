@@ -4,27 +4,48 @@ import { paths } from "./apiV1/schema";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-const querySerializer = (q?: Record<string, any>) => {
+type Pageable = {
+  page?: number;
+  size?: number;
+  sort?: string[];
+};
+
+type QueryShape = {
+  pageable?: Pageable;
+  [k: string]: unknown;
+};
+
+const querySerializer = (q?: unknown): string => {
+  if (q == null || typeof q !== "object") return "";
+  const obj = q as QueryShape;
+
   const params = new URLSearchParams();
-  if (!q) return "";
-  const pg = q.pageable as
-    | { page?: number; size?: number; sort?: string[] }
-    | undefined;
+
+  const pg = obj.pageable;
   if (pg) {
-    if (pg.page != null) params.set("page", String(pg.page));
-    if (pg.size != null) params.set("size", String(pg.size));
-    if (Array.isArray(pg.sort))
-      pg.sort.forEach((s) => params.append("sort", s));
+    if (typeof pg.page === "number") params.set("page", String(pg.page));
+    if (typeof pg.size === "number") params.set("size", String(pg.size));
+    if (Array.isArray(pg.sort)) {
+      for (const s of pg.sort) params.append("sort", s);
+    }
   }
-  for (const [k, v] of Object.entries(q)) {
+
+  for (const [k, v] of Object.entries(obj)) {
     if (k === "pageable" || v == null) continue;
-    if (Array.isArray(v)) v.forEach((vv) => params.append(k, String(vv)));
-    else if (typeof v !== "object") params.set(k, String(v));
+
+    if (Array.isArray(v)) {
+      for (const vv of v) params.append(k, String(vv));
+    } else if (
+      typeof v === "string" ||
+      typeof v === "number" ||
+      typeof v === "boolean"
+    ) {
+      params.set(k, String(v));
+    }
   }
 
   return params.toString();
 };
-
 const client = createClient<paths>({
   baseUrl: API_BASE_URL,
   querySerializer,

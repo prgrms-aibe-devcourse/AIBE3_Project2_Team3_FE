@@ -1,6 +1,5 @@
 "use client";
 
-/* ✅ 추가: 리뷰 작성 훅과 타입 임포트 */
 import { useCreateReview } from "@/global/api/useReviewQuery";
 import { Button } from "@/global/components/ui/button";
 import {

@@ -1,6 +1,5 @@
 "use client";
 
-/* ✅ 추가: 공용 훅과 타입 사용 */
 import { useProjectReviews } from "@/global/api/useReviewQuery";
 import { Button } from "@/global/components/ui/button";
 import {
@@ -32,6 +31,7 @@ export default function ReviewListDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
+
   const query = useProjectReviews(
     Number(projectId),
     { page, size: pageSize, sort },
@@ -78,36 +78,37 @@ export default function ReviewListDialog({
           ) : (
             <ScrollArea className="max-h-[420px] pr-3">
               <div className="space-y-4">
-                {list.map((rv) => {
-                  const created: string | undefined =
-                    (rv as any).createdAt ?? (rv as any).createdDate;
-                  return (
-                    <div key={rv.id} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="font-medium">
-                          작성자: {rv.userNickname} · 대상: {rv.targetNickname}
-                        </div>
-                        <div className="flex items-center gap-1 text-sm">
-                          {[1, 2, 3, 4, 5].map((n) => (
-                            <Star
-                              key={n}
-                              className={`h-4 w-4 ${n <= rv.rating ? "fill-current" : ""}`}
-                            />
-                          ))}
-                          <span className="ml-1">({rv.rating}/5)</span>
-                        </div>
+                {list.map((rv) => (
+                  <div key={rv.id} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium">
+                        작성자: {rv.userNickname} · 대상: {rv.targetNickname}
                       </div>
-                      <div className="whitespace-pre-wrap break-words">
-                        {rv.comment}
+                      <div className="flex items-center gap-1 text-sm">
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <Star
+                            key={n}
+                            className={`h-4 w-4 ${n <= rv.rating ? "fill-current" : ""}`}
+                          />
+                        ))}
+                        <span className="ml-1">({rv.rating}/5)</span>
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        작성일:{" "}
-                        {created ? new Date(created).toLocaleString() : "-"}
-                      </div>
-                      <Separator />
                     </div>
-                  );
-                })}
+
+                    <div className="whitespace-pre-wrap break-words">
+                      {rv.comment}
+                    </div>
+
+                    <div className="text-xs text-muted-foreground">
+                      작성일:{" "}
+                      {rv.createdAt
+                        ? new Date(rv.createdAt).toLocaleString()
+                        : "-"}
+                    </div>
+
+                    <Separator />
+                  </div>
+                ))}
               </div>
             </ScrollArea>
           )}
