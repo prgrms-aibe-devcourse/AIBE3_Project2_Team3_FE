@@ -51,7 +51,7 @@ export default function SkillsPage() {
     <AdminLayout>
       <h1 className="mb-8 text-3xl font-bold">스킬 관리</h1>
 
-      <Card>
+      <Card className="overflow-hidden">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>스킬 목록</CardTitle>
 
@@ -79,8 +79,8 @@ export default function SkillsPage() {
 
         <Separator />
 
-        <CardContent className="space-y-2 pt-4">
-          <ScrollArea className="h-full max-h-[65vh]">
+        <CardContent className="space-y-2 pt-4 max-h-[65vh] overflow-y-auto">
+          <ScrollArea className="h-full">
             <div className="space-y-2 px-4 py-3">
               {isLoading && (
                 <div className="text-sm text-muted-foreground">
