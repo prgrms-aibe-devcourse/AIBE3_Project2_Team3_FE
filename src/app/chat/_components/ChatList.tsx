@@ -453,14 +453,6 @@ export function ChatList({ selectedChatId }: ChatListProps) {
                         <span className="text-xs text-muted-foreground">
                           {formatChatTimestamp(chat.lastMessage.createdDate)}
                         </span>
-                        {chat.unreadCount > 0 && (
-                          <Badge
-                            variant="default"
-                            className="h-5 w-5 p-0 flex items-center justify-center text-xs"
-                          >
-                            {chat.unreadCount}
-                          </Badge>
-                        )}
                       </div>
                     </div>
                     <p
