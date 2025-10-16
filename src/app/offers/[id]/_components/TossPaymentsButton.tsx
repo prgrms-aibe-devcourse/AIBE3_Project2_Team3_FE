@@ -40,7 +40,7 @@ export function TossPaymentsButton({
             customerName: "김토스",
             customerEmail: "customer123@gmail.com",
             successUrl: `${window.location.origin}/sandbox/success?freelancerId=${freelancer.id}`,
-            failUrl: `${window.location.origin}/sandbox/fail`,
+            failUrl: `${window.location.origin}/sandbox/fail?freelancerId=${freelancer.id}`,
           });
         } catch (error) {
           toast({
