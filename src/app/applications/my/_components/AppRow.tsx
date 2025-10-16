@@ -22,6 +22,7 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 
 import ReviewDialog from "./ReviewDialog";
+import ReviewCreateDialog from "./ReviewDialog";
 import ReviewListDialog from "./ReviewListDialog";
 
 export default function ApplicationRow({
@@ -163,20 +164,15 @@ export default function ApplicationRow({
           </Button>
         )}
         {tab == "my" && item.status === "COMPLETED" && (
-          <ReviewDialog
+          <ReviewCreateDialog
             postId={item.postId}
             postTitle={item.postTitle}
             onSubmitted={onReviewSubmitted}
-            trigger={
-              <Button size="sm" variant="outline">
-                리뷰 작성
-              </Button>
-            }
           />
         )}
         {tab === "received" && item.status === "COMPLETED" && (
           <ReviewListDialog
-            projectId={item.postId}
+            postId={item.postId}
             trigger={
               <Button size="sm" variant="secondary">
                 리뷰 확인

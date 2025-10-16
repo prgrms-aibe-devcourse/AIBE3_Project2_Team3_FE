@@ -1,6 +1,10 @@
 "use client";
 
-import { useCreateReview } from "@/global/api/useReviewQuery";
+import {
+  useCreateReview,
+  useMyReview,
+  useUpdateReview,
+} from "@/global/api/useReviewQuery";
 import { Button } from "@/global/components/ui/button";
 import {
   Dialog,
@@ -18,7 +22,6 @@ import { Star } from "lucide-react";
 
 type Props = {
   postId: number;
-  trigger?: React.ReactNode;
   postTitle?: string;
   onSubmitted?: () => void;
   initialHasMyReview?: boolean;
@@ -27,49 +30,56 @@ type Props = {
 export default function ReviewCreateDialog({
   postId,
   postTitle,
-  trigger,
   onSubmitted,
-  initialHasMyReview = false,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState<number>(5);
   const [comment, setComment] = useState("");
-  const [hasMyReview, setHasMyReview] = useState(initialHasMyReview);
+
+  const myQ = useMyReview(postId, true);
+  const my = myQ.data;
+  const hasMyReview = Boolean(my);
 
   const createMut = useCreateReview(postId);
+  const updateMut = useUpdateReview(my?.id || 0, postId);
   const submitting = createMut.isPending;
 
   const canSubmit = rating >= 1 && comment.trim().length >= 5;
   const label = useMemo(
     () => (hasMyReview ? "리뷰 수정" : "리뷰 작성"),
-    [hasMyReview],
+    [myQ.isLoading, hasMyReview],
   );
 
   const submit = async () => {
     if (!canSubmit) return;
-    await createMut.mutateAsync({ rating, comment: comment.trim() });
-    setHasMyReview(true);
+    if (hasMyReview && my) {
+      await updateMut.mutateAsync({ rating, comment: comment.trim() });
+    } else {
+      await createMut.mutateAsync({ rating, comment: comment.trim() });
+    }
     setOpen(false);
-    setComment("");
-    setRating(5);
     onSubmitted?.();
   };
 
   useEffect(() => {
+    if (open && my) {
+      setRating(my.rating);
+      setComment(my.comment);
+    }
     if (!open) {
       setComment("");
       setRating(5);
     }
-  }, [open]);
+  }, [open, my]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {trigger ?? (
+        {
           <Button size="sm" variant="outline">
             {label}
           </Button>
-        )}
+        }
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
