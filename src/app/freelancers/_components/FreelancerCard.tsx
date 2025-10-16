@@ -1,5 +1,6 @@
 "use client";
 
+import { useToggleLikeFreelancer } from "@/global/api/useFreelancerQuery";
 import {
   Avatar,
   AvatarFallback,
@@ -9,6 +10,7 @@ import { Badge } from "@/global/components/ui/badge";
 import { Button } from "@/global/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/global/components/ui/card";
 import { DEFAULT_AVATAR } from "@/global/consts";
+import { toast } from "@/global/hooks/useToast";
 import { formatCustomDuration } from "@/global/lib/utils";
 import { FreelancerDto } from "@/global/types/freelancer.types";
 import { MouseEvent, useState } from "react";
@@ -22,7 +24,9 @@ interface FreelancerCardProps {
 }
 
 export function FreelancerCard({ freelancer }: FreelancerCardProps) {
-  const [isFavorited, setIsFavorited] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(freelancer.liked);
+  const [likeCount, setLikeCount] = useState(freelancer.likeCount);
+  const { mutate } = useToggleLikeFreelancer();
   const router = useRouter();
 
   const clickCard = () => {
@@ -31,7 +35,21 @@ export function FreelancerCard({ freelancer }: FreelancerCardProps) {
 
   const clickFavorite = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    setIsFavorited(!isFavorited);
+    const prev = isFavorited; // ← 현재 값 스냅샷
+    setIsFavorited((p) => !p);
+    mutate(freelancer.id, {
+      onSuccess: (res) => {
+        setIsFavorited(res.data.liked);
+        setLikeCount(res.data.likeCount);
+      },
+      onError: (res) => {
+        setIsFavorited(prev);
+        toast({
+          title: "실패",
+          description: res.message,
+        });
+      },
+    });
   };
   return (
     <Card
@@ -76,6 +94,7 @@ export function FreelancerCard({ freelancer }: FreelancerCardProps) {
             <Heart
               className={`h-4 w-4 ${isFavorited ? "fill-red-500 text-primary" : ""}`}
             />
+            {likeCount ? likeCount : ""}
           </Button>
         </div>
 
@@ -161,7 +180,7 @@ export function FreelancerCard({ freelancer }: FreelancerCardProps) {
           <div className="text-right text-xs text-muted-foreground">
             <div className="flex items-center">
               <Eye className="h-3 w-3 mr-1" />
-              {0}
+              {freelancer.viewCount}
             </div>
             <div>{0}명 제안</div>
           </div>

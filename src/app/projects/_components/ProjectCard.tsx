@@ -1,5 +1,6 @@
 "use client";
 
+import { useToggleLikeProject } from "@/global/api/useProjectQuery";
 import {
   Avatar,
   AvatarFallback,
@@ -9,6 +10,7 @@ import { Badge } from "@/global/components/ui/badge";
 import { Button } from "@/global/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/global/components/ui/card";
 import { DEFAULT_AVATAR } from "@/global/consts";
+import { toast } from "@/global/hooks/useToast";
 import { formatCustomDuration } from "@/global/lib/utils";
 import { ProjectDto } from "@/global/types/project.types";
 import { MouseEvent, useState } from "react";
@@ -22,7 +24,9 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
-  const [isFavorited, setIsFavorited] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(project.liked);
+  const [likeCount, setLikeCount] = useState(project.likeCount);
+  const { mutate } = useToggleLikeProject();
   const router = useRouter();
 
   const clickCard = () => {
@@ -31,7 +35,21 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
   const clickFavorite = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
+    const prev = isFavorited;
     setIsFavorited(!isFavorited);
+    mutate(project.id, {
+      onSuccess: (res) => {
+        setIsFavorited(res.data.liked);
+        setLikeCount(res.data.likeCount);
+      },
+      onError: (res) => {
+        setIsFavorited(prev);
+        toast({
+          title: "실패",
+          description: res.message,
+        });
+      },
+    });
   };
 
   return (
@@ -77,6 +95,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
             <Heart
               className={`h-4 w-4 ${isFavorited ? "fill-red-500 text-primary" : ""}`}
             />
+            {likeCount ? likeCount : ""}
           </Button>
         </div>
         {/* 제목/내용 */}
@@ -162,7 +181,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
           <div className="text-right text-xs text-muted-foreground">
             <div className="flex items-center">
               <Eye className="h-3 w-3 mr-1" />
-              {0}
+              {project.viewCount}
             </div>
             <div>{0}명 지원</div>
           </div>
