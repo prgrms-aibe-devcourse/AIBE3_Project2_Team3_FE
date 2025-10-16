@@ -43,7 +43,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** 질문 상세 조회 */
+        get: operations["getQuestion"];
         /** 질문 수정 */
         put: operations["modifyQuestion"];
         post?: never;
@@ -717,22 +718,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/reviews/freelancer/{freelancerId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getMyReview"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/regions": {
         parameters: {
             query?: never;
@@ -1198,7 +1183,7 @@ export interface components {
         AnswerDto: {
             /** Format: int64 */
             id: number;
-            content: string;
+            comment: string;
             /** Format: date-time */
             createdDate: string;
             /** Format: date-time */
@@ -2095,6 +2080,37 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataQuestionDto"];
                 };
             };
             /** @description Bad Request */
@@ -4037,37 +4053,6 @@ export interface operations {
         };
     };
     getMyReview: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                postId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataReviewDto"];
-                };
-            };
-            /** @description Bad Request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataVoid"];
-                };
-            };
-        };
-    };
-    getFreelancerReviews: {
         parameters: {
             query?: never;
             header?: never;
