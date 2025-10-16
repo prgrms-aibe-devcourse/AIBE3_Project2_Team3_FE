@@ -21,21 +21,25 @@ import { format } from "date-fns";
 
 import { useRouter } from "next/navigation";
 
+import ReviewDialog from "./ReviewDialog";
+import ReviewListDialog from "./ReviewListDialog";
+
 export default function ApplicationRow({
   item,
   index,
   tab,
   onChat,
+  onReviewSubmitted,
 }: {
   item: ApplicationWithUserDto;
   index: number;
   tab: string;
   onChat?: () => void;
+  onReviewSubmitted?: () => void;
 }) {
   const router = useRouter();
   const { mutate: modifyStatusMutate } = useModifyAppStatus(item.id);
   const removeMut = useRemoveApp();
-
   const handleModifyStatus = (status: DealStatus) => {
     modifyStatusMutate(
       { status },
@@ -159,9 +163,26 @@ export default function ApplicationRow({
           </Button>
         )}
         {tab == "my" && item.status === "COMPLETED" && (
-          <Button size="sm" variant="outline" onClick={() => null}>
-            리뷰 작성
-          </Button>
+          <ReviewDialog
+            postId={item.postId}
+            postTitle={item.postTitle}
+            onSubmitted={onReviewSubmitted}
+            trigger={
+              <Button size="sm" variant="outline">
+                리뷰 작성
+              </Button>
+            }
+          />
+        )}
+        {tab === "received" && item.status === "COMPLETED" && (
+          <ReviewListDialog
+            projectId={item.postId}
+            trigger={
+              <Button size="sm" variant="secondary">
+                리뷰 확인
+              </Button>
+            }
+          />
         )}
       </div>
     </div>
