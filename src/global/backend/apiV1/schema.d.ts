@@ -1274,6 +1274,8 @@ export interface components {
             /** Format: int64 */
             likeCount: number;
             liked: boolean;
+            /** Format: int64 */
+            applicationCount: number;
         };
         RegionDto: {
             /** Format: int64 */
@@ -1365,6 +1367,8 @@ export interface components {
             likeCount: number;
             liked: boolean;
             files: components["schemas"]["FreelancerFileDto"][];
+            /** Format: int64 */
+            offerCount: number;
         };
         FreelancerFileDto: {
             /** Format: int64 */

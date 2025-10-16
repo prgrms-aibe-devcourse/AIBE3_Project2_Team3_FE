@@ -182,7 +182,7 @@ export function FreelancerCard({ freelancer }: FreelancerCardProps) {
               <Eye className="h-3 w-3 mr-1" />
               {freelancer.viewCount}
             </div>
-            <div>{0}명 제안</div>
+            <div>{freelancer.offerCount}명 제안</div>
           </div>
         </div>
       </CardContent>
