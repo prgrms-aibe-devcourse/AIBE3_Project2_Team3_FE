@@ -20,7 +20,7 @@ export default function ApplicationWritePage({
   const { data: project, isLoading: projectLoading } = useDetailProject(postId);
 
   const handleSuccess = useCallback(() => {
-    router.replace(`/projects/${postId}`);
+    router.replace(`/applications/my`);
   }, [router, postId]);
 
   const handleCancel = useCallback(() => {
