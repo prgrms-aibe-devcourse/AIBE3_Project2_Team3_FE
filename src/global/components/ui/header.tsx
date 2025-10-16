@@ -1,25 +1,28 @@
 "use client";
 
 import { useFetchMe, useLogout } from "@/global/api/useAuthQuery";
+import { DEFAULT_AVATAR } from "@/global/consts";
 import { useState } from "react";
 
 import Link from "next/link";
 
 import {
   Bell,
+  ClipboardList,
   FilePlus2,
   FileText,
   Files,
+  Handshake,
   IdCardLanyardIcon,
   LogOut,
   Menu,
   MessageCircle,
-  User,
   UserCircle,
   UserRoundPlus,
   X,
 } from "lucide-react";
 
+import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Badge } from "./badge";
 import { Button } from "./button";
 import {
@@ -105,7 +108,13 @@ export function Header() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-2">
-                    <User className="h-4 w-4" />
+                    <Avatar className="h-4 w-4">
+                      <AvatarImage
+                        src={data.data.profileImageUrl || DEFAULT_AVATAR}
+                        alt="프로필"
+                      />
+                      <AvatarFallback>프로필</AvatarFallback>
+                    </Avatar>
                     {data.data.nickname}님
                   </Button>
                 </DropdownMenuTrigger>
@@ -123,20 +132,20 @@ export function Header() {
                     <DropdownMenuSubContent className="w-56">
                       <DropdownMenuItem asChild>
                         <Link
-                          href="/dashboard/posts/projects"
-                          className="flex items-center gap-2"
-                        >
-                          <FileText className="h-4 w-4" />
-                          내가 작성한 글
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link
                           href="/projects/new"
                           className="flex items-center gap-2"
                         >
                           <FilePlus2 className="h-4 w-4" />
                           프로젝트 작성
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href="/projects/my"
+                          className="flex items-center gap-2"
+                        >
+                          <FileText className="h-4 w-4" />
+                          내가 작성한 글
                         </Link>
                       </DropdownMenuItem>
                     </DropdownMenuSubContent>
@@ -149,15 +158,6 @@ export function Header() {
                     <DropdownMenuSubContent className="w-56">
                       <DropdownMenuItem asChild>
                         <Link
-                          href="/dashboard/posts/freelancers"
-                          className="flex items-center gap-2"
-                        >
-                          <UserCircle className="h-4 w-4" />
-                          내가 작성한 글
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link
                           href="/freelancers/new"
                           className="flex items-center gap-2"
                         >
@@ -165,12 +165,40 @@ export function Header() {
                           프리랜서 작성
                         </Link>
                       </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href="/freelancers/my"
+                          className="flex items-center gap-2"
+                        >
+                          <UserCircle className="h-4 w-4" />
+                          내가 작성한 글
+                        </Link>
+                      </DropdownMenuItem>
                     </DropdownMenuSubContent>
                   </DropdownMenuSub>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
+                    <Link href="/applications/my">
+                      <ClipboardList className="h-4 w-4" />
+                      지원관리
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/offers/my">
+                      <Handshake className="h-4 w-4" />
+                      제안관리
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
                     <Link href="/profile">
-                      <User className="h-4 w-4" />
+                      <Avatar className="h-4 w-4">
+                        <AvatarImage
+                          src={data.data.profileImageUrl || DEFAULT_AVATAR}
+                          alt="프로필"
+                        />
+                        <AvatarFallback>프로필</AvatarFallback>
+                      </Avatar>
                       마이페이지
                     </Link>
                   </DropdownMenuItem>
@@ -251,6 +279,36 @@ export function Header() {
                   프리랜서 작성
                 </Link>
                 <Link
+                  href="/projects/my"
+                  className="block text-sm font-medium hover:text-primary transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  작성한 프로젝트
+                </Link>
+                <Link
+                  href="/freelancers/my"
+                  className="block text-sm font-medium hover:text-primary transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  작성한 프리랜서
+                </Link>
+                <div className="flex flex-col py-4 space-y-4 border-y">
+                  <Link
+                    href="/applications/my"
+                    className="block text-sm font-medium hover:text-primary transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    지원관리
+                  </Link>
+                  <Link
+                    href="/offers/my"
+                    className="block text-sm font-medium hover:text-primary transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    제안관리
+                  </Link>
+                </div>
+                <Link
                   href="/dashboard"
                   className="block text-sm font-medium hover:text-primary transition-colors"
                   onClick={() => setIsMenuOpen(false)}
@@ -287,7 +345,13 @@ export function Header() {
                     asChild
                   >
                     <Link href="/profile">
-                      <User className="h-4 w-4" />
+                      <Avatar className="h-4 w-4">
+                        <AvatarImage
+                          src={data.data.profileImageUrl || DEFAULT_AVATAR}
+                          alt="프로필"
+                        />
+                        <AvatarFallback>프로필</AvatarFallback>
+                      </Avatar>
                       마이페이지
                     </Link>
                   </Button>

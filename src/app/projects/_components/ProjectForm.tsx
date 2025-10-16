@@ -27,49 +27,144 @@ import {
 } from "@/global/components/ui/select";
 import { Textarea } from "@/global/components/ui/textarea";
 import { EXPERIENCE_OPTIONS, SALARY_UNITS } from "@/global/consts";
-import { toLocalDateTimeString, toUnit } from "@/global/lib/utils";
+import {
+  fromExperience,
+  fromUnit,
+  toLocalDateTimeString,
+  toUnit,
+} from "@/global/lib/utils";
 import {
   EmploymentType,
   HirerType,
+  ProjectDto,
   ProjectWriteReqBody,
 } from "@/global/types/project.types";
 import { addDays, startOfDay } from "date-fns";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type ProjectFormProps = {
   onSubmit: (param: ProjectWriteReqBody) => void;
   onCancel: () => void;
+  defaultValues?: ProjectDto;
 };
 
-export function ProjectForm({ onSubmit, onCancel }: ProjectFormProps) {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [attachments, setAttachments] = useState<File[]>([]);
+export function ProjectForm({
+  onSubmit,
+  onCancel,
+  defaultValues,
+}: ProjectFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedRegion, setSelectedRegion] = useState<number[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<number[]>([]);
-  const [selectedSkillIds, setSelectedSkillIds] = useState<number[]>([]);
-  const [hirerType, setHirerType] = useState<HirerType>("individual");
-  const [employmentType, setEmploymentType] =
-    useState<EmploymentType>("onsite");
-  const [salary, setSalary] = useState({ amount: 1, unit: "krw_10k" });
-  const [personnel, setPersonel] = useState({ amount: 0, unit: "person" });
-  const [skillLevel, setSkillLevel] = useState(EXPERIENCE_OPTIONS[0].id);
-  const { data: categoryTree, isLoading: catLoading } = useListCategory();
-  const { data: regionTree, isLoading: regLoading } = useListRegion();
+  const [title, setTitle] = useState(defaultValues?.title ?? "");
+  const [content, setContent] = useState(defaultValues?.content ?? "");
+  const [selectedRegion, setSelectedRegion] = useState<number[]>(
+    defaultValues?.regions
+      ? defaultValues.regions.map((region) => region.id)
+      : [],
+  );
+  const [selectedCategory, setSelectedCategory] = useState<number[]>(
+    defaultValues?.categories
+      ? defaultValues.categories.map((category) => category.id)
+      : [],
+  );
+  const [selectedSkillIds, setSelectedSkillIds] = useState<number[]>(
+    defaultValues?.skills ? defaultValues.skills.map((skill) => skill.id) : [],
+  );
+  const [salary, setSalary] = useState(
+    defaultValues?.salary
+      ? {
+          amount: fromUnit(SALARY_UNITS, defaultValues.salary, "krw"),
+          unit: "krw",
+        }
+      : { amount: 1, unit: "krw_10k" },
+  );
+  const [hirerType, setHirerType] = useState<HirerType>(
+    (defaultValues?.hirerType as HirerType) ?? "individual",
+  );
+  const [employmentType, setEmploymentType] = useState<EmploymentType>(
+    (defaultValues?.employmentType as EmploymentType) ?? "onsite",
+  );
+  const [personnel, setPersonel] = useState({
+    amount: defaultValues?.personnel ?? 0,
+    unit: "person",
+  });
+  const [skillLevel, setSkillLevel] = useState(
+    defaultValues?.skillLevel
+      ? fromExperience(defaultValues.skillLevel)
+      : EXPERIENCE_OPTIONS[0].id,
+  );
   const [deadlineDate, setDeadlineDate] = useState<Date>(
-    startOfDay(addDays(new Date(), 7)),
+    defaultValues?.deadlineDate
+      ? new Date(defaultValues.deadlineDate)
+      : startOfDay(addDays(new Date(), 7)),
   );
   const [startedDate, setStartedDate] = useState<Date>(
-    startOfDay(addDays(new Date(), 14)),
+    defaultValues?.startedDate
+      ? new Date(defaultValues.startedDate)
+      : startOfDay(addDays(new Date(), 14)),
   );
   const [endedDate, setEndedDate] = useState<Date>(
-    startOfDay(addDays(new Date(), 21)),
+    defaultValues?.endedDate
+      ? new Date(defaultValues.endedDate)
+      : startOfDay(addDays(new Date(), 21)),
   );
 
-  const handleFileSelect = (files: File[]) => {
-    setAttachments((prev) => [...prev, ...files]);
-  };
+  useEffect(() => {
+    if (!defaultValues) return;
+    setTitle(defaultValues.title ?? "");
+    setContent(defaultValues.content ?? "");
+    setSelectedRegion(
+      defaultValues.regions
+        ? defaultValues.regions.map((region) => region.id)
+        : [],
+    );
+    setSelectedCategory(
+      defaultValues.categories
+        ? defaultValues.categories.map((category) => category.id)
+        : [],
+    );
+    setSelectedSkillIds(
+      defaultValues.skills ? defaultValues.skills.map((skill) => skill.id) : [],
+    );
+    setSalary(
+      defaultValues.salary
+        ? {
+            amount: fromUnit(SALARY_UNITS, defaultValues.salary, "krw"),
+            unit: "krw",
+          }
+        : { amount: 1, unit: "krw_10k" },
+    );
+    setPersonel({
+      amount: defaultValues.personnel ?? 0,
+      unit: "person",
+    });
+    setHirerType((defaultValues.hirerType as HirerType) ?? "individual");
+    setEmploymentType(
+      (defaultValues.employmentType as EmploymentType) ?? "onsite",
+    );
+    setSkillLevel(
+      defaultValues.skillLevel
+        ? fromExperience(defaultValues.skillLevel)
+        : EXPERIENCE_OPTIONS[0].id,
+    );
+    setDeadlineDate(
+      defaultValues.deadlineDate
+        ? new Date(defaultValues.deadlineDate)
+        : startOfDay(addDays(new Date(), 7)),
+    );
+    setStartedDate(
+      defaultValues.startedDate
+        ? new Date(defaultValues.startedDate)
+        : startOfDay(addDays(new Date(), 7)),
+    );
+    setEndedDate(
+      defaultValues.endedDate
+        ? new Date(defaultValues.endedDate)
+        : startOfDay(addDays(new Date(), 7)),
+    );
+  }, [defaultValues]);
+
+  const { data: categoryTree, isLoading: catLoading } = useListCategory();
+  const { data: regionTree, isLoading: regLoading } = useListRegion();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -330,6 +425,8 @@ export function ProjectForm({ onSubmit, onCancel }: ProjectFormProps) {
             </Button>
             <Button
               type="submit"
+              name="isViewed"
+              value="false"
               disabled={
                 !title.trim() ||
                 !content.trim() ||
@@ -342,6 +439,8 @@ export function ProjectForm({ onSubmit, onCancel }: ProjectFormProps) {
             </Button>
             <Button
               type="submit"
+              name="isViewed"
+              value="true"
               disabled={
                 !title.trim() ||
                 !content.trim() ||

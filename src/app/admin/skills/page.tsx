@@ -19,9 +19,9 @@ import { useSkillListStore } from "@/global/stores/useSkillListStore";
 import { SkillDto } from "@/global/types/skill.types";
 import { useEffect, useMemo, useState } from "react";
 
+import { ConfirmDelete } from "../../../global/components/dialog/ConfirmDeleteDialog";
 import { AddDialog } from "../_components/AddDialog";
 import AdminLayout from "../_components/AdminLayout";
-import { ConfirmDelete } from "../_components/ConfirmDeleteDialog";
 
 export default function SkillsPage() {
   // 검색/정렬/페이지 사이즈 스토어

@@ -14,6 +14,7 @@ import {
   DEFAULT_FEE_MIN,
   DEFAULT_FEE_RATE,
   DEFAULT_FEE_ROUNDING,
+  EXPERIENCE_OPTIONS,
   PUBLIC_ROUTES,
   Rounding,
 } from "../consts";
@@ -49,6 +50,7 @@ export function formatTimeAgo(input: InputDate): string {
   const date = toDate(input);
 
   const sec = differenceInSeconds(now, date);
+  if (sec < 0) return "마감";
   if (sec < 5) return "방금 전";
   if (sec < 60) return `${sec}초 전`;
 
@@ -65,19 +67,21 @@ export function formatTimeAgo(input: InputDate): string {
   return abs; // 7일 이상은 절대 날짜
 }
 
-export function toUnit(unitOption: UnitOption[], amount: number, unit: string) {
+export function toUnit(
+  unitOption: UnitOption[],
+  amount: number,
+  unit: UnitOption["value"],
+) {
   const f = unitOption.find((o) => o.value === unit)!.factor;
-  if (!f) return null;
   return amount * f;
 }
 
 export function fromUnit(
   unitOption: UnitOption[],
   total: number,
-  unit: string,
+  unit: UnitOption["value"],
 ) {
   const f = unitOption.find((o) => o.value === unit)!.factor;
-  if (!f) return null;
   return Math.trunc(total / f);
 }
 
@@ -185,3 +189,10 @@ export function isAllowedPath(pathname: string): boolean {
 
   return isFreelancerDetail || isProjectDetail;
 }
+
+export const fromExperience = (skillLevel: number) => {
+  return (
+    EXPERIENCE_OPTIONS.find((o) => o.level === skillLevel)?.id ??
+    EXPERIENCE_OPTIONS[0].id
+  );
+};

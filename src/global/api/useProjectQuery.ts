@@ -4,7 +4,9 @@ import { useMemo } from "react";
 
 import client from "../backend/client";
 import { unwrap } from "../backend/unwrap";
+import { useMyProjectListStore } from "../stores/useMyProjectListStore";
 import { useProjectListStore } from "../stores/useProjectListStore";
+import { Pageable } from "../types/common.types";
 import {
   ProjectListParam,
   ProjectModifyReqBody,
@@ -41,6 +43,26 @@ const remove = async (id: number) =>
     }),
   );
 
+const myList = async (param: Pageable) =>
+  unwrap(
+    await client.GET("/api/v1/projects/my", {
+      params: { query: param },
+    }),
+  );
+
+const toggleLike = async (id: number) =>
+  unwrap(
+    await client.POST("/api/v1/projects/{id}/likes/toggle", {
+      params: { path: { id } },
+    }),
+  );
+const views = async (id: number) =>
+  unwrap(
+    await client.POST("/api/v1/projects/{id}/views", {
+      params: { path: { id } },
+    }),
+  );
+
 export const projectQueryKeys = createQueryKeys("project", {
   lists: () => ["list"],
   list: (param: ProjectListParam) => ["list", param],
@@ -49,6 +71,9 @@ export const projectQueryKeys = createQueryKeys("project", {
   create: () => ["create"],
   modify: (id) => ["modify", id],
   remove: (id) => ["remove", id],
+  myList: () => ["myList"],
+  toggleLike: () => ["toggleLike"],
+  views: () => ["views"],
 });
 
 export const useListProject = () => {
@@ -136,5 +161,35 @@ export const useRemoveProject = (id: number) => {
     onSuccess: () => {
       qc.setQueryData(projectQueryKeys.detail(id).queryKey, null);
     },
+  });
+};
+
+export const useListMyProjects = () => {
+  const { page, size, sort } = useMyProjectListStore((state) => state);
+  const param = useMemo(() => ({ page, size, sort }), [page, size, sort]);
+  return useQuery({
+    queryKey: projectQueryKeys.myList().queryKey,
+    queryFn: () => myList(param),
+    staleTime: 5 * 60 * 1000 - 1,
+    gcTime: 5 * 60 * 1000 - 1,
+    retry: 0,
+  });
+};
+
+export const useToggleLikeProject = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: projectQueryKeys.toggleLike().queryKey,
+    mutationFn: toggleLike,
+    onSuccess: () => {},
+  });
+};
+
+export const useViewProject = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: projectQueryKeys.views().queryKey,
+    mutationFn: views,
+    onSuccess: () => {},
   });
 };

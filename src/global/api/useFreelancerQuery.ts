@@ -5,10 +5,12 @@ import { useMemo } from "react";
 import client from "../backend/client";
 import { unwrap } from "../backend/unwrap";
 import { useFreelancerListStore } from "../stores/useFreelancerListStore";
+import { useMyFreelancerListStore } from "../stores/useMyFreelancerListStore";
+import { Pageable } from "../types/common.types";
 import {
+  CreateFreelancerReqBody,
   FreelancerListParam,
-  FreelancerModifyReqBody,
-  FreelancerWriteReqBody,
+  ModifyFreelancerReqBody,
 } from "../types/freelancer.types";
 
 const list = async (param: FreelancerListParam) =>
@@ -23,20 +25,44 @@ const detail = async (id: number) =>
     await client.GET("/api/v1/freelancers/{id}", { params: { path: { id } } }),
   );
 
-const create = async (body: FreelancerWriteReqBody) =>
-  unwrap(await client.POST("/api/v1/freelancers", { body }));
+const create = async (formData: FormData) =>
+  unwrap(
+    await client.POST("/api/v1/freelancers", {
+      body: formData as unknown as CreateFreelancerReqBody,
+    }),
+  );
 
-const modify = async (id: number, body: FreelancerModifyReqBody) =>
+const modify = async (id: number, formData: FormData) =>
   unwrap(
     await client.PUT("/api/v1/freelancers/{id}", {
       params: { path: { id } },
-      body,
+      body: formData as unknown as ModifyFreelancerReqBody,
     }),
   );
 
 const remove = async (id: number) =>
   unwrap(
     await client.DELETE("/api/v1/freelancers/{id}", {
+      params: { path: { id } },
+    }),
+  );
+
+const myList = async (param: Pageable) =>
+  unwrap(
+    await client.GET("/api/v1/freelancers/my", {
+      params: { query: param },
+    }),
+  );
+
+const toggleLike = async (id: number) =>
+  unwrap(
+    await client.POST("/api/v1/freelancers/{id}/likes/toggle", {
+      params: { path: { id } },
+    }),
+  );
+const views = async (id: number) =>
+  unwrap(
+    await client.POST("/api/v1/freelancers/{id}/views", {
       params: { path: { id } },
     }),
   );
@@ -49,6 +75,9 @@ export const freelancerQueryKeys = createQueryKeys("freelancer", {
   create: () => ["create"],
   modify: (id) => ["modify", id],
   remove: (id) => ["remove", id],
+  myList: () => ["myList"],
+  toggleLike: () => ["toggleLike"],
+  views: () => ["views"],
 });
 
 export const useListFreelancer = () => {
@@ -124,7 +153,7 @@ export const useModifyFreelancer = (id: number) => {
   const qc = useQueryClient();
   return useMutation({
     mutationKey: freelancerQueryKeys.modify(id).queryKey,
-    mutationFn: (body: FreelancerModifyReqBody) => modify(id, body),
+    mutationFn: (formData: FormData) => modify(id, formData),
     onSuccess: (res) => {
       qc.setQueryData(freelancerQueryKeys.detail(id).queryKey, res.data);
     },
@@ -139,5 +168,35 @@ export const useRemoveFreelancer = (id: number) => {
     onSuccess: () => {
       qc.setQueryData(freelancerQueryKeys.detail(id).queryKey, null);
     },
+  });
+};
+
+export const useListMyFreelancers = () => {
+  const { page, size, sort } = useMyFreelancerListStore((state) => state);
+  const param = useMemo(() => ({ page, size, sort }), [page, size, sort]);
+  return useQuery({
+    queryKey: freelancerQueryKeys.myList().queryKey,
+    queryFn: () => myList(param),
+    staleTime: 5 * 60 * 1000 - 1,
+    gcTime: 5 * 60 * 1000 - 1,
+    retry: 0,
+  });
+};
+
+export const useToggleLikeFreelancer = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: freelancerQueryKeys.toggleLike().queryKey,
+    mutationFn: toggleLike,
+    onSuccess: () => {},
+  });
+};
+
+export const useViewFreelancer = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationKey: freelancerQueryKeys.views().queryKey,
+    mutationFn: views,
+    onSuccess: () => {},
   });
 };

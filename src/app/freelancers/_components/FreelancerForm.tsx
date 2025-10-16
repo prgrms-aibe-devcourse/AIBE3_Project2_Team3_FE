@@ -18,26 +18,101 @@ import { Input } from "@/global/components/ui/input";
 import { Label } from "@/global/components/ui/label";
 import { Textarea } from "@/global/components/ui/textarea";
 import { SALARY_UNITS, TIME_UNITS } from "@/global/consts";
-import { toUnit } from "@/global/lib/utils";
-import { FreelancerWriteReqBody } from "@/global/types/freelancer.types";
-import { useState } from "react";
+import { fromUnit, toUnit } from "@/global/lib/utils";
+import { ExistingFile } from "@/global/types/common.types";
+import { FreelancerDto } from "@/global/types/freelancer.types";
+import { useEffect, useState } from "react";
 
 type FreelancerFormProps = {
-  onSubmit: (param: FreelancerWriteReqBody) => void;
+  onSubmit: (formData: FormData) => void;
   onCancel: () => void;
+  defaultValues?: FreelancerDto;
 };
-export function FreelancerForm({ onSubmit, onCancel }: FreelancerFormProps) {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [attachments, setAttachments] = useState<File[]>([]);
+export function FreelancerForm({
+  onSubmit,
+  onCancel,
+  defaultValues,
+}: FreelancerFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedRegion, setSelectedRegion] = useState<number[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<number[]>([]);
-  const [selectedSkillIds, setSelectedSkillIds] = useState<number[]>([]);
-  const [period, setPeriod] = useState({ amount: 7, unit: "day" });
-  const [salary, setSalary] = useState({ amount: 1, unit: "krw_10k" });
+  const [title, setTitle] = useState(defaultValues?.title ?? "");
+  const [content, setContent] = useState(defaultValues?.content ?? "");
+  const [selectedRegion, setSelectedRegion] = useState<number[]>(
+    defaultValues?.regions
+      ? defaultValues.regions.map((region) => region.id)
+      : [],
+  );
+  const [selectedCategory, setSelectedCategory] = useState<number[]>(
+    defaultValues?.categories
+      ? defaultValues.categories.map((category) => category.id)
+      : [],
+  );
+  const [selectedSkillIds, setSelectedSkillIds] = useState<number[]>(
+    defaultValues?.skills ? defaultValues.skills.map((skill) => skill.id) : [],
+  );
+  const [period, setPeriod] = useState(
+    defaultValues?.period
+      ? {
+          amount: fromUnit(TIME_UNITS, defaultValues.period, "hour"),
+          unit: "hour",
+        }
+      : { amount: 7, unit: "day" },
+  );
+  const [salary, setSalary] = useState(
+    defaultValues?.salary
+      ? {
+          amount: fromUnit(SALARY_UNITS, defaultValues.salary, "krw"),
+          unit: "krw",
+        }
+      : { amount: 1, unit: "krw_10k" },
+  );
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [existingFiles, setExistingFiles] = useState<ExistingFile[]>([]); // 서버가 준 기존 파일
+  const [removedFileIds, setRemovedFileIds] = useState<Set<number>>(new Set());
   const { data: categoryTree, isLoading: catLoading } = useListCategory();
   const { data: regionTree, isLoading: regLoading } = useListRegion();
+
+  useEffect(() => {
+    if (!defaultValues) return;
+    setTitle(defaultValues.title ?? "");
+    setContent(defaultValues.content ?? "");
+    setSelectedRegion(
+      defaultValues.regions
+        ? defaultValues.regions.map((region) => region.id)
+        : [],
+    );
+    setSelectedCategory(
+      defaultValues.categories
+        ? defaultValues.categories.map((category) => category.id)
+        : [],
+    );
+    setSelectedSkillIds(
+      defaultValues.skills ? defaultValues.skills.map((skill) => skill.id) : [],
+    );
+    setPeriod(
+      defaultValues.period
+        ? {
+            amount: fromUnit(TIME_UNITS, defaultValues.period, "hour"),
+            unit: "hour",
+          }
+        : { amount: 7, unit: "day" },
+    );
+    setSalary(
+      defaultValues.salary
+        ? {
+            amount: fromUnit(SALARY_UNITS, defaultValues.salary, "krw"),
+            unit: "krw",
+          }
+        : { amount: 1, unit: "krw_10k" },
+    );
+    setExistingFiles(defaultValues.files);
+  }, [defaultValues]);
+
+  const toggleRemove = (id: number) =>
+    setRemovedFileIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,18 +135,28 @@ export function FreelancerForm({ onSubmit, onCancel }: FreelancerFormProps) {
     }
 
     const isViewed = fd.get("isViewed") === "true";
+    const reqBody = {
+      post: { title, content, isViewed },
+      freelancer: {
+        salary: toUnit(SALARY_UNITS, salary.amount, salary.unit) ?? 0,
+        period: toUnit(TIME_UNITS, period.amount, period.unit) ?? 0,
+      },
+      regionIds: selectedRegion,
+      categoryIds: selectedCategory,
+      skillIds: selectedSkillIds,
+    };
 
+    const requestFormData = new FormData();
+    requestFormData.append(
+      "reqBody",
+      new Blob([JSON.stringify(reqBody)], { type: "application/json" }),
+    );
+    attachments.forEach((f) => requestFormData.append("files", f));
+    Array.from(removedFileIds).forEach((id) =>
+      requestFormData.append("removeIds", String(id)),
+    );
     try {
-      await onSubmit({
-        post: { title, content, isViewed },
-        freelancer: {
-          salary: toUnit(SALARY_UNITS, salary.amount, salary.unit) ?? 0,
-          period: toUnit(TIME_UNITS, period.amount, period.unit) ?? 0,
-        },
-        regionIds: selectedRegion,
-        categoryIds: selectedCategory,
-        skillIds: selectedSkillIds,
-      });
+      await onSubmit(requestFormData);
     } finally {
       setIsSubmitting(false);
     }
@@ -177,6 +262,34 @@ export function FreelancerForm({ onSubmit, onCancel }: FreelancerFormProps) {
           {/* 포트폴리오 */}
           <div className="space-y-2">
             <Label>첨부파일 (선택사항)</Label>
+            <ul className="space-y-2">
+              {existingFiles.map((f) => {
+                const removed = removedFileIds.has(f.id);
+                return (
+                  <li key={f.id} className="flex items-center justify-between">
+                    <a
+                      href={f.url}
+                      target="_blank"
+                      className={removed ? "line-through opacity-60" : ""}
+                    >
+                      {f.fileName}
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => toggleRemove(f.id)}
+                      className="text-sm"
+                    >
+                      {removed ? "복구" : "삭제"}
+                    </button>
+                  </li>
+                );
+              })}
+              {!existingFiles.length && (
+                <li className="text-sm text-muted-foreground">
+                  기존 파일 없음
+                </li>
+              )}
+            </ul>
             <FileUpload
               onFileSelect={handleFileSelect}
               accept="image/*,.pdf,.doc,.docx"

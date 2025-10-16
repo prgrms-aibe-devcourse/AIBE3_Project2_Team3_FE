@@ -17,9 +17,11 @@ import {
   ChatInviteReqBody,
   ChatMessageDto,
   ChatMessageListParam,
+  ChatRoomDto,
   ChatRoomListParam,
   ChatSendReqBody,
   PagePayloadChatMessageDto,
+  PagePayloadChatRoomDto,
   RsDataChatInviteResBody,
   UserInviteDto,
 } from "../types/chat.types";
@@ -86,9 +88,16 @@ const refuseRoomInvite = async (roomId: number) =>
 const createRoom = async (body: ChatCreateReqBody) =>
   unwrap(await client.POST("/api/v1/chat/rooms", { body }));
 
+const getMembers = async (roomId: number) =>
+  unwrap(
+    await client.GET("/api/v1/chat/rooms/{roomId}/members", {
+      params: { path: { roomId } },
+    }),
+  );
+
 export const chatQueryKeys = createQueryKeys("chat", {
   chatRoomLists: () => ["room", "list"],
-  chatRoomList: (param) => ["room", "list", param],
+  chatRoomList: () => ["room", "list"],
   chatMessageLists: () => ["message", "list"],
   chatMessageList: (roomId) => ["message", "list", roomId],
   send: (roomId) => ["message", "send", roomId],
@@ -99,13 +108,14 @@ export const chatQueryKeys = createQueryKeys("chat", {
   acceptInvite: (roomId: number) => ["invite", "accept", roomId],
   refuseInvite: (roomId: number) => ["invite", "refuse", roomId],
   create: () => ["rooms", "create"],
+  members: (roomId: number) => ["rooms", "members", roomId],
 });
 
 export const useListChatRoom = () => {
   const { size, sort } = useChatRoomListStore((state) => state);
   const param = useMemo(() => ({ size, sort }), [size, sort]);
   return useInfiniteQuery({
-    queryKey: chatQueryKeys.chatRoomList(param).queryKey,
+    queryKey: chatQueryKeys.chatRoomList().queryKey,
     queryFn: ({ pageParam }) => chatRoomList({ ...param, page: pageParam }),
     getNextPageParam: (res) => (res.page.last ? null : res.page.page + 1),
     initialPageParam: 0,
@@ -199,10 +209,60 @@ export const useCreateChatRoom = () => {
   return useMutation({
     mutationKey: chatQueryKeys.create().queryKey,
     mutationFn: (body: ChatCreateReqBody) => createRoom(body),
-    onSuccess: (res) => {
-      qc.invalidateQueries({
-        queryKey: chatQueryKeys.chatRoomLists().queryKey,
+    onSuccess: async (res) => {
+      prependRoomToFirstPage(
+        qc,
+        chatQueryKeys.chatRoomLists().queryKey,
+        res.data,
+      );
+      await qc.invalidateQueries({
+        queryKey: chatQueryKeys.chatRoomList().queryKey,
       });
     },
   });
 };
+
+export const useGetRoomMembers = (roomId: number | undefined) => {
+  return useQuery({
+    queryKey: chatQueryKeys.members(roomId ?? 0).queryKey,
+    queryFn: () => {
+      if (!roomId) throw new Error("roomId가 없습니다.");
+      return getMembers(roomId);
+    },
+    enabled: !!roomId,
+    staleTime: 5 * 60 * 1000 - 1,
+    gcTime: 5 * 60 * 1000 - 1,
+    retry: 0,
+  });
+};
+
+function prependRoomToFirstPage(
+  qc: ReturnType<typeof useQueryClient>,
+  key = chatQueryKeys.chatRoomLists().queryKey,
+  room: ChatRoomDto,
+) {
+  qc.setQueryData<InfiniteData<PagePayloadChatRoomDto, number>>(key, (old) => {
+    if (!old || old.pages.length === 0) return old;
+
+    const first = old.pages[0];
+    const pageSize = first.page.size ?? first.content.length;
+
+    // 중복 제거 후 맨 앞에 추가
+    const dedup = first.content.filter((r) => r.id !== room.id);
+    const newContent = [room, ...dedup].slice(0, pageSize);
+
+    const newPage0: PagePayloadChatRoomDto = {
+      ...first,
+      content: newContent,
+      page: {
+        ...first.page,
+        totalElements: first.page.totalElements + 1, // 낙관적 증가(선택)
+      },
+    };
+
+    return {
+      ...old,
+      pages: [newPage0, ...old.pages.slice(1)],
+    };
+  });
+}
