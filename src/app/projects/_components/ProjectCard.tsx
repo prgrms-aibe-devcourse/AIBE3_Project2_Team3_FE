@@ -183,7 +183,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
               <Eye className="h-3 w-3 mr-1" />
               {project.viewCount}
             </div>
-            <div>{0}명 지원</div>
+            <div>{project.applicationCount}명 지원</div>
           </div>
         </div>
       </CardContent>

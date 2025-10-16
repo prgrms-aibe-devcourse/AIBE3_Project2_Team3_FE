@@ -23,7 +23,6 @@ import {
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
-import { Badge } from "./badge";
 import { Button } from "./button";
 import {
   DropdownMenu,
@@ -103,9 +102,6 @@ export function Header() {
               <Button variant="ghost" size="sm" className="relative" asChild>
                 <Link href="/chat">
                   <MessageCircle className="h-4 w-4" />
-                  <Badge className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-xs">
-                    2
-                  </Badge>
                 </Link>
               </Button>
               <Button variant="ghost" size="sm">
