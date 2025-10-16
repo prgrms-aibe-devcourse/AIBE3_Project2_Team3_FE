@@ -317,7 +317,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/projects/{id}/view": {
+    "/api/v1/projects/{id}/views": {
         parameters: {
             query?: never;
             header?: never;
@@ -334,7 +334,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/projects/{id}/like": {
+    "/api/v1/projects/{id}/likes": {
         parameters: {
             query?: never;
             header?: never;
@@ -343,8 +343,26 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 프로젝트 글 좋아요/취소 */
-        post: operations["toggleLike"];
+        /** 좋아요 ON */
+        post: operations["likeOn"];
+        /** 좋아요 OFF */
+        delete: operations["likeOff"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{id}/likes/toggle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 좋아요 토글 */
+        post: operations["likeToggle"];
         delete?: never;
         options?: never;
         head?: never;
@@ -386,7 +404,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/freelancers/{id}/view": {
+    "/api/v1/freelancers/{id}/views": {
         parameters: {
             query?: never;
             header?: never;
@@ -403,7 +421,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/freelancers/{id}/like": {
+    "/api/v1/freelancers/{id}/likes": {
         parameters: {
             query?: never;
             header?: never;
@@ -412,8 +430,26 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** 프리랜서 글 좋아요/취소 */
-        post: operations["toggleLike_1"];
+        /** 좋아요 ON */
+        post: operations["likeOn_1"];
+        /** 좋아요 OFF */
+        delete: operations["likeOff_1"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/freelancers/{id}/likes/toggle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** 좋아요 토글 */
+        post: operations["likeToggle_1"];
         delete?: never;
         options?: never;
         head?: never;
@@ -657,6 +693,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getProjectReviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reviews/my/{postId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getMyReview"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1233,10 +1285,11 @@ export interface components {
             personnel: number;
             /** Format: int32 */
             skillLevel: number;
-            /** Format: int32 */
+            /** Format: int64 */
             viewCount: number;
-            /** Format: int32 */
+            /** Format: int64 */
             likeCount: number;
+            liked: boolean;
         };
         RegionDto: {
             /** Format: int64 */
@@ -1322,10 +1375,11 @@ export interface components {
             salary: number;
             /** Format: int64 */
             period: number;
-            /** Format: int32 */
+            /** Format: int64 */
             viewCount: number;
-            /** Format: int32 */
+            /** Format: int64 */
             likeCount: number;
+            liked: boolean;
             files: components["schemas"]["FreelancerFileDto"][];
         };
         FreelancerFileDto: {
@@ -1458,6 +1512,29 @@ export interface components {
             regionIds: number[];
             categoryIds: number[];
             skillIds: number[];
+        };
+        RsDataViewResBody: {
+            resultCode: string;
+            message: string;
+            data: components["schemas"]["ViewResBody"];
+        };
+        ViewResBody: {
+            /** Format: int64 */
+            postId: number;
+            /** Format: int64 */
+            viewCount: number;
+        };
+        LikeResBody: {
+            /** Format: int64 */
+            postId: number;
+            /** Format: int64 */
+            likeCount: number;
+            liked: boolean;
+        };
+        RsDataLikeResBody: {
+            resultCode: string;
+            message: string;
+            data: components["schemas"]["LikeResBody"];
         };
         OfferWriteReqBody: {
             /** Format: int64 */
@@ -3021,7 +3098,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["RsDataVoid"];
+                    "*/*": components["schemas"]["RsDataViewResBody"];
                 };
             };
             /** @description Bad Request */
@@ -3035,7 +3112,7 @@ export interface operations {
             };
         };
     };
-    toggleLike: {
+    likeOn: {
         parameters: {
             query?: never;
             header?: never;
@@ -3052,7 +3129,69 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    "*/*": components["schemas"]["RsDataLikeResBody"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
                     "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    likeOff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataLikeResBody"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    likeToggle: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataLikeResBody"];
                 };
             };
             /** @description Bad Request */
@@ -3194,7 +3333,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["RsDataVoid"];
+                    "*/*": components["schemas"]["RsDataViewResBody"];
                 };
             };
             /** @description Bad Request */
@@ -3208,7 +3347,7 @@ export interface operations {
             };
         };
     };
-    toggleLike_1: {
+    likeOn_1: {
         parameters: {
             query?: never;
             header?: never;
@@ -3225,7 +3364,69 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
+                    "*/*": components["schemas"]["RsDataLikeResBody"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
                     "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    likeOff_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataLikeResBody"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    likeToggle_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataLikeResBody"];
                 };
             };
             /** @description Bad Request */
@@ -3818,6 +4019,37 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RsDataPagePayloadReviewDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getMyReview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                postId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataReviewDto"];
                 };
             };
             /** @description Bad Request */

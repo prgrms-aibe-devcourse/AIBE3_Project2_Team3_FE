@@ -6,5 +6,6 @@ export type PagePayloadReviewDto =
   components["schemas"]["PagePayloadReviewDto"];
 export type RsDataPagePayloadReviewDto =
   components["schemas"]["RsDataPagePayloadReviewDto"];
+export type RsDataReviewDto = components["schemas"]["RsDataReviewDto"];
 export type ProjectReviewsParam =
   paths["/api/v1/reviews/project/{projectId}"]["get"]["parameters"]["query"];
