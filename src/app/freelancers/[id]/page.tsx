@@ -1,6 +1,10 @@
 "use client";
 
-import { useDetailFreelancer } from "@/global/api/useFreelancerQuery";
+import {
+  useDetailFreelancer,
+  useToggleLikeFreelancer,
+  useViewFreelancer,
+} from "@/global/api/useFreelancerQuery";
 import LoadingScreen from "@/global/components/loading/loading";
 import {
   Avatar,
@@ -21,9 +25,11 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/global/components/ui/tabs";
+import { DEFAULT_AVATAR } from "@/global/consts";
+import { toast } from "@/global/hooks/useToast";
 import { formatCustomDuration, formatTimeAgo } from "@/global/lib/utils";
 import { format } from "date-fns";
-import { use, useState } from "react";
+import { MouseEvent, use, useEffect, useRef, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -47,8 +53,35 @@ export default function FreelancerDetailPage({
 }) {
   const { id } = use(params);
   const { data: freelancer } = useDetailFreelancer(id);
+  const { mutate: likeMutate } = useToggleLikeFreelancer();
+  const { mutate: viewMutate } = useViewFreelancer();
   const [isFavorited, setIsFavorited] = useState(false);
+  const [viewCount, setViewCount] = useState(0);
+  const [likeCount, setLikeCount] = useState(0);
   const router = useRouter();
+  const firedRef = useRef(false);
+  useEffect(() => {
+    if (!freelancer?.id) return;
+
+    // StrictMode 2회 실행 가드
+    if (firedRef.current) return;
+    firedRef.current = true;
+
+    // (선택) 세션 당 1회만 증가
+    const key = `viewed:freelancer:${freelancer.id}`;
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+
+    viewMutate(freelancer.id, {
+      onSuccess: (res) => setViewCount(res.data.viewCount),
+    });
+  }, [freelancer?.id, viewMutate]);
+  useEffect(() => {
+    if (!freelancer) return;
+    setIsFavorited(freelancer.liked);
+    setViewCount(freelancer.viewCount);
+    setLikeCount(freelancer.likeCount);
+  }, [freelancer]);
   if (!freelancer)
     return (
       <LoadingScreen
@@ -56,6 +89,24 @@ export default function FreelancerDetailPage({
         tips={["잠시만 기다려 주세요"]}
       />
     );
+  const clickFavorite = (e: MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    const prev = isFavorited; // ← 현재 값 스냅샷
+    setIsFavorited((p) => !p);
+    likeMutate(freelancer.id, {
+      onSuccess: (res) => {
+        setIsFavorited(res.data.liked);
+        setLikeCount(res.data.likeCount);
+      },
+      onError: (res) => {
+        setIsFavorited(prev);
+        toast({
+          title: "실패",
+          description: res.message,
+        });
+      },
+    });
+  };
   return (
     <div className="py-4 px-4">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -126,7 +177,7 @@ export default function FreelancerDetailPage({
                     </div>
                     <div className="flex items-center">
                       <Eye className="h-4 w-4 mr-2" />
-                      {0}
+                      {viewCount}
                     </div>
                   </div>
                 </div>
@@ -135,11 +186,12 @@ export default function FreelancerDetailPage({
                     variant="ghost"
                     size="sm"
                     className="cursor-pointer"
-                    onClick={() => setIsFavorited(!isFavorited)}
+                    onClick={(e) => clickFavorite(e)}
                   >
                     <Heart
                       className={`h-4 w-4 ${isFavorited ? "fill-red-500 text-primary" : ""}`}
                     />
+                    {likeCount ? likeCount : ""}
                   </Button>
                 </div>
               </div>
@@ -147,7 +199,9 @@ export default function FreelancerDetailPage({
             <CardContent className="pt-6">
               <div className="flex items-start space-x-6">
                 <Avatar className="h-22 w-22">
-                  <AvatarImage src={"https://picsum.photos/200"} />
+                  <AvatarImage
+                    src={freelancer.author.profileImageUrl || DEFAULT_AVATAR}
+                  />
                   <AvatarFallback className="text-2xl">
                     {"이미지"}
                   </AvatarFallback>

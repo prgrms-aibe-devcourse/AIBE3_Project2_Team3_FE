@@ -10,6 +10,7 @@ import {
   OfferModifyStatusResBody,
   OfferMyListParam,
   OfferReceivedListParam,
+  OfferWriteReqBody,
 } from "../types/offer.types";
 
 const my = async (param: OfferMyListParam) =>
@@ -30,10 +31,14 @@ const modifyStatus = async (id: number, body: OfferModifyStatusResBody) =>
     }),
   );
 
+const create = async (body: OfferWriteReqBody) =>
+  unwrap(await client.POST("/api/v1/offers", { body }));
+
 export const offerQueryKeys = createQueryKeys("offer", {
   my: () => ["my"],
   received: () => ["received"],
   modifyStatus: () => ["modifyStatus"],
+  create: () => ["create"],
 });
 
 export const useListMyOffer = (enabled = true) => {
@@ -83,5 +88,13 @@ export const useModifyOfferStatus = (id: number) => {
         queryKey: offerQueryKeys.received().queryKey,
       });
     },
+  });
+};
+
+export const useCreateOffer = () => {
+  return useMutation({
+    mutationKey: offerQueryKeys.create().queryKey,
+    mutationFn: create,
+    onSuccess: () => {},
   });
 };

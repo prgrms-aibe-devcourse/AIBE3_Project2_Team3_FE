@@ -19,6 +19,12 @@ export function TossPayments({ amount }: TossPaymentsProps) {
     }
 
     fetchPaymentWidgets();
+
+    // 클린업 함수 추가
+    return () => {
+      setWidgets(null);
+      setReady(false);
+    };
   }, [clientKey]);
 
   useEffect(() => {
