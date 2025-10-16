@@ -214,100 +214,107 @@ export default function QuestionDetailPage() {
               {question.answers &&
               Array.isArray(question.answers) &&
               question.answers.length > 0 ? (
-                question.answers.map((answer: any) => (
-                  <div key={answer.id} className="p-6">
-                    <div className="flex items-start gap-4">
-                      <Avatar>
-                        <AvatarFallback>
-                          {answer.user?.nickname?.charAt(0) || "?"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold">
-                              {answer.user?.nickname || "알 수 없음"}
-                            </span>
-                            <span className="text-sm text-muted-foreground">
-                              {new Date(answer.createdDate).toLocaleString()}
-                            </span>
+                question.answers.map(
+                  (answer: {
+                    id: number;
+                    user?: { nickname?: string };
+                    comment?: string;
+                    createdDate: string;
+                  }) => (
+                    <div key={answer.id} className="p-6">
+                      <div className="flex items-start gap-4">
+                        <Avatar>
+                          <AvatarFallback>
+                            {answer.user?.nickname?.charAt(0) || "?"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold">
+                                {answer.user?.nickname || "알 수 없음"}
+                              </span>
+                              <span className="text-sm text-muted-foreground">
+                                {new Date(answer.createdDate).toLocaleString()}
+                              </span>
+                            </div>
+                            {/* 관리자만 수정/삭제 가능 */}
+                            {isAdmin && (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleEditAnswer(
+                                        answer.id,
+                                        answer.comment || "",
+                                      )
+                                    }
+                                  >
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    수정
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteClick(answer.id)}
+                                    className="text-destructive"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    삭제
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            )}
                           </div>
-                          {/* 관리자만 수정/삭제 가능 */}
-                          {isAdmin && (
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <MoreHorizontal className="h-4 w-4" />
+                          {/* 편집 모드 */}
+                          {editingAnswerId === answer.id ? (
+                            <div className="space-y-3">
+                              <Textarea
+                                value={editingContent}
+                                onChange={(e) =>
+                                  setEditingContent(e.target.value)
+                                }
+                                className="min-h-[100px]"
+                              />
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  onClick={() => handleSaveEdit(answer.id)}
+                                  disabled={!editingContent.trim()}
+                                >
+                                  저장
                                 </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                  onClick={() =>
-                                    handleEditAnswer(
-                                      answer.id,
-                                      (answer as any).comment || "",
-                                    )
-                                  }
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={handleCancelEdit}
                                 >
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  수정
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleDeleteClick(answer.id)}
-                                  className="text-destructive"
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  삭제
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                                  취소
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="prose prose-sm max-w-none">
+                              {answer.comment
+                                ?.split("\n")
+                                .map((paragraph: string, pIndex: number) => (
+                                  <p
+                                    key={pIndex}
+                                    className="mb-3 last:mb-0 whitespace-pre-wrap"
+                                  >
+                                    {paragraph}
+                                  </p>
+                                )) || <p>내용을 불러올 수 없습니다.</p>}
+                            </div>
                           )}
                         </div>
-                        {/* 편집 모드 */}
-                        {editingAnswerId === answer.id ? (
-                          <div className="space-y-3">
-                            <Textarea
-                              value={editingContent}
-                              onChange={(e) =>
-                                setEditingContent(e.target.value)
-                              }
-                              className="min-h-[100px]"
-                            />
-                            <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                onClick={() => handleSaveEdit(answer.id)}
-                                disabled={!editingContent.trim()}
-                              >
-                                저장
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={handleCancelEdit}
-                              >
-                                취소
-                              </Button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="prose prose-sm max-w-none">
-                            {(answer as any).comment
-                              ?.split("\n")
-                              .map((paragraph: string, pIndex: number) => (
-                                <p
-                                  key={pIndex}
-                                  className="mb-3 last:mb-0 whitespace-pre-wrap"
-                                >
-                                  {paragraph}
-                                </p>
-                              )) || <p>내용을 불러올 수 없습니다.</p>}
-                          </div>
-                        )}
                       </div>
                     </div>
-                  </div>
-                ))
+                  ),
+                )
               ) : (
                 <div className="p-6 text-center text-muted-foreground">
                   아직 답변이 없습니다.

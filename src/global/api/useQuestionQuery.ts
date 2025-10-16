@@ -15,11 +15,13 @@ const list = async (param: Pageable) =>
     await client.GET("/api/v1/questions", {
       params: {
         query: {
-          page: param.page,
-          size: param.size,
-          sort: param.sort[0] || "createdDate,desc",
+          pageable: {
+            page: param.page,
+            size: param.size,
+            sort: [param.sort[0] || "createdDate,desc"],
+          },
           searchKeyword: "",
-        } as any,
+        },
       },
     }),
   );
@@ -47,10 +49,12 @@ const myList = async (param: Pageable) =>
     await client.GET("/api/v1/questions/my", {
       params: {
         query: {
-          page: param.page,
-          size: param.size,
-          sort: param.sort[0] || "createdDate,desc",
-        } as any,
+          pageable: {
+            page: param.page,
+            size: param.size,
+            sort: [param.sort[0] || "createdDate,desc"],
+          },
+        },
       },
     }),
   );
@@ -80,9 +84,9 @@ export const useListQuestion = (param?: Pageable) => {
   return useQuery({
     queryKey: questionQueryKeys.list(defaultParam).queryKey,
     queryFn: () => list(defaultParam),
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-    retry: 1,
+    staleTime: 5 * 60 * 1000 - 1,
+    gcTime: 5 * 60 * 1000 - 1,
+    retry: 0,
   });
 };
 
@@ -160,9 +164,9 @@ export const useListMyQuestions = (param?: Pageable) => {
   return useQuery({
     queryKey: questionQueryKeys.myList().queryKey,
     queryFn: () => myList(defaultParam),
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-    retry: 1,
+    staleTime: 5 * 60 * 1000 - 1,
+    gcTime: 5 * 60 * 1000 - 1,
+    retry: 0,
   });
 };
 
@@ -182,9 +186,9 @@ export const useDetailQuestion = (id: number) => {
   return useQuery({
     queryKey: questionQueryKeys.detail(id).queryKey,
     queryFn: () => detail(id),
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
-    retry: 1,
+    staleTime: 5 * 60 * 1000 - 1,
+    gcTime: 5 * 60 * 1000 - 1,
+    retry: 0,
     enabled: !!id,
   });
 };

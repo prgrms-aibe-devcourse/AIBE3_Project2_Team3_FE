@@ -25,7 +25,7 @@ import AdminLayout from "../_components/AdminLayout";
 
 export default function SkillsPage() {
   // 검색/정렬/페이지 사이즈 스토어
-  const { size, sort, search, setSearch } = useSkillListStore((s) => s);
+  const { search, setSearch } = useSkillListStore((s) => s);
 
   // 입력박스용 로컬 상태 + 디바운스
   const [keyword, setKeyword] = useState(search);
