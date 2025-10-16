@@ -1,6 +1,6 @@
 "use client";
 
-import { useProjectReviews } from "@/global/api/useReviewQuery";
+import { usePostReviews } from "@/global/api/useReviewQuery";
 import { Button } from "@/global/components/ui/button";
 import {
   Dialog,
@@ -18,14 +18,14 @@ import { useMemo, useState } from "react";
 import { Loader2, Star } from "lucide-react";
 
 type Props = {
-  projectId: number;
+  postId: number;
   trigger?: React.ReactNode;
   pageSize?: number;
   titlePrefix?: string;
 };
 
 export default function ReviewListDialog({
-  projectId,
+  postId,
   trigger,
   pageSize = 10,
   titlePrefix = "프로젝트",
@@ -33,11 +33,11 @@ export default function ReviewListDialog({
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
 
-  const query = useProjectReviews(projectId, { page, size: pageSize }, open);
+  const query = usePostReviews(postId, { page, size: pageSize }, open);
 
   const title = useMemo(
-    () => `${titlePrefix} #${projectId} 리뷰`,
-    [titlePrefix, projectId],
+    () => `${titlePrefix} #${postId} 리뷰`,
+    [titlePrefix, postId],
   );
   const list = query.data?.content ?? [];
   const pageInfo = query.data?.page;

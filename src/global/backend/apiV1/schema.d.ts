@@ -685,14 +685,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/reviews/project/{projectId}": {
+    "/api/v1/reviews/post/{postId}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getProjectReviews"];
+        get: operations["getPostReviews"];
         put?: never;
         post?: never;
         delete?: never;
@@ -724,7 +724,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["getFreelancerReviews"];
+        get: operations["getMyReview"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3999,14 +3999,14 @@ export interface operations {
             };
         };
     };
-    getProjectReviews: {
+    getPostReviews: {
         parameters: {
             query: {
                 pageable: components["schemas"]["Pageable"];
             };
             header?: never;
             path: {
-                projectId: number;
+                postId: number;
             };
             cookie?: never;
         };
@@ -4065,12 +4065,10 @@ export interface operations {
     };
     getFreelancerReviews: {
         parameters: {
-            query: {
-                pageable: components["schemas"]["Pageable"];
-            };
+            query?: never;
             header?: never;
             path: {
-                freelancerId: number;
+                postId: number;
             };
             cookie?: never;
         };
@@ -4082,7 +4080,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["RsDataPagePayloadReviewDto"];
+                    "*/*": components["schemas"]["RsDataReviewDto"];
                 };
             };
             /** @description Bad Request */
