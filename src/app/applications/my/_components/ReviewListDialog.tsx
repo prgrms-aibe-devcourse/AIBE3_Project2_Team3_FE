@@ -13,35 +13,36 @@ import {
 } from "@/global/components/ui/dialog";
 import { ScrollArea } from "@/global/components/ui/scroll-area";
 import { Separator } from "@/global/components/ui/separator";
-import type { ReviewDto } from "@/global/types/review.types";
 import { useMemo, useState } from "react";
 
 import { Loader2, Star } from "lucide-react";
+
+type Props = {
+  projectId: number;
+  trigger?: React.ReactNode;
+  pageSize?: number;
+  titlePrefix?: string;
+};
 
 export default function ReviewListDialog({
   projectId,
   trigger,
   pageSize = 10,
-  sort = "id,ASC",
-}: {
-  projectId: number | string;
-  trigger?: React.ReactNode;
-  pageSize?: number;
-  sort?: string | string[];
-}) {
+  titlePrefix = "프로젝트",
+}: Props) {
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
 
-  const query = useProjectReviews(
-    Number(projectId),
-    { page, size: pageSize, sort },
-    open,
+  const query = useProjectReviews(projectId, { page, size: pageSize }, open);
+
+  const title = useMemo(
+    () => `${titlePrefix} #${projectId} 리뷰`,
+    [titlePrefix, projectId],
   );
-
-  const list: ReviewDto[] = query.data?.content ?? [];
+  const list = query.data?.content ?? [];
   const pageInfo = query.data?.page;
-
-  const title = useMemo(() => `프로젝트 #${projectId} 리뷰`, [projectId]);
+  const errorText =
+    query.error instanceof Error ? query.error.message : "오류가 발생했습니다.";
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -57,7 +58,7 @@ export default function ReviewListDialog({
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
-            이 프로젝트에 등록된 리뷰를 확인하실 수 있습니다.
+            이 {titlePrefix.toLowerCase()}에 등록된 리뷰를 확인하실 수 있습니다.
           </DialogDescription>
         </DialogHeader>
 
@@ -68,9 +69,7 @@ export default function ReviewListDialog({
               불러오는 중입니다…
             </div>
           ) : query.isError ? (
-            <div className="text-sm text-destructive">
-              {(query.error as Error)?.message ?? "오류가 발생했습니다."}
-            </div>
+            <div className="text-sm text-destructive">{errorText}</div>
           ) : list.length === 0 ? (
             <div className="text-sm text-muted-foreground">
               등록된 리뷰가 없습니다.
@@ -94,18 +93,15 @@ export default function ReviewListDialog({
                         <span className="ml-1">({rv.rating}/5)</span>
                       </div>
                     </div>
-
                     <div className="whitespace-pre-wrap break-words">
                       {rv.comment}
                     </div>
-
                     <div className="text-xs text-muted-foreground">
                       작성일:{" "}
                       {rv.createdAt
                         ? new Date(rv.createdAt).toLocaleString()
                         : "-"}
                     </div>
-
                     <Separator />
                   </div>
                 ))}

@@ -3,26 +3,27 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import client from "../backend/client";
 import { unwrap } from "../backend/unwrap";
-import type {
-  PagePayloadReviewDto,
-  ProjectReviewListQuery,
+import { PageQuery, Pageable } from "../types/common.types";
+import {
+  ProjectReviewsParam,
   ReviewReqBody,
   RsDataPagePayloadReviewDto,
 } from "../types/review.types";
 
-const toQuery = (
-  page?: number,
-  size?: number,
-  sort?: string | string[],
-): ProjectReviewListQuery => {
-  const sortArr = Array.isArray(sort) ? sort : sort ? [sort] : [];
-  return {
-    pageable: {
-      page: page ?? 0,
-      size: size ?? 10,
-      sort: sortArr,
-    },
+const listByProject = async (projectId: number, q: PageQuery) => {
+  const flat = {
+    page: q.page ?? 0,
+    size: q.size ?? 10,
+    sort: Array.isArray(q.sort) ? q.sort : q.sort ? [q.sort] : [],
   };
+  const rs = await client.GET("/api/v1/reviews/project/{projectId}", {
+    params: {
+      path: { projectId },
+      query: flat as unknown as ProjectReviewsParam,
+    },
+  });
+
+  return unwrap<RsDataPagePayloadReviewDto>(rs).data;
 };
 
 const createByPostId = async (postId: number, body: ReviewReqBody) =>
@@ -33,38 +34,36 @@ const createByPostId = async (postId: number, body: ReviewReqBody) =>
     }),
   );
 
-const listByProject = async (args: {
-  projectId: number;
-  page?: number;
-  size?: number;
-  sort?: string | string[];
-}): Promise<PagePayloadReviewDto> => {
-  const rs = unwrap<RsDataPagePayloadReviewDto>(
-    await client.GET("/api/v1/reviews/project/{projectId}", {
-      params: {
-        path: { projectId: args.projectId },
-        query: toQuery(args.page, args.size, args.sort),
-      },
-    }),
-  );
-  return rs.data;
-};
-
 export const reviewQueryKeys = createQueryKeys("review", {
-  create: (postId: number) => ["create", postId],
-  projectListArgs: (
-    projectId: number,
-    page = 0,
-    size = 10,
-    sort = "id,ASC",
-  ) => [
+  projectList: (projectId: number, q: PageQuery) => [
+    "review",
     "projectList",
     projectId,
-    page,
-    size,
-    Array.isArray(sort) ? sort.join("|") : sort,
+    q.page ?? 0,
+    q.size ?? 10,
+    (q.sort ?? []).join("|"),
   ],
+  create: (postId: number) => ["review", "create", postId],
 });
+
+export const useProjectReviews = (
+  projectId: number,
+  q: PageQuery,
+  enabled = true,
+) => {
+  return useQuery({
+    queryKey: reviewQueryKeys.projectList(projectId, {
+      page: q.page,
+      size: q.size,
+      sort: q.sort,
+    }).queryKey,
+    queryFn: () => listByProject(projectId, q),
+    staleTime: 5 * 60 * 1000 - 1,
+    gcTime: 5 * 60 * 1000 - 1,
+    retry: 0,
+    enabled,
+  });
+};
 
 export const useCreateReview = (postId: number) => {
   const qc = useQueryClient();
@@ -72,27 +71,7 @@ export const useCreateReview = (postId: number) => {
     mutationKey: reviewQueryKeys.create(postId).queryKey,
     mutationFn: (body: ReviewReqBody) => createByPostId(postId, body),
     onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: ["review"] });
+      await qc.invalidateQueries({ queryKey: ["review", "projectList"] });
     },
-  });
-};
-
-export const useProjectReviews = (
-  projectId: number,
-  opts?: { page?: number; size?: number; sort?: string | string[] },
-  enabled = true,
-) => {
-  const page = opts?.page ?? 0;
-  const size = opts?.size ?? 10;
-  const sort = opts?.sort ?? "id,ASC";
-
-  return useQuery({
-    queryKey: reviewQueryKeys.projectListArgs(projectId, page, size, sort)
-      .queryKey,
-    queryFn: () => listByProject({ projectId, page, size, sort }),
-    staleTime: 5 * 60 * 1000 - 1,
-    gcTime: 5 * 60 * 1000 - 1,
-    retry: 0,
-    enabled,
   });
 };

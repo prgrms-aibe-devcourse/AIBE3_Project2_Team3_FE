@@ -164,7 +164,8 @@ export default function ApplicationRow({
         )}
         {tab == "my" && item.status === "COMPLETED" && (
           <ReviewDialog
-            app={item}
+            postId={item.postId}
+            postTitle={item.postTitle}
             onSubmitted={onReviewSubmitted}
             trigger={
               <Button size="sm" variant="outline">
