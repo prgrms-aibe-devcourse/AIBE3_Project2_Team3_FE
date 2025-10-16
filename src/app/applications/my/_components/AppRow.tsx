@@ -172,7 +172,7 @@ export default function ApplicationRow({
         )}
         {tab === "received" && item.status === "COMPLETED" && (
           <ReviewListDialog
-            projectId={item.postId}
+            postId={item.postId}
             trigger={
               <Button size="sm" variant="secondary">
                 리뷰 확인

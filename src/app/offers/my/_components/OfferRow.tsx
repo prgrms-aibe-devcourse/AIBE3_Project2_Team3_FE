@@ -1,3 +1,7 @@
+"use client";
+
+import ReviewCreateDialog from "@/app/applications/my/_components/ReviewDialog";
+import ReviewListDialog from "@/app/applications/my/_components/ReviewListDialog";
 import { useModifyOfferStatus } from "@/global/api/useOfferQuery";
 import { DealStatus, StatusBadge } from "@/global/components/deals/StatusBadge";
 import { Button } from "@/global/components/ui/button";
@@ -11,11 +15,13 @@ export default function OfferRow({
   index,
   tab,
   onChat,
+  onReviewSubmitted,
 }: {
   item: OfferWithUserDto;
   index: number;
   tab: string;
   onChat?: () => void;
+  onReviewSubmitted?: () => void;
 }) {
   const { mutate: modifyStatusMutate } = useModifyOfferStatus(item.id);
   const handleModifyStatus = (status: DealStatus) => {
@@ -85,9 +91,21 @@ export default function OfferRow({
           </Button>
         )}
         {tab == "my" && item.status === "COMPLETED" && (
-          <Button size="sm" variant="outline" onClick={() => null}>
-            리뷰작성
-          </Button>
+          <ReviewCreateDialog
+            postId={item.postId}
+            postTitle={item.postTitle}
+            onSubmitted={onReviewSubmitted}
+          />
+        )}
+        {tab === "received" && item.status === "COMPLETED" && (
+          <ReviewListDialog
+            postId={item.postId}
+            trigger={
+              <Button size="sm" variant="secondary">
+                리뷰 확인
+              </Button>
+            }
+          />
         )}
       </div>
     </div>

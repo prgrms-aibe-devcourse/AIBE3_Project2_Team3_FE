@@ -11,15 +11,15 @@ import {
   RsDataReviewDto,
 } from "../types/review.types";
 
-const listByProject = async (projectId: number, q: PageQuery) => {
+const listByPost = async (postId: number, q: PageQuery) => {
   const flat = {
     page: q.page ?? 0,
     size: q.size ?? 10,
     sort: Array.isArray(q.sort) ? q.sort : q.sort ? [q.sort] : [],
   };
-  const rs = await client.GET("/api/v1/reviews/project/{projectId}", {
+  const rs = await client.GET("/api/v1/reviews/post/{postId}", {
     params: {
-      path: { projectId },
+      path: { postId },
       query: flat as unknown as ProjectReviewsParam,
     },
   });
@@ -51,10 +51,10 @@ const getMyReview = async (postId: number) =>
   ).data;
 
 export const reviewQueryKeys = createQueryKeys("review", {
-  projectList: (projectId: number, q: PageQuery) => [
+  projectList: (postId: number, q: PageQuery) => [
     "review",
-    "projectList",
-    projectId,
+    "postList",
+    postId,
     q.page ?? 0,
     q.size ?? 10,
     (q.sort ?? []).join("|"),
@@ -64,18 +64,18 @@ export const reviewQueryKeys = createQueryKeys("review", {
   update: (reviewId: number) => ["review", "update", reviewId],
 });
 
-export const useProjectReviews = (
-  projectId: number,
+export const usePostReviews = (
+  postId: number,
   q: PageQuery,
   enabled = true,
 ) => {
   return useQuery({
-    queryKey: reviewQueryKeys.projectList(projectId, {
+    queryKey: reviewQueryKeys.projectList(postId, {
       page: q.page,
       size: q.size,
       sort: q.sort,
     }).queryKey,
-    queryFn: () => listByProject(projectId, q),
+    queryFn: () => listByPost(postId, q),
     staleTime: 5 * 60 * 1000 - 1,
     gcTime: 5 * 60 * 1000 - 1,
     retry: 0,

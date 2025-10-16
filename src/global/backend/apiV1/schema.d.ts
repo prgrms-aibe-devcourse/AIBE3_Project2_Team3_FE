@@ -685,14 +685,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/reviews/project/{projectId}": {
+    "/api/v1/reviews/post/{postId}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getProjectReviews"];
+        get: operations["getPostReviews"];
         put?: never;
         post?: never;
         delete?: never;
@@ -709,22 +709,6 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getMyReview"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/reviews/freelancer/{freelancerId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getFreelancerReviews"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3999,14 +3983,14 @@ export interface operations {
             };
         };
     };
-    getProjectReviews: {
+    getPostReviews: {
         parameters: {
             query: {
                 pageable: components["schemas"]["Pageable"];
             };
             header?: never;
             path: {
-                projectId: number;
+                postId: number;
             };
             cookie?: never;
         };
@@ -4050,39 +4034,6 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RsDataReviewDto"];
-                };
-            };
-            /** @description Bad Request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataVoid"];
-                };
-            };
-        };
-    };
-    getFreelancerReviews: {
-        parameters: {
-            query: {
-                pageable: components["schemas"]["Pageable"];
-            };
-            header?: never;
-            path: {
-                freelancerId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataPagePayloadReviewDto"];
                 };
             };
             /** @description Bad Request */
