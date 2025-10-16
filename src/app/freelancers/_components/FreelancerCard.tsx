@@ -26,7 +26,7 @@ interface FreelancerCardProps {
 export function FreelancerCard({ freelancer }: FreelancerCardProps) {
   const [isFavorited, setIsFavorited] = useState(freelancer.liked);
   const [likeCount, setLikeCount] = useState(freelancer.likeCount);
-  const { mutate } = useToggleLikeFreelancer(freelancer.id);
+  const { mutate } = useToggleLikeFreelancer();
   const router = useRouter();
 
   const clickCard = () => {

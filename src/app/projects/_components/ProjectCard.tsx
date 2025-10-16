@@ -26,7 +26,7 @@ interface ProjectCardProps {
 export function ProjectCard({ project }: ProjectCardProps) {
   const [isFavorited, setIsFavorited] = useState(project.liked);
   const [likeCount, setLikeCount] = useState(project.likeCount);
-  const { mutate } = useToggleLikeProject(project.id);
+  const { mutate } = useToggleLikeProject();
   const router = useRouter();
 
   const clickCard = () => {

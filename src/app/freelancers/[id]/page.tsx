@@ -53,8 +53,8 @@ export default function FreelancerDetailPage({
 }) {
   const { id } = use(params);
   const { data: freelancer } = useDetailFreelancer(id);
-  const { mutate: likeMutate } = useToggleLikeFreelancer(id);
-  const { mutate: viewMutate } = useViewFreelancer(id);
+  const { mutate: likeMutate } = useToggleLikeFreelancer();
+  const { mutate: viewMutate } = useViewFreelancer();
   const [isFavorited, setIsFavorited] = useState(false);
   const [viewCount, setViewCount] = useState(0);
   const [likeCount, setLikeCount] = useState(0);

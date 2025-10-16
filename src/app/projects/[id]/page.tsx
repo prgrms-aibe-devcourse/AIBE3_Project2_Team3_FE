@@ -45,8 +45,8 @@ export default function ProjectDetailPage({
 }) {
   const { id } = use(params);
   const { data: project, isLoading } = useDetailProject(id);
-  const { mutate: likeMutate } = useToggleLikeProject(id);
-  const { mutate: viewMutate } = useViewProject(id);
+  const { mutate: likeMutate } = useToggleLikeProject();
+  const { mutate: viewMutate } = useViewProject();
   const [isFavorited, setIsFavorited] = useState(false);
   const [viewCount, setViewCount] = useState(0);
   const [likeCount, setLikeCount] = useState(0);
