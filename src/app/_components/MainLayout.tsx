@@ -1,5 +1,6 @@
 "use client";
 
+import { useFetchMe } from "@/global/api/useAuthQuery";
 import { Badge } from "@/global/components/ui/badge";
 import { Button } from "@/global/components/ui/button";
 import {
@@ -20,18 +21,16 @@ import { useMemo } from "react";
 import Link from "next/link";
 
 import {
-  CheckCircle,
-  MessageSquare,
-  Search as SearchIcon,
-  UserPlus,
-} from "lucide-react";
-import {
   ArrowRight,
   ArrowUpRight,
+  CheckCircle,
   CheckCircle2,
   Clock,
   Heart,
+  MessageSquare,
+  Search as SearchIcon,
   Star,
+  UserPlus,
 } from "lucide-react";
 // 추가 아이콘
 import { LifeBuoy, Shield } from "lucide-react";
@@ -61,6 +60,8 @@ const mockProjects = Array.from({ length: 9 }).map((_, i) => ({
 }));
 
 export default function MainLayout() {
+  const { data } = useFetchMe();
+
   const topTalents = useMemo(
     () => [...mockTalents].sort((a, b) => b.likes - a.likes).slice(0, 6),
     [],
@@ -253,14 +254,16 @@ export default function MainLayout() {
             </div>
           </div>
 
-          <div className="mt-8 flex justify-center">
-            <Button asChild className="px-6">
-              <Link href="/auth/login">
-                지금 시작하기
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
+          {!data && (
+            <div className="mt-8 flex justify-center">
+              <Button asChild className="px-6">
+                <Link href="/auth/login">
+                  지금 시작하기
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 

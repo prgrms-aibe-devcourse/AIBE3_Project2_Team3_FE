@@ -68,7 +68,7 @@ export function SignupForm() {
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">회원가입</CardTitle>
         <CardDescription>
-          TalentLink에 가입하여 새로운 기회를 만나보세요
+          JOB+PICK에 가입하여 새로운 기회를 만나보세요
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -177,14 +177,7 @@ export function SignupForm() {
           <div className="flex items-center space-x-2">
             <Checkbox id="terms" required />
             <Label htmlFor="terms" className="text-sm">
-              <Link href="/terms" className="text-primary hover:underline">
-                이용약관
-              </Link>{" "}
-              및{" "}
-              <Link href="/privacy" className="text-primary hover:underline">
-                개인정보처리방침
-              </Link>
-              에 동의합니다
+              <div>회원 가입 및 이용에 동의합니다.</div>
             </Label>
           </div>
 
@@ -202,15 +195,6 @@ export function SignupForm() {
               또는
             </span>
           </div>
-        </div>
-
-        <div className="space-y-3">
-          <Button variant="outline" className="w-full bg-transparent">
-            Google로 계속하기
-          </Button>
-          <Button variant="outline" className="w-full bg-transparent">
-            GitHub으로 계속하기
-          </Button>
         </div>
 
         <div className="text-center text-sm">
