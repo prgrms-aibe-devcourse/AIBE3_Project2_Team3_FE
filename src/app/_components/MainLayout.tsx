@@ -135,10 +135,12 @@ export default function MainLayout() {
                         </div>
                         <div className="flex items-center gap-3 text-sm">
                           <span className="inline-flex items-center gap-1 text-muted-foreground">
-                            <Star className="h-4 w-4" /> {t.rating.toFixed(1)}
+                            <Star className="h-4 w-4 text-black fill-yellow-500" />{" "}
+                            {t.rating.toFixed(1)}
                           </span>
                           <span className="inline-flex items-center gap-1">
-                            <Heart className="h-4 w-4" /> {t.likes}
+                            <Heart className="h-4 w-4 text-black fill-red-500" />{" "}
+                            {t.likes}
                           </span>
                         </div>
                       </div>
@@ -184,7 +186,8 @@ export default function MainLayout() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="inline-flex items-center gap-1 text-sm">
-                          <Heart className="h-4 w-4" /> {p.likes}
+                          <Heart className="h-4 w-4 text-black fill-red-500" />{" "}
+                          {p.likes}
                         </span>
                         <Button asChild size="sm">
                           <Link href={`/projects/${p.id}`}>상세보기</Link>

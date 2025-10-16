@@ -55,16 +55,16 @@ export function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden md:flex items-center divide-x divide-border">
           <Link
             href="/projects"
-            className="text-sm font-medium hover:text-primary transition-colors"
+            className="inline-block text-sm font-medium px-4 py-4 hover:bg-muted hover:font-semibold transition-colors"
           >
             프로젝트 찾기
           </Link>
           <Link
             href="/freelancers"
-            className="text-sm font-medium hover:text-primary transition-colors"
+            className="inline-block text-sm font-medium px-4 py-4 hover:bg-muted hover:font-semibold transition-colors"
           >
             프리랜서 찾기
           </Link>
@@ -72,7 +72,7 @@ export function Header() {
             <>
               <Link
                 href="/dashboard"
-                className="text-sm font-medium hover:text-primary transition-colors"
+                className="inline-block text-sm font-medium px-4 py-4 hover:bg-muted hover:font-semibold transition-colors"
               >
                 대시보드
               </Link>
@@ -82,7 +82,7 @@ export function Header() {
             <>
               <Link
                 href="/admin"
-                className="text-sm font-medium hover:text-primary transition-colors"
+                className="inline-block text-sm font-medium px-4 py-4 rounded-md hover:bg-muted hover:font-semibold transition-colors"
               >
                 관리자
               </Link>
