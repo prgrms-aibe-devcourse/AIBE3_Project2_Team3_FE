@@ -128,7 +128,8 @@ export default function QuestionDetailPage() {
     setDeletingAnswerId(null);
   };
 
-  const question = data?.data;
+  // 타입 안전성을 위한 데이터 추출
+  const question = (data as any)?.data || data;
 
   if (isLoading || isUserLoading) {
     return (

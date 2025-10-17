@@ -227,10 +227,37 @@ export const useListMyQuestions = (param?: Pageable) => {
   });
 };
 
-const detail = async (id: number) =>
-  unwrap(
-    await client.GET("/api/v1/questions/{id}", { params: { path: { id } } }),
-  );
+const detail = async (id: number) => {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+  const url = `${baseUrl}/api/v1/questions/${id}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const result = await response.json();
+
+  if (result.resultCode === "S-1") {
+    return result.data;
+  } else if (result.data) {
+    return result;
+  } else if (result.resultCode) {
+    throw new Error(
+      result.message || `API call failed with code: ${result.resultCode}`,
+    );
+  } else {
+    return result;
+  }
+};
 
 export const useDetailQuestion = (id: number) => {
   return useQuery({
