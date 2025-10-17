@@ -18,6 +18,10 @@ import { Separator } from "@/global/components/ui/separator";
 import { toast } from "@/global/hooks/useToast";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { useRouter } from "next/navigation";
+
+// src/app/chat/invites/_components/InviteInbox.tsx
+
 // src/app/chat/invites/_components/InviteInbox.tsx
 
 // src/app/chat/invites/_components/InviteInbox.tsx
@@ -38,6 +42,8 @@ type InviteItem = {
 };
 
 export function InviteInbox() {
+  const router = useRouter();
+
   const qc = useQueryClient();
   const { data: me, isLoading: meLoading, isError: meError } = useFetchMe();
   const userId = me?.data?.id;
@@ -109,6 +115,9 @@ export function InviteInbox() {
                           queryKey: ["chat", "invites", userId],
                         });
                         qc.invalidateQueries({ queryKey: ["room", "list"] });
+
+                        // 채팅방으로 이동
+                        router.push(`/chat/${inv.roomId}`);
                       },
                       onError: (e) =>
                         toast({
