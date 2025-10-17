@@ -180,7 +180,7 @@ export function FreelancerForm({
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="리뷰 제목을 입력하세요"
+              placeholder="게시글 제목을 입력하세요"
               required
             />
           </div>
@@ -192,7 +192,7 @@ export function FreelancerForm({
               id="content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="프로젝트 경험에 대해 자세히 작성해주세요..."
+              placeholder="내용에 대해 자세히 작성해주세요..."
               rows={5}
               className="min-h-[15rem] max-h-[15rem] overflow-y-auto resize-y"
               required
