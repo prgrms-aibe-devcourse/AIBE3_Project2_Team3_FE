@@ -67,6 +67,12 @@ export function Header() {
           >
             프리랜서 찾기
           </Link>
+          <Link
+            href="/questions"
+            className="text-sm font-medium hover:text-primary transition-colors"
+          >
+            문의 하기
+          </Link>
           {!!data && (
             <>
               <Link
@@ -257,6 +263,13 @@ export function Header() {
               onClick={() => setIsMenuOpen(false)}
             >
               프리랜서 찾기
+            </Link>
+            <Link
+              href="/questions"
+              className="block text-sm font-medium hover:text-primary transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              문의 하기
             </Link>
             {!!data && (
               <>

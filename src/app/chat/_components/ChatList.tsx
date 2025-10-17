@@ -32,6 +32,7 @@ import {
 import { Input } from "@/global/components/ui/input";
 import { ScrollArea } from "@/global/components/ui/scroll-area";
 import { Separator } from "@/global/components/ui/separator";
+import { toast } from "@/global/hooks/useToast";
 import { formatChatTimestamp } from "@/global/lib/utils";
 import { useChatRoomListStore } from "@/global/stores/useChatRoomListStore";
 import type { ChatMemberDto, UserInviteDto } from "@/global/types/chat.types";
@@ -186,6 +187,14 @@ function InviteUsersDialog({
     try {
       setError(null);
       await invite(selected.map((u) => u.id)); // ← useInviteUsers 사용
+
+      // 성공 토스트 메시지
+      const userNames = selected.map((u) => u.nickname).join(", ");
+      toast({
+        title: "초대 완료",
+        description: `${userNames}님을 초대하였습니다.`,
+      });
+
       // 초기화
       setSelected([]);
       setQ("");
@@ -224,19 +233,19 @@ function InviteUsersDialog({
         {/* 검색 영역 */}
         <div className="space-y-2">
           <div className="relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={onKeyDown}
               placeholder="닉네임으로 검색"
-              className="pl-10"
+              className="pl-10 pr-20 h-12"
             />
             <Button
               type="button"
               variant="secondary"
               size="sm"
-              className="absolute right-1.5 top-1.5"
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-8"
               onClick={runSearch}
               disabled={isSearching || !q.trim()}
             >

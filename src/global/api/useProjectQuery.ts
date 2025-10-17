@@ -138,6 +138,8 @@ export const useCreateProject = () => {
     mutationFn: create,
     onSuccess: (res) => {
       qc.setQueryData(projectQueryKeys.detail(res.data.id).queryKey, res.data);
+      // 모든 프로젝트 리스트 쿼리 무효화 (메인 페이지 포함)
+      qc.invalidateQueries({ queryKey: ["project", "list"] });
     },
   });
 };

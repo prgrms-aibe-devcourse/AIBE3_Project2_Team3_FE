@@ -43,7 +43,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** 질문 상세 조회 */
+        get: operations["getQuestion"];
         /** 질문 수정 */
         put: operations["modifyQuestion"];
         post?: never;
@@ -1182,7 +1183,7 @@ export interface components {
         AnswerDto: {
             /** Format: int64 */
             id: number;
-            content: string;
+            comment: string;
             /** Format: date-time */
             createdDate: string;
             /** Format: date-time */
@@ -2079,6 +2080,37 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataVoid"];
+                };
+            };
+        };
+    };
+    getQuestion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["RsDataQuestionDto"];
                 };
             };
             /** @description Bad Request */
