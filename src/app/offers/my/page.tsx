@@ -1,5 +1,6 @@
 "use client";
 
+import { useCreateChatRoom } from "@/global/api/useChatQuery";
 import {
   useListMyOffer,
   useListReceivedOffer,
@@ -13,10 +14,13 @@ import {
   CardTitle,
 } from "@/global/components/ui/card";
 import { PaginationBar } from "@/global/components/ui/paginationBar";
+import { toast } from "@/global/hooks/useToast";
 import { useMyOfferListStore } from "@/global/stores/useMyOfferListStore";
 import { useReceivedOfferListStore } from "@/global/stores/useReceivedOfferListStore";
 import { OfferWithUserDto } from "@/global/types/offer.types";
 import { useState } from "react";
+
+import { useRouter } from "next/navigation";
 
 import OfferRow from "./_components/OfferRow";
 
@@ -24,6 +28,9 @@ export default function MyOffersPage() {
   const [tab, setTab] = useState<"my" | "received">("my");
   const myQ = useListMyOffer(tab === "my");
   const rcQ = useListReceivedOffer(tab === "received");
+  const { mutate: createChatRoom } = useCreateChatRoom();
+
+  const router = useRouter();
 
   const data = tab === "my" ? myQ.data : rcQ.data;
   const isLoading = tab === "my" ? myQ.isLoading : rcQ.isLoading;
@@ -31,6 +38,36 @@ export default function MyOffersPage() {
   // 페이지네이션: 탭별 store 사용
   const { page: myPage, setPage: setMyPage } = useMyOfferListStore();
   const { page: rcPage, setPage: setRcPage } = useReceivedOfferListStore();
+
+  const handleChat = async (id: number, title: string) => {
+    createChatRoom(
+      {
+        roomName: `${title} #${id}` || `제안관리 채팅방 #${id}`,
+        inviteeIds: [],
+        offerId: id,
+        applicationId: undefined,
+      },
+      {
+        onSuccess: (res) => {
+          const roomId = res.data.id;
+          toast({
+            title: "채팅 연결 성공",
+            description: "채팅방으로 이동합니다.",
+            open: true,
+          });
+          // 채팅방으로 이동
+          router.push(`/chat/${roomId}`);
+        },
+        onError: () => {
+          toast({
+            title: "채팅 연결 실패",
+            description: "서버와 통신 중 오류가 발생했습니다.",
+            open: true,
+          });
+        },
+      },
+    );
+  };
 
   if (!data)
     return (
@@ -81,6 +118,7 @@ export default function MyOffersPage() {
                       i -
                       data.page.page * data.page.size
                     }
+                    onChat={() => handleChat(it.id, it.postTitle)}
                   />
                 ))}
               </div>
