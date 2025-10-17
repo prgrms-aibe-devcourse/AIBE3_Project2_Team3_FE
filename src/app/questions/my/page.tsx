@@ -2,20 +2,20 @@
 
 import { useListMyQuestions } from "@/global/api/useQuestionQuery";
 import { Card } from "@/global/components/ui/card";
+import { QuestionDto } from "@/global/types/question.types";
 import { useMemo } from "react";
 
 import QuestionRow from "./_components/QuestionRow";
 
 export default function MyQuestionsPage() {
-  const { data, status, refetch, isFetching } = useListMyQuestions();
+  const { data, status, isFetching } = useListMyQuestions();
 
-  const items = useMemo(() => data?.content ?? [], [data]);
+  const items = useMemo((): QuestionDto[] => data?.content ?? [], [data]);
 
   return (
     <main className="w-full py-8 px-4">
       <h1 className="text-2xl font-bold mb-4">내 문의사항</h1>
 
-      {/* 리스트 (세로 1열) */}
       <div className="flex flex-col gap-4">
         {status === "pending" &&
           Array.from({ length: 5 }).map((_, i) => (

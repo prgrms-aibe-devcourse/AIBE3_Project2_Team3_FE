@@ -6,25 +6,54 @@ import client from "../backend/client";
 import { unwrap } from "../backend/unwrap";
 import { Pageable } from "../types/common.types";
 import {
+  QuestionListParam,
   QuestionModifyReqBody,
   QuestionWriteReqBody,
 } from "../types/question.types";
 
-const list = async (param: Pageable) =>
-  unwrap(
-    await client.GET("/api/v1/questions", {
-      params: {
-        query: {
-          pageable: {
-            page: param.page,
-            size: param.size,
-            sort: param.sort,
-          },
-          searchKeyword: "",
-        },
-      },
-    }),
-  );
+const list = async (param: QuestionListParam) => {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+  const searchParams = new URLSearchParams();
+
+  searchParams.append("pageable.page", param.page.toString());
+  searchParams.append("pageable.size", param.size.toString());
+
+  const sortArray = param.sort.length > 0 ? param.sort : ["createdDate,desc"];
+  sortArray.forEach((sortItem) => {
+    searchParams.append("pageable.sort", sortItem);
+  });
+
+  searchParams.append("searchKeyword", param.searchKeyword || "");
+
+  const url = `${baseUrl}/api/v1/questions?${searchParams.toString()}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const result = await response.json();
+
+  if (result.resultCode === "S-1") {
+    return result.data;
+  } else if (result.content && result.page) {
+    return result;
+  } else if (result.resultCode) {
+    throw new Error(
+      result.message || `API call failed with code: ${result.resultCode}`,
+    );
+  } else {
+    return result;
+  }
+};
 
 const create = async (body: QuestionWriteReqBody) =>
   unwrap(await client.POST("/api/v1/questions", { body }));
@@ -44,24 +73,51 @@ const remove = async (id: number) =>
     }),
   );
 
-const myList = async (param: Pageable) =>
-  unwrap(
-    await client.GET("/api/v1/questions/my", {
-      params: {
-        query: {
-          pageable: {
-            page: param.page,
-            size: param.size,
-            sort: param.sort,
-          },
-        },
-      },
-    }),
-  );
+const myList = async (param: Pageable) => {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+  const searchParams = new URLSearchParams();
+
+  searchParams.append("pageable.page", param.page.toString());
+  searchParams.append("pageable.size", param.size.toString());
+
+  const sortArray = param.sort.length > 0 ? param.sort : ["createdDate,desc"];
+  sortArray.forEach((sortItem) => {
+    searchParams.append("pageable.sort", sortItem);
+  });
+
+  const url = `${baseUrl}/api/v1/questions/my?${searchParams.toString()}`;
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const result = await response.json();
+
+  if (result.resultCode === "S-1") {
+    return result.data;
+  } else if (result.content && result.page) {
+    return result;
+  } else if (result.resultCode) {
+    throw new Error(
+      result.message || `API call failed with code: ${result.resultCode}`,
+    );
+  } else {
+    return result;
+  }
+};
 
 export const questionQueryKeys = createQueryKeys("question", {
   lists: () => ["list"],
-  list: (param: Pageable) => ["list", param],
+  list: (param: QuestionListParam) => ["list", param],
   details: () => ["detail"],
   detail: (id) => ["detail", id],
   create: () => ["create"],
@@ -70,12 +126,13 @@ export const questionQueryKeys = createQueryKeys("question", {
   myList: () => ["myList"],
 });
 
-export const useListQuestion = (param?: Pageable) => {
+export const useListQuestion = (param?: Partial<QuestionListParam>) => {
   const defaultParam = useMemo(
-    () => ({
+    (): QuestionListParam => ({
       page: 0,
       size: 5,
       sort: ["createdDate,desc"],
+      searchKeyword: "",
       ...param,
     }),
     [param],
@@ -170,17 +227,10 @@ export const useListMyQuestions = (param?: Pageable) => {
   });
 };
 
-const detail = async (id: number) => {
-  const response = await fetch(`http://localhost:8080/api/v1/questions/${id}`, {
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    throw new Error(`질문을 불러오는데 실패했습니다: ${response.status}`);
-  }
-
-  return await response.json();
-};
+const detail = async (id: number) =>
+  unwrap(
+    await client.GET("/api/v1/questions/{id}", { params: { path: { id } } }),
+  );
 
 export const useDetailQuestion = (id: number) => {
   return useQuery({
