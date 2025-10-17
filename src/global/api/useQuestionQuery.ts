@@ -18,7 +18,7 @@ const list = async (param: Pageable) =>
           pageable: {
             page: param.page,
             size: param.size,
-            sort: [param.sort[0] || "createdDate,desc"],
+            sort: param.sort,
           },
           searchKeyword: "",
         },
@@ -52,7 +52,7 @@ const myList = async (param: Pageable) =>
           pageable: {
             page: param.page,
             size: param.size,
-            sort: [param.sort[0] || "createdDate,desc"],
+            sort: param.sort,
           },
         },
       },
