@@ -43,8 +43,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** 질문 상세 조회 */
-        get: operations["getQuestion"];
+        get?: never;
         /** 질문 수정 */
         put: operations["modifyQuestion"];
         post?: never;
@@ -1183,7 +1182,7 @@ export interface components {
         AnswerDto: {
             /** Format: int64 */
             id: number;
-            comment: string;
+            content: string;
             /** Format: date-time */
             createdDate: string;
             /** Format: date-time */
@@ -1386,14 +1385,14 @@ export interface components {
             content: string;
             /** Format: int64 */
             salary: number;
-            /** Format: int32 */
+            /** Format: int64 */
             period: number;
         };
         ApplicationModifyResBody: {
             content: string;
             /** Format: int64 */
             salary: number;
-            /** Format: int32 */
+            /** Format: int64 */
             period: number;
         };
         RsDataApplicationModifyResBody: {
@@ -1547,6 +1546,10 @@ export interface components {
         ChatCreateReqBody: {
             roomName: string;
             inviteeIds: number[];
+            /** Format: int64 */
+            offerId?: number;
+            /** Format: int64 */
+            applicationId?: number;
         };
         ChatMessageDto: {
             /** Format: int64 */
@@ -1607,7 +1610,7 @@ export interface components {
             content: string;
             /** Format: int64 */
             salary: number;
-            /** Format: int32 */
+            /** Format: int64 */
             period: number;
         };
         ApplicationWriteResBody: {
@@ -1622,7 +1625,7 @@ export interface components {
             content: string;
             /** Format: int64 */
             salary: number;
-            /** Format: int32 */
+            /** Format: int64 */
             period: number;
             /** Format: date-time */
             createdDate: string;
@@ -1772,7 +1775,7 @@ export interface components {
             status: string;
             /** Format: int64 */
             salary: number;
-            /** Format: int32 */
+            /** Format: int64 */
             period: number;
             /** Format: date-time */
             createdDate: string;
@@ -1877,7 +1880,7 @@ export interface components {
             content: string;
             /** Format: int64 */
             salary: number;
-            /** Format: int32 */
+            /** Format: int64 */
             period: number;
             /** Format: date-time */
             createdDate: string;
@@ -1898,7 +1901,7 @@ export interface components {
             status: string;
             /** Format: int64 */
             salary: number;
-            /** Format: int32 */
+            /** Format: int64 */
             period: number;
             /** Format: date-time */
             createdDate: string;
@@ -2080,37 +2083,6 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["RsDataVoid"];
-                };
-            };
-            /** @description Bad Request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataVoid"];
-                };
-            };
-        };
-    };
-    getQuestion: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["RsDataQuestionDto"];
                 };
             };
             /** @description Bad Request */

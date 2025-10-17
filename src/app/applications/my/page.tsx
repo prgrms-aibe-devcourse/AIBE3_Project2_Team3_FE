@@ -4,6 +4,7 @@ import {
   useListMyApp,
   useListReceivedApp,
 } from "@/global/api/useApplicationQuery";
+import { useCreateChatRoom } from "@/global/api/useChatQuery";
 import LoadingScreen from "@/global/components/loading/loading";
 import { Button } from "@/global/components/ui/button";
 import {
@@ -13,10 +14,13 @@ import {
   CardTitle,
 } from "@/global/components/ui/card";
 import { PaginationBar } from "@/global/components/ui/paginationBar";
+import { toast } from "@/global/hooks/useToast";
 import { useMyAppListStore } from "@/global/stores/useMyAppListStore";
 import { useReceivedAppListStore } from "@/global/stores/useReceivedAppListStore";
 import { ApplicationWithUserDto } from "@/global/types/application.types";
 import { useState } from "react";
+
+import { useRouter } from "next/navigation";
 
 import ApplicationRow from "./_components/AppRow";
 
@@ -24,6 +28,9 @@ export default function ApplicationsPage() {
   const [tab, setTab] = useState<"my" | "received">("my");
   const myQ = useListMyApp(tab === "my");
   const rcQ = useListReceivedApp(tab === "received");
+  const { mutate: createChatRoom } = useCreateChatRoom();
+
+  const router = useRouter();
 
   const data = tab === "my" ? myQ.data : rcQ.data;
   const isLoading = tab === "my" ? myQ.isLoading : rcQ.isLoading;
@@ -38,6 +45,36 @@ export default function ApplicationsPage() {
         tips={["잠시만 기다려 주세요"]}
       />
     );
+
+  const handleChat = async (id: number, title: string) => {
+    createChatRoom(
+      {
+        roomName: title || `지원관리 채팅방 #${id}`,
+        inviteeIds: [],
+        offerId: undefined,
+        applicationId: id,
+      },
+      {
+        onSuccess: (res) => {
+          const roomId = res.data.id;
+          toast({
+            title: "채팅 연결 성공",
+            description: "채팅방으로 이동합니다.",
+            open: true,
+          });
+          // 채팅방으로 이동
+          router.push(`/chat/${roomId}`);
+        },
+        onError: () => {
+          toast({
+            title: "채팅 연결 실패",
+            description: "서버와 통신 중 오류가 발생했습니다.",
+            open: true,
+          });
+        },
+      },
+    );
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 py-8 px-4">
@@ -82,6 +119,7 @@ export default function ApplicationsPage() {
                       i -
                       data.page.page * data.page.size
                     }
+                    onChat={() => handleChat(it.id, it.postTitle)}
                   />
                 ))}
               </div>
