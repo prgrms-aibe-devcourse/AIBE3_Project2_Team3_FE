@@ -140,7 +140,7 @@ export default function ProjectDetailPage({
                     </div>
                     <div className="flex items-center">
                       <Users className="h-4 w-4 mr-2" />
-                      {0}명 지원
+                      {project.applicationCount}명 지원
                     </div>
                     <div className="flex items-center">
                       <Eye className="h-4 w-4 mr-2" />

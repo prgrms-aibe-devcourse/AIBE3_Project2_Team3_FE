@@ -166,7 +166,7 @@ export default function FreelancerDetailPage({
                     </div>
                     <div className="flex items-center">
                       <Users className="h-4 w-4 mr-2" />
-                      {0}개 제안
+                      {freelancer.offerCount}개 제안
                     </div>
                     <div className="flex items-center">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />

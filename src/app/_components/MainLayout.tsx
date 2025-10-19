@@ -1,5 +1,14 @@
 "use client";
 
+import { useFetchMe } from "@/global/api/useAuthQuery";
+import {
+  useListFreelancer,
+  useToggleLikeFreelancer,
+} from "@/global/api/useFreelancerQuery";
+import {
+  useListProject,
+  useToggleLikeProject,
+} from "@/global/api/useProjectQuery";
 import { Badge } from "@/global/components/ui/badge";
 import { Button } from "@/global/components/ui/button";
 import {
@@ -15,23 +24,23 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/global/components/ui/tabs";
-import { useMemo } from "react";
+import { toast } from "@/global/hooks/useToast";
+import { MouseEvent, useMemo, useState } from "react";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-import {
-  CheckCircle,
-  MessageSquare,
-  Search as SearchIcon,
-  UserPlus,
-} from "lucide-react";
 import {
   ArrowRight,
   ArrowUpRight,
+  CheckCircle,
   CheckCircle2,
   Clock,
   Heart,
+  MessageSquare,
+  Search as SearchIcon,
   Star,
+  UserPlus,
 } from "lucide-react";
 // 추가 아이콘
 import { LifeBuoy, Shield } from "lucide-react";
@@ -40,35 +49,28 @@ import { ArrowCol } from "./ArrowCol";
 import { QuickLink } from "./QuickLink";
 import { StepCard } from "./StepCard";
 
-// 임시: 인기 프리랜서/프로젝트 데이터 (좋아요 수 기준 정렬)
-const mockTalents = Array.from({ length: 10 }).map((_, i) => ({
-  id: i + 1,
-  name: `프리랜서 ${i + 1}`,
-  title: i % 2 ? "Full‑stack Developer" : "Product Designer",
-  tags: i % 2 ? ["Next.js", "Spring", "AWS"] : ["Figma", "UX", "Brand"],
-  rate: i % 2 ? "₩80,000/hr" : "₩60,000/hr",
-  rating: 4.5 + (i % 5) * 0.1,
-  likes: 10 + ((i * 7) % 97),
-}));
-
-const mockProjects = Array.from({ length: 9 }).map((_, i) => ({
-  id: i + 1,
-  title: i % 2 ? "사내 대시보드 리뉴얼" : "모바일 온보딩 제작",
-  budget: i % 2 ? "₩300~500만원" : "₩150~250만원",
-  due: `D-${(i % 9) + 1}`,
-  skills: i % 2 ? ["React", "NestJS"] : ["Lottie", "Figma"],
-  likes: 5 + ((i * 11) % 83),
-}));
-
 export default function MainLayout() {
-  const topTalents = useMemo(
-    () => [...mockTalents].sort((a, b) => b.likes - a.likes).slice(0, 6),
-    [],
-  );
-  const topProjects = useMemo(
-    () => [...mockProjects].sort((a, b) => b.likes - a.likes).slice(0, 6),
-    [],
-  );
+  const { data } = useFetchMe();
+  const [activeTab, setActiveTab] = useState<"talents" | "projects">("talents");
+  const router = useRouter();
+
+  // API 호출 - 조건부로 호출
+  const freelancersQuery = useListFreelancer();
+  const projectsQuery = useListProject();
+
+  // 좋아요 기능
+  const { mutate: toggleFreelancerLike } = useToggleLikeFreelancer();
+  const { mutate: toggleProjectLike } = useToggleLikeProject();
+
+  const topTalents = useMemo(() => {
+    if (!freelancersQuery.data?.content) return [];
+    return freelancersQuery.data.content.slice(0, 6);
+  }, [freelancersQuery.data]);
+
+  const topProjects = useMemo(() => {
+    if (!projectsQuery.data?.content) return [];
+    return projectsQuery.data.content.slice(0, 6);
+  }, [projectsQuery.data]);
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -112,7 +114,13 @@ export default function MainLayout() {
       {/* 인기 탭: 프리랜서 / 프로젝트 */}
       <section className="border-b">
         <div className="mx-auto max-w-6xl px-4 py-10">
-          <Tabs defaultValue="talents" className="w-full">
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) =>
+              setActiveTab(value as "talents" | "projects")
+            }
+            className="w-full"
+          >
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-xl font-semibold">인기</h2>
               <TabsList>
@@ -122,78 +130,187 @@ export default function MainLayout() {
             </div>
 
             <TabsContent value="talents" className="mt-0">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                {topTalents.map((t) => (
-                  <Card key={t.id} className="hover:shadow-sm">
-                    <CardContent className="space-y-3 p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="min-w-0">
-                          <div className="truncate font-medium">{t.name}</div>
-                          <div className="truncate text-sm text-muted-foreground">
-                            {t.title}
+              {freelancersQuery.isLoading ? (
+                <div className="text-center py-8">로딩 중...</div>
+              ) : topTalents.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  등록된 프리랜서가 없습니다.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                  {topTalents.map((t) => {
+                    const handleCardClick = () => {
+                      router.push(`/freelancers/${t.id}`);
+                    };
+
+                    const handleLikeClick = (
+                      e: MouseEvent<HTMLButtonElement>,
+                    ) => {
+                      e.stopPropagation();
+                      toggleFreelancerLike(t.id, {
+                        onSuccess: () => {
+                          // 성공 시 데이터를 다시 가져오기
+                          freelancersQuery.refetch();
+                        },
+                        onError: (error) => {
+                          toast({
+                            title: "실패",
+                            description:
+                              error.message || "좋아요 처리에 실패했습니다.",
+                          });
+                        },
+                      });
+                    };
+
+                    return (
+                      <Card
+                        key={t.id}
+                        className="hover:shadow-lg transition-shadow duration-200 hover:cursor-pointer"
+                        onClick={handleCardClick}
+                      >
+                        <CardContent className="space-y-3 p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate font-medium">
+                                {t.author.nickname}
+                              </div>
+                              <div className="truncate text-sm text-muted-foreground">
+                                {t.title}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3 text-sm">
+                              <span className="inline-flex items-center gap-1 text-muted-foreground">
+                                <Star className="h-4 w-4" /> 0.0
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="p-1 h-auto"
+                                onClick={handleLikeClick}
+                              >
+                                <Heart
+                                  className={`h-4 w-4 ${
+                                    t.liked ? "fill-red-500 text-red-500" : ""
+                                  }`}
+                                />
+                                <span className="ml-1">{t.likeCount}</span>
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-3 text-sm">
-                          <span className="inline-flex items-center gap-1 text-muted-foreground">
-                            <Star className="h-4 w-4" /> {t.rating.toFixed(1)}
-                          </span>
-                          <span className="inline-flex items-center gap-1">
-                            <Heart className="h-4 w-4" /> {t.likes}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {t.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex items-center justify-between text-sm">
-                        <div>{t.rate}</div>
-                        <Button asChild size="sm" variant="outline">
-                          <Link href={`/freelancers/${t.id}`}>프로필</Link>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                          <div className="flex flex-wrap gap-1">
+                            {t.skills?.slice(0, 3).map((skill) => (
+                              <Badge key={skill.id} variant="secondary">
+                                {skill.name}
+                              </Badge>
+                            ))}
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <div>₩{t.salary?.toLocaleString() || "0"}</div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/freelancers/${t.id}`);
+                              }}
+                            >
+                              프로필
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="projects" className="mt-0">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                {topProjects.map((p) => (
-                  <Card key={p.id} className="hover:shadow-sm">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="line-clamp-1 text-base">
-                        {p.title}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>{p.budget}</span>
-                        <span>{p.due}</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {p.skills.map((s) => (
-                          <Badge key={s} variant="secondary">
-                            {s}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="inline-flex items-center gap-1 text-sm">
-                          <Heart className="h-4 w-4" /> {p.likes}
-                        </span>
-                        <Button asChild size="sm">
-                          <Link href={`/projects/${p.id}`}>상세보기</Link>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              {projectsQuery.isLoading ? (
+                <div className="text-center py-8">로딩 중...</div>
+              ) : topProjects.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  등록된 프로젝트가 없습니다.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                  {topProjects.map((p) => {
+                    const handleCardClick = () => {
+                      router.push(`/projects/${p.id}`);
+                    };
+
+                    const handleLikeClick = (
+                      e: MouseEvent<HTMLButtonElement>,
+                    ) => {
+                      e.stopPropagation();
+                      toggleProjectLike(p.id, {
+                        onSuccess: () => {
+                          // 성공 시 데이터를 다시 가져오기
+                          projectsQuery.refetch();
+                        },
+                        onError: (error) => {
+                          toast({
+                            title: "실패",
+                            description:
+                              error.message || "좋아요 처리에 실패했습니다.",
+                          });
+                        },
+                      });
+                    };
+
+                    return (
+                      <Card
+                        key={p.id}
+                        className="hover:shadow-lg transition-shadow duration-200 hover:cursor-pointer"
+                        onClick={handleCardClick}
+                      >
+                        <CardHeader className="pb-2">
+                          <CardTitle className="line-clamp-1 text-base">
+                            {p.title}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div className="flex items-center justify-between text-sm text-muted-foreground">
+                            <span>₩{p.salary?.toLocaleString()}</span>
+                            <span>{p.author.nickname}</span>
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {p.skills?.slice(0, 3).map((skill) => (
+                              <Badge key={skill.id} variant="secondary">
+                                {skill.name}
+                              </Badge>
+                            ))}
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="p-1 h-auto"
+                              onClick={handleLikeClick}
+                            >
+                              <Heart
+                                className={`h-4 w-4 ${
+                                  p.liked ? "fill-red-500 text-red-500" : ""
+                                }`}
+                              />
+                              <span className="ml-1">{p.likeCount}</span>
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/projects/${p.id}`);
+                              }}
+                            >
+                              상세보기
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
@@ -253,14 +370,16 @@ export default function MainLayout() {
             </div>
           </div>
 
-          <div className="mt-8 flex justify-center">
-            <Button asChild className="px-6">
-              <Link href="/auth/login">
-                지금 시작하기
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
+          {!data && (
+            <div className="mt-8 flex justify-center">
+              <Button asChild className="px-6">
+                <Link href="/auth/login">
+                  지금 시작하기
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 

@@ -145,6 +145,8 @@ export const useCreateFreelancer = () => {
         freelancerQueryKeys.detail(res.data.id).queryKey,
         res.data,
       );
+      // 모든 프리랜서 리스트 쿼리 무효화 (메인 페이지 포함)
+      qc.invalidateQueries({ queryKey: ["freelancer", "list"] });
     },
   });
 };

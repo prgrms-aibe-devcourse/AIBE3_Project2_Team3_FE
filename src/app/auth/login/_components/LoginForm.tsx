@@ -51,7 +51,7 @@ export function LoginForm() {
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">로그인</CardTitle>
         <CardDescription>
-          계정에 로그인하여 TalentLink를 시작하세요
+          계정에 로그인하여 JOB+PICK을 시작하세요
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -123,16 +123,6 @@ export function LoginForm() {
             </span>
           </div>
         </div>
-
-        <div className="space-y-3">
-          <Button variant="outline" className="w-full bg-transparent">
-            Google로 계속하기
-          </Button>
-          <Button variant="outline" className="w-full bg-transparent">
-            GitHub으로 계속하기
-          </Button>
-        </div>
-
         <div className="text-center text-sm">
           계정이 없으신가요?{" "}
           <Link href="/auth/signup" className="text-primary hover:underline">
